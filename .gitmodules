@@ -1,0 +1,6 @@
+[submodule "experiments/baseline/ansible/roles/ceph"]
+	path = experiments/baseline/ansible/roles/ceph
+	url = https://github.com/michaelsevilla/ceph-ansible.git
+[submodule "experiments/baseline/ansible/roles/srl"]
+	path = experiments/baseline/ansible/roles/srl
+	url = https://github.com/systemslab/srl-roles.git

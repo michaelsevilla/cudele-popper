@@ -1,0 +1,39 @@
+---
+################
+# SRC          #
+################
+ceph_repository: https://github.com/michaelsevilla/ceph.git
+ceph_docker_version: f91680128ef51a85d28019c9afd29109bd178b1c
+ceph_docker_username: michaelsevilla
+ceph_docker_imagename: cephdaemon
+ceph_wait_status: "HEALTH_WARN"
+#ceph_wait_status: "HEALTH_OK"
+
+################
+# MON          #
+################
+monitor_interface: em1
+ceph_mon_docker_interface: em1
+ceph_mon_docker_subnet: 192.168.140.0/24
+
+################
+# OSD          #
+################
+ceph_pgs: [8]
+
+# uncomment to use a real disk
+#ceph_osd_docker_extra_env: "CEPH_DAEMON=OSD_CEPH_DISK_ACTIVATE"
+#ceph_osd_docker_prepare_env: "CEPH_DAEMON=OSD_CEPH_DISK_PREPARE,OSD_FORCE_ZAP=1"
+#ceph_osd_docker_devices:
+# - /dev/sde
+
+# uncomment to use a directory
+ceph_osd_docker_extra_env: "DUMMY=DUMMY"
+osd_directory: true
+
+####################
+# experiment stuff #
+####################
+repetitions: 1
+ceph_radosbench_cmd: "rados -p rbd bench --show-time 5 write"
+mount_point: "/cephfs-baseliner"
