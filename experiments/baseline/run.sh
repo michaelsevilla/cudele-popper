@@ -26,6 +26,12 @@ VARS="-e @/popper/vars.yml \
       -i /etc/ansible/hosts"
 DOCKER="docker run -it --rm $NETW $DIRS $ANSB $CODE $WORK michaelsevilla/ansible $ARGS $VARS"
 
+# debug mode
+if [ ! -z $1 ]; then
+  docker run -it --rm $NETW $DIRS $ANSB $CODE $WORK --entrypoint=ansible michaelsevilla/ansible $VARS $@
+  exit
+fi
+
 $DOCKER ceph.yml monitor.yml
 $DOCKER /workloads/radosbench.yml \
         /workloads/netbench.yml \
