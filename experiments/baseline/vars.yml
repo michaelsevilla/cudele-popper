@@ -5,11 +5,18 @@
 ################
 # SRC          #
 ################
-ceph_repository:       <CHANGE ME> # where to find the ceph code 
-ceph_docker_version:   <CHANGE ME> # version of the image (e.g., latest)
-ceph_docker_username:  <CHANGE ME> # name of the user (e.g., ceph)
-ceph_docker_imagename: <CHANGE ME> # name of the image (e.g., daemon)
-ceph_wait_status:      <CHANGE ME> # string that indicates cluster is good
+ceph_repository: https://github.com/michaelsevilla/ceph.git
+ceph_docker_version: tag-stable-3.0-jewel-ubuntu-14.04
+#ceph_docker_version: latest
+ceph_docker_username: ceph
+ceph_docker_imagename: daemon
+ceph_wait_status: "HEALTH_OK"
+cloudlab: true
+#ceph_repository:       <CHANGE ME> # where to find the ceph code 
+#ceph_docker_version:   <CHANGE ME> # version of the image (e.g., latest)
+#ceph_docker_username:  <CHANGE ME> # name of the user (e.g., ceph)
+#ceph_docker_imagename: <CHANGE ME> # name of the image (e.g., daemon)
+#ceph_wait_status:      <CHANGE ME> # string that indicates cluster is good
 ## uncomment for msevilla's cluster
 #ceph_repository: https://github.com/michaelsevilla/ceph.git
 #ceph_docker_version: f91680128ef51a85d28019c9afd29109bd178b1c
@@ -22,9 +29,12 @@ ceph_wait_status:      <CHANGE ME> # string that indicates cluster is good
 ################
 # MON          #
 ################
-monitor_interface:         <CHANGE ME> # for these, see ceph-ansible repo
-ceph_mon_docker_interface: <CHANGE ME>
-ceph_mon_docker_subnet:    <CHANGE ME>
+monitor_interface: eth1
+ceph_mon_docker_interface: eth1
+ceph_mon_docker_subnet: 10.10.1.1
+#monitor_interface:         <CHANGE ME> # for these, see ceph-ansible repo
+#ceph_mon_docker_interface: <CHANGE ME>
+#ceph_mon_docker_subnet:    <CHANGE ME>
 ## uncomment for msevilla's cluster
 #monitor_interface: eth1
 #ceph_mon_docker_interface: eth1
@@ -33,18 +43,20 @@ ceph_mon_docker_subnet:    <CHANGE ME>
 ################
 # OSD          #
 ################
-ceph_pgs: <CHANGE ME> # how many placement groups to add
+ceph_pgs: [64]
+journal_collocation: true
+#ceph_pgs: <CHANGE ME> # how many placement groups to add
 ## uncomment for msevilla's cluster
 #ceph_pgs: [128]
 ## uncomment for singlenode
 #ceph_pgs: [8]
 
-<CHANGE ME> # select one of the below scenarios
-## uncomment to use a real disk
-#ceph_osd_docker_extra_env: "CEPH_DAEMON=OSD_CEPH_DISK_ACTIVATE"
-#ceph_osd_docker_prepare_env: "CEPH_DAEMON=OSD_CEPH_DISK_PREPARE,OSD_FORCE_ZAP=1"
-#ceph_osd_docker_devices:
-# - /dev/sde
+#<CHANGE ME> # select one of the below scenarios
+# uncomment to use a real disk
+ceph_osd_docker_extra_env: "CEPH_DAEMON=OSD_CEPH_DISK_ACTIVATE"
+ceph_osd_docker_prepare_env: "CEPH_DAEMON=OSD_CEPH_DISK_PREPARE,OSD_FORCE_ZAP=1"
+ceph_osd_docker_devices:
+ - /dev/sdb
 
 ## uncomment to use a directory
 #ceph_osd_docker_extra_env: "DUMMY=DUMMY"
@@ -53,18 +65,21 @@ ceph_pgs: <CHANGE ME> # how many placement groups to add
 ##############
 # MDS        #
 ##############
-mount_point: <CHANGE ME> # where CephFS should mount
+#mount_point: <CHANGE ME> # where CephFS should mount
 ## uncomment for multinode and singlenode
-#Emount_point: "/cephfs-baseliner"
+#mount_point: "/cephfs-baseliner"
+mount_point: "/cephfs"
 
 ####################
 # experiment stuff #
 ####################
-repetitions:         <CHANGE ME> # how many times the experiment should run
-ceph_radosbench_cmd: <CHANGE ME> # how to benchmark the RADOS cluster
+#repetitions:         <CHANGE ME> # how many times the experiment should run
+#ceph_radosbench_cmd: <CHANGE ME> # how to benchmark the RADOS cluster
 ## uncomment for singlnode
 #ceph_radosbench_cmd: "rados -p rbd bench --show-time 5 write"
 #repetitions: 1
 ## uncomment for multinode
 #ceph_radosbench_cmd: "rados -p rbd bench --show-time 120 write"
 #repetitions: 3
+repetitions: 3
+ceph_radosbench_cmd: "rados -p cephfs_metadata bench --show-time 120 write"

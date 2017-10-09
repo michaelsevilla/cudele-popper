@@ -1,14 +1,16 @@
 [osds]
-<ADD HOSTNAME> ansible_ssh_user=<ADD USERNAME>
+node-1 ansible_ssh_user=msevilla
+node-2 ansible_ssh_user=msevilla
+node-3 ansible_ssh_user=msevilla
 
 [mons]
-<ADD HOSTNAME> ansible_ssh_user=<ADD USERNAME>
+node-0 ansible_ssh_user=msevilla
 
 [mdss]
-<ADD HOSTNAME> ansible_ssh_user=<ADD USERNAME>
+node-4 ansible_ssh_user=msevilla
 
 [clients]
-<ADD HOSTNAME> ansible_ssh_user=<ADD USERNAME>
+node-6 ansible_ssh_user=msevilla
 
 [graphite]
-<ADD HOSTNAME> ansible_ssh_user=<ADD USERNAME>
+node-7 ansible_ssh_user=msevilla

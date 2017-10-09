@@ -18,10 +18,10 @@
   tasks:
   - pause: minutes=1
 
-- hosts: clients
-  become: True
-  roles:
-  - ceph-client
+#- hosts: clients
+#  become: True
+#  roles:
+#  - ceph-client
 
 - name: grow the pgs
   hosts: mons[0]
@@ -34,6 +34,7 @@
 - hosts: mons
   serial: 1
   tasks:
+  - command:  docker exec {{ ansible_hostname }} ceph osd pool rm rbd rbd --yes-i-really-really-mean-it
   - command:  docker exec {{ ansible_hostname }} ceph -s
     register: result
     until:    result.stdout.find("{{ ceph_wait_status }}") != -1

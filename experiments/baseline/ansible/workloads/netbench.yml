@@ -11,6 +11,7 @@
   - name: run the network benchmark
     shell: >
       docker run -d \
+        --net host \
         --name=iperf-server \
         -p 5001:5001 \
         moutten/iperf:2.0 \
@@ -22,6 +23,7 @@
   - name: run the network benchmark
     shell: >
       docker run --rm \
+        --net host \
         --name=iperf-client \
         -p 5002:5002 \
         moutten/iperf:2.0 \

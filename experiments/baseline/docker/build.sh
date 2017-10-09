@@ -3,10 +3,10 @@
 set -ex
 
 # horrible hack
-HASH=`cat vars.yml | grep "ceph_docker_version: " | awk '{print $2}'`
-GITR=`cat vars.yml | grep "ceph_repository: " | awk '{print $2}'`
-USERNAME=`cat vars.yml | grep "ceph_docker_username: " | awk '{print $2}'`
-IMAGENAME=`cat vars.yml | grep "ceph_docker_imagename: " | awk '{print $2}'`
+HASH=`cat vars.yml | grep "ceph_docker_version: " | grep -v "#" | awk '{print $2}'`
+GITR=`cat vars.yml | grep "ceph_repository: " | grep -v "#" | awk '{print $2}'`
+USERNAME=`cat vars.yml | grep "ceph_docker_username: " | grep -v "#" | awk '{print $2}'`
+IMAGENAME=`cat vars.yml | grep "ceph_docker_imagename: " | grep -v "#" | awk '{print $2}'`
 if [ -z $HASH ]; then exit 1; fi
 if [ -z $GITR ]; then exit 1; fi
 if [ -z $USERNAME ]; then exit 1; fi
@@ -36,10 +36,15 @@ dmake \
 cd -
 
 docker tag ceph-$HASH ceph/daemon:$HASH
-docker run -it -d -v $SRC:/ceph --name tmp --entrypoint=/bin/bash ceph/daemon:$HASH
-docker exec tmp /bin/bash -c "cp /ceph/build/lib/*rados*.so* /usr/lib"
-docker commit --change='ENTRYPOINT ["/entrypoint.sh"]' tmp $TAG
-docker rm -f tmp 
+
+docker run \
+  --name copier \
+  --entrypoint=/bin/bash \
+  -v $SRC:/ceph \
+  ceph/daemon:jewel -c "cp -r /ceph/build/install/usr/* /usr"
+docker commit --change='ENTRYPOINT ["/entrypoint.sh"]' copier $USERNAME/$IMAGENAME:$HASH &> /dev/null
+docker stop copier
+docker rm copier
 
 set +x
-echo "Great SUCCESS!!!!"
+echo "Great SUCCESS!!!! Image name is: $USERNAME/$IMAGENAME:$HASH"
