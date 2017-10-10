@@ -35,4 +35,4 @@ sudo ifconfig eth2:0 $ip up
 echo $HOSTNAME | sed "s/\./ /g" | awk '{print $1}' | xargs sudo hostname
 
 # pull the code
-git clone --recursive https://github.com/michaelsevilla/progFS-popper.git
+git clone --recursive https://github.com/michaelsevilla/progFS-popper.git /tmp/progFS-popper
