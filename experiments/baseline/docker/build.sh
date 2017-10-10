@@ -19,27 +19,23 @@ SRC="/tmp/ceph-daemon"
 mkdir $SRC || true
 cd $SRC
 
-## pull base image from ceph (we will layer on top of this)
-#wget https://raw.githubusercontent.com/systemslab/docker-cephdev/master/aliases.sh
-#. aliases.sh && rm aliases.sh
-#docker pull ceph/daemon:tag-build-master-jewel-ubuntu-14.04
-#docker tag ceph/daemon:tag-build-master-jewel-ubuntu-14.04 ceph/daemon:jewel
-#docker pull cephbuilder/ceph:latest
-#
-#dmake \
-#  -e SHA1_OR_REF="$HASH" \
-#  -e GIT_URL="$GITR" \
-#  -e BUILD_THREADS=`grep processor /proc/cpuinfo | wc -l` \
-#  -e CONFIGURE_FLAGS="-DWITH_TESTS=OFF" \
-#  -e RECONFIGURE="true" \
-#  cephbuilder/ceph:latest build-cmake
-#cd -
-#
+# pull base image from ceph (we will layer on top of this)
+wget https://raw.githubusercontent.com/systemslab/docker-cephdev/master/aliases.sh
+. aliases.sh && rm aliases.sh
+docker pull ceph/daemon:tag-build-master-jewel-ubuntu-14.04
+docker tag ceph/daemon:tag-build-master-jewel-ubuntu-14.04 ceph/daemon:jewel
+docker pull cephbuilder/ceph:latest
+
+dmake \
+  -e SHA1_OR_REF="$HASH" \
+  -e GIT_URL="$GITR" \
+  -e BUILD_THREADS=`grep processor /proc/cpuinfo | wc -l` \
+  -e CONFIGURE_FLAGS="-DWITH_TESTS=OFF" \
+  -e RECONFIGURE="true" \
+  cephbuilder/ceph:latest build-cmake
+cd -
+
 docker tag ceph-$HASH ceph/daemon:$HASH
-#docker run -it -d -v $SRC:/ceph --name tmp --entrypoint=/bin/bash ceph/daemon:$HASH
-#docker exec tmp /bin/bash -c "cp /ceph/build/lib/*rados*.so* /usr/lib"
-#docker commit --change='ENTRYPOINT ["/entrypoint.sh"]' tmp $TAG
-#docker rm -f tmp 
 
 docker run \
   --name copier \
