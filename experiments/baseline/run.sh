@@ -2,16 +2,17 @@
 # This file should contain the series of steps that are required to execute 
 # the experiment. Any non-zero exit code will be interpreted as a failure
 # by the 'popper check' command.
-set -e
+set -ex
 
 rm -fr results || true
 mkdir results
 
 # if you know Ansible and Docker, the below should make sense
 # - we attach ceph-ansible to root because they expect us to be in that dir
+ROOT=`dirname $PWD | xargs dirname`
 NETW="--net host -v $HOME/.ssh:/root/.ssh"
 DIRS="-v `pwd`:/popper \
-      -v `pwd`/ansible/roles/ceph:/root \
+      -v $ROOT/ansible/ceph:/root \
       -w /root "
 ANSB="-v `pwd`/ansible/group_vars/:/root/group_vars \
       -v `pwd`/hosts:/etc/ansible/hosts \
@@ -33,8 +34,8 @@ if [ ! -z $1 ]; then
 fi
 
 $DOCKER ceph.yml monitor.yml
-$DOCKER /workloads/radosbench.yml \
-        /workloads/netbench.yml \
-        /workloads/osdbench.yml
+#$DOCKER /workloads/radosbench.yml \
+#        /workloads/netbench.yml \
+#        /workloads/osdbench.yml
 
 exit 0
