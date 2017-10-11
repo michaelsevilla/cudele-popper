@@ -6,9 +6,9 @@
 # SRC          #
 ################
 ceph_repository: https://github.com/michaelsevilla/ceph.git
-ceph_docker_version: 8adf01b
-ceph_docker_username: michaelsevilla
-ceph_docker_imagename: ceph
+ceph_docker_version: tag-stable-3.0-jewel-ubuntu-14.04
+ceph_docker_username: ceph
+ceph_docker_imagename: daemon
 ceph_wait_status: "HEALTH_OK"
 #ceph_repository:       <CHANGE ME> # where to find the ceph code 
 #ceph_docker_version:   <CHANGE ME> # version of the image (e.g., latest)
@@ -27,8 +27,8 @@ ceph_wait_status: "HEALTH_OK"
 ################
 # MON          #
 ################
-monitor_interface: eth0
-ceph_mon_docker_interface: eth0
+monitor_interface: eth2
+ceph_mon_docker_interface: eth2
 ceph_mon_docker_subnet: 10.10.1.1
 #monitor_interface:         <CHANGE ME> # for these, see ceph-ansible repo
 #ceph_mon_docker_interface: <CHANGE ME>
@@ -41,7 +41,8 @@ ceph_mon_docker_subnet: 10.10.1.1
 ################
 # OSD          #
 ################
-ceph_pgs: 128
+ceph_pgs: [128]
+journal_collocation: true
 #ceph_pgs: <CHANGE ME> # how many placement groups to add
 ## uncomment for msevilla's cluster
 #ceph_pgs: [128]

@@ -11,6 +11,7 @@ sudo apt-get update -y
 sudo apt-get install -y \
     vim \
     screen \
+    gdisk \
     linux-image-extra-$(uname -r) \
     linux-image-extra-virtual \
     apt-transport-https \
