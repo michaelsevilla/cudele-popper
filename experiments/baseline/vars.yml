@@ -7,6 +7,7 @@
 ################
 ceph_repository: https://github.com/michaelsevilla/ceph.git
 ceph_docker_version: tag-stable-3.0-jewel-ubuntu-14.04
+#ceph_docker_version: latest
 ceph_docker_username: ceph
 ceph_docker_imagename: daemon
 ceph_wait_status: "HEALTH_OK"
@@ -42,7 +43,7 @@ ceph_mon_docker_subnet: 10.10.1.1
 ################
 # OSD          #
 ################
-ceph_pgs: [128]
+ceph_pgs: [64]
 journal_collocation: true
 #ceph_pgs: <CHANGE ME> # how many placement groups to add
 ## uncomment for msevilla's cluster
@@ -80,5 +81,5 @@ mount_point: "/cephfs"
 ## uncomment for multinode
 #ceph_radosbench_cmd: "rados -p rbd bench --show-time 120 write"
 #repetitions: 3
-repetitions: 1
-ceph_radosbench_cmd: "rados -p rbd bench --show-time 5 write"
+repetitions: 3
+ceph_radosbench_cmd: "rados -p cephfs_metadata bench --show-time 120 write"

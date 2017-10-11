@@ -13,6 +13,7 @@ ROOT=`dirname $PWD | xargs dirname`
 NETW="--net host -v $HOME/.ssh:/root/.ssh"
 DIRS="-v `pwd`:/popper \
       -v $ROOT/ansible/ceph:/root \
+      -v $ROOT/ansible/srl:/popper/ansible/roles/srl \
       -w /root "
 ANSB="-v `pwd`/ansible/group_vars/:/root/group_vars \
       -v `pwd`/hosts:/etc/ansible/hosts \
@@ -33,9 +34,9 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-$DOCKER ceph.yml monitor.yml
-#$DOCKER /workloads/radosbench.yml \
-#        /workloads/netbench.yml \
-#        /workloads/osdbench.yml
+$DOCKER ceph.yml monitor.yml \
+        /workloads/radosbench.yml \
+        /workloads/netbench.yml \
+        /workloads/osdbench.yml
 
 exit 0
