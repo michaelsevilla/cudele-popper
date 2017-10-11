@@ -10,6 +10,7 @@ ceph_docker_version: tag-stable-3.0-jewel-ubuntu-14.04
 ceph_docker_username: ceph
 ceph_docker_imagename: daemon
 ceph_wait_status: "HEALTH_OK"
+cloudlab: true
 #ceph_repository:       <CHANGE ME> # where to find the ceph code 
 #ceph_docker_version:   <CHANGE ME> # version of the image (e.g., latest)
 #ceph_docker_username:  <CHANGE ME> # name of the user (e.g., ceph)
@@ -27,8 +28,8 @@ ceph_wait_status: "HEALTH_OK"
 ################
 # MON          #
 ################
-monitor_interface: eth2
-ceph_mon_docker_interface: eth2
+monitor_interface: eth1
+ceph_mon_docker_interface: eth1
 ceph_mon_docker_subnet: 10.10.1.1
 #monitor_interface:         <CHANGE ME> # for these, see ceph-ansible repo
 #ceph_mon_docker_interface: <CHANGE ME>
