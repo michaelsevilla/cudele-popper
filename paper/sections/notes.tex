@@ -1,0 +1,56 @@
+% I work with the file system layer that sits on top of Ceph
+% - internal subsystems and interfaces that Ceph uses to provide a strongly consistent POSIX file system
+%   - e.g., load balancing mechanisms, for hotspots/flash crowds on directories
+%     caches for inodes, capabilities for guarding a shared resource, and a large journal for fault tolerance
+% - our programmability initiative talks about composing these internal interfaces for higher level services
+
+% 
+% Previous work: 
+% - master's thesis: scale-out vs. scale-up architectures 
+% - work in industry: file systems for the cloud, big data processing over
+% object storage, and automating workflows
+%
+% I work under Carlos at UC Santa Cruz and we study how to migrate file system
+% metadata to alleviate overloaded servers. The idea is to take the namespace
+% on one metadata server, chop it up into smaller subtrees, and farm those
+% subtrees out to other metadata servers.  It's very similar to IndexFS/ShardFS
+% but we try to leverage namespace locality by allowing variable sized
+% subtrees. We published a paper at SC'15 where we talk about a load balancing
+% API we built on CephFS that let's administrators control how to chop up
+% subtrees and when/where to move them (also got merged into Ceph).
+%
+% Go to conclusion
+%
+% Why I want to work with Brad
+% - new perspectives on file system designs, especially NON-POSIXy 
+% - work in a national lab: I know about theirarchitectures and problems but
+% I've never used an HPC system - real world applications and benchmarks; most
+% of my work has been accepted for novelty but not for fully benchmarking a
+% system
+% - lines up with my thesis
+%
+% What I want to work on:
+% - continue working on my thesis; this next phase of having a global namespace
+% but different consistency semantics within that namespace for data management
+%   - namespace: recursive data structure as a logical model for understanding the user's goals
+%   - merge: what is the proper way to merge deltafs/batchfs updates back into the global namespace
+%   - data management: deltaFS made the case that apps shouldn't use the fs to synchronize;
+%     we contend that you could use the fs as data management; remembering how to access your data
+%
+% What I have been working on 
+% - leverage internal services/subsystems in Ceph; avoids code duplication and
+% let's us test this over the same system 
+% - benchmarking the overheads of strong consistency/journalling - we've figured
+% out how to thrash capabilities and turn off the journal
+% Questions
+% - do you still collaborate with CMU? Would you want all of us to work together?
+% - what projects do you want to work on?
+% - how closely would you want to work with Carlos?
+% - what system would you want to work on?
+
+% The main difference between CephFS and the CMU systems is that our approach
+% is a little more flexible.  We can partition the namespace in any way and can
+% co-locate items together if they are dependent on each other -- in theroy...
+% in practice it is very hard to figure out what the workload is trying to do.
+% Also, we can program the decision making based on different metrics, like
+% CPU, request rate, etc.
