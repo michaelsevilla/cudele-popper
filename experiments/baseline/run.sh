@@ -34,9 +34,9 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-$DOCKER ceph.yml monitor.yml \
-        /workloads/radosbench.yml \
-        /workloads/netbench.yml \
-        /workloads/osdbench.yml
+$DOCKER ceph.yml monitor.yml #\
+#        /workloads/radosbench.yml \
+#        /workloads/netbench.yml \
+#        /workloads/osdbench.yml
 
 exit 0
