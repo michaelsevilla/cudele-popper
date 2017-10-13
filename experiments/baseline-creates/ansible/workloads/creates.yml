@@ -1,0 +1,23 @@
+- hosts: clients
+  become: True
+  tasks:
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+
+  - include: mdtest.yml
+
+  - name: wait for the job to finish
+    shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
+    register: result
+    until: result.stdout.find("false") != -1
+    retries: 6000
+
+  - name: get the output for mdtest
+    shell: docker logs client
+    register: results
+  - local_action: >
+      copy content={{ item }} 
+      dest="/popper/results/mdtest-isolated-{{ nfiles }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"
