@@ -66,6 +66,7 @@
   - shell: docker rm {{ ansible_ssh_host }} radosbench
     ignore_errors: True
 
+
 - hosts: mdss
   tasks:
   - shell: docker stop ceph-{{ ansible_host }}-mds
