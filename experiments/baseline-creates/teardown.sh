@@ -2,8 +2,9 @@
 # Put all your cleanup tasks here.
 set -ex
 
+SITE=`cat vars.yml | grep "site: " | grep -v "#" | awk '{print $2}'`
 ARGS="--forks 50 --skip-tags package-install,with_pkg"
-VARS="-e @/popper/cloudlab_configs/vars.yml -e @/popper/ansible/vars.yml -i /etc/ansible/hosts"
+VARS="-e @/popper/vars.yml -e @/popper/ansible/vars.yml -i /etc/ansible/hosts"
 ROOT=`dirname $PWD | xargs dirname`
 docker run -it --rm \
   --net host \

@@ -15,6 +15,7 @@ ceph_conf_overrides:
      osd pool default size: 1
      osd pool default pg num: 512
      osd pool default pgp num: 512
+     mon data avail warn: 5
    mon:
      debug mon: 1
    osd:

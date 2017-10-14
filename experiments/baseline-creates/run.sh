@@ -8,6 +8,7 @@ rm -fr results || true
 
 # if you know Ansible and Docker, the below should make sense
 # - we attach ceph-ansible to root because they expect us to be in that dir
+SITE=`cat vars.yml | grep "site: " | grep -v "#" | awk '{print $2}'`
 ROOT=`dirname $PWD | xargs dirname`
 NETW="--net host -v $HOME/.ssh:/root/.ssh"
 DIRS="-v `pwd`:/popper \
@@ -22,7 +23,7 @@ CODE="-v `pwd`/ansible/ceph.yml:/root/ceph.yml \
       -v `pwd`/ansible/monitor.yml:/root/monitor.yml"
 WORK="-v `pwd`/ansible/workloads:/workloads"
 ARGS="--forks 50 --skip-tags package-install,with_pkg"
-VARS="-e @/popper/cloudlab_configs/vars.yml \
+VARS="-e @/popper/vars.yml \
       -e @/popper/ansible/vars.yml \
       -i /etc/ansible/hosts"
 DOCKER="docker run -it --rm $NETW $DIRS $ANSB $CODE $WORK michaelsevilla/ansible $ARGS $VARS"
@@ -33,13 +34,14 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-for clients in 5 4 3 2 1; do
+for clients in 1; do
   mkdir results
-  ./teardown_cloudlab.sh
-  cp cloudlab_configs/clients$clients hosts
+  ./teardown.sh
+  cp configs_$SITE/clients$clients hosts
   $DOCKER ceph.yml monitor.yml
+  exit
   $DOCKER -e nfiles=98000 /workloads/creates.yml
-  mv results results-cloudlab-clients$clients
+  mv results results-$SITE-clients$clients
 done
 
 exit 0
