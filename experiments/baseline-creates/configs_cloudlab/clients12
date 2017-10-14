@@ -22,24 +22,6 @@ node-13 ansible_ssh_user=msevilla
 node-14 ansible_ssh_user=msevilla
 node-15 ansible_ssh_user=msevilla
 node-16 ansible_ssh_user=msevilla
-node-17 ansible_ssh_user=msevilla
-node-18 ansible_ssh_user=msevilla
-node-19 ansible_ssh_user=msevilla
-node-20 ansible_ssh_user=msevilla
-node-21 ansible_ssh_user=msevilla
-node-22 ansible_ssh_user=msevilla
-node-23 ansible_ssh_user=msevilla
-node-24 ansible_ssh_user=msevilla
-node-25 ansible_ssh_user=msevilla
-node-26 ansible_ssh_user=msevilla
-node-27 ansible_ssh_user=msevilla
-node-28 ansible_ssh_user=msevilla
-node-29 ansible_ssh_user=msevilla
-node-30 ansible_ssh_user=msevilla
-node-31 ansible_ssh_user=msevilla
-node-32 ansible_ssh_user=msevilla
-node-33 ansible_ssh_user=msevilla
-node-1 ansible_ssh_user=msevilla
 
 [graphite]
 node-0 ansible_ssh_user=msevilla

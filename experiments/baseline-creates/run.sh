@@ -34,12 +34,11 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-for clients in 1; do
+for clients in 10 11 12 13 14 15 16 17 18 19 20; do
   mkdir results
   ./teardown.sh
   cp configs_$SITE/clients$clients hosts
   $DOCKER ceph.yml monitor.yml
-  exit
   $DOCKER -e nfiles=98000 /workloads/creates.yml
   mv results results-$SITE-clients$clients
 done
