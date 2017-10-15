@@ -1,0 +1,43 @@
+---
+# This file has the global overrides, that MUST be changed per cluster. More
+# variables are in ansible/group_vars. ;)
+
+################
+# SRC          #
+################
+ceph_repository: https://github.com/michaelsevilla/ceph.git
+ceph_docker_version: 8adf01b
+ceph_docker_username: michaelsevilla
+ceph_docker_imagename: ceph
+ceph_wait_status: "HEALTH_OK"
+site: piha
+kraken: false
+
+################
+# MON          #
+################
+monitor_interface: eth1
+ceph_mon_docker_interface: eth1
+ceph_mon_docker_subnet: 192.168.140.0/24
+
+################
+# OSD          #
+################
+ceph_pgs: [64, 128]
+ceph_osd_docker_extra_env: "CEPH_DAEMON=OSD_CEPH_DISK_ACTIVATE"
+ceph_osd_docker_prepare_env: "CEPH_DAEMON=OSD_CEPH_DISK_PREPARE,OSD_FORCE_ZAP=1"
+ceph_osd_docker_devices:
+ - /dev/sde
+osd_data_size: 100
+
+##############
+# MDS        #
+##############
+mount_point: "/cephfs-cudele-mechanisms"
+
+####################
+# experiment stuff #
+####################
+ceph_radosbench_cmd: "rados -p cephfs_metadata bench --show-time 120 write"
+repetitions: 1
+drop_delay: 30

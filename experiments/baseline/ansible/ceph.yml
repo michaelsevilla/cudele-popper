@@ -18,10 +18,10 @@
   tasks:
   - pause: minutes=1
 
-#- hosts: clients
-#  become: True
-#  roles:
-#  - ceph-client
+- hosts: clients
+  become: True
+  roles:
+  - ceph-client
 
 - name: grow the pgs
   hosts: mons[0]

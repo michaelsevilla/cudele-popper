@@ -1,0 +1,62 @@
+- hosts: clients[0]
+  become: True
+  tasks:
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - set_fact: output="/popper/results/summary.txt"
+
+  - name: decouple subtree and copy the journal of events to the client (setup)
+    copy: src="/popper/ansible/basejournal.bin" dest="/etc/ceph/basejournal.bin"
+
+  - name: materialize the snapshot in client memory
+    shell: docker exec cephfs cephfs-journal-tool journal import /etc/ceph/basejournal.bin
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="snapshot,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: add events to the in memory journal (the flag SHOULD be save)
+    shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist false --decoupled_dir mydir
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="create,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: add events to the in memory journal and save to a file
+    shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="save,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: persist (and make redundant) our journal of additional events
+    shell: docker exec cephfs rados -p cephfs_metadata put bogusjournal.bin /etc/ceph/events.bin
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="persist,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: add events to the in memory journal and apply them to the metadata store
+    shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --memapply true --decoupled_dir mydir
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="apply,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: apply the events again (required for correctness -- it is a bug)
+    shell: docker exec cephfs cephfs-journal-tool event apply summary --decoupled_dir mydir
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="apply1,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: get the size of the journal file (to estimate transfer time)
+    shell: ls -l /etc/ceph/events.bin | awk '{print $5}'
+    register: results
+  - local_action: lineinfile dest="{{ playbook_dir|dirname }}/results/{{ nfiles }}/fsize.txt" line="{{ nfiles }},{{ ansible_date_time.time }},{{ results.stdout }}" create="yes"
+
+  - name: move that file to the control server
+    fetch: src="/etc/ceph/events.bin" dest="/tmp/events.bin" flat=yes
+
+- hosts: mdss[0]
+  become: True
+  tasks:
+
+  - set_fact: output="{{ playbook_dir|dirname }}/results/{{ nfiles }}/summary.txt"
+
+  - name: move that file to the metadata server
+    copy: dest="/etc/ceph/events.bin" src="/tmp/events.bin"
+
+  - name: merge it
+    shell: docker exec ceph-{{ ansible_hostname }}-mds ceph daemon mds.{{ ansible_hostname }} merge /etc/ceph/events.bin
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="v.apply,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
