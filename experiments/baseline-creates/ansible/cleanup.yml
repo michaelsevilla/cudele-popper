@@ -73,7 +73,7 @@
   - shell: docker rm ceph-{{ ansible_host }}-mds
     ignore_errors: True
 
-- hosts: clients
+- hosts: clients, interfere
   tasks:
   - shell: docker stop cephfs
     ignore_errors: True

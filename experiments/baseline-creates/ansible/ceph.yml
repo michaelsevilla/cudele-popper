@@ -1,5 +1,5 @@
 ---
-# Defines deployment design and assigns role to server groups
+## Defines deployment design and assigns role to server groups
 - hosts: mons
   become: True
   roles:
@@ -18,7 +18,7 @@
   tasks:
   - pause: minutes=1
 
-- hosts: clients
+- hosts: clients, interfere
   become: True
   roles:
   - ceph-client
