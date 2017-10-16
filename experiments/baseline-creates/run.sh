@@ -35,14 +35,16 @@ if [ ! -z $1 ]; then
 fi
 
 ./teardown.sh; rm -rf results
-for clients in 15 20 25 30 35; do
-  mkdir results || true
-  cp configs_$SITE/clients$clients hosts
-  for job in "creates" "creates-touchstream"; do
-    ./teardown.sh
-    $DOCKER -e nfiles=98000 ceph.yml /workloads/${job}.yml
+for log in "nolog" "log"; do
+  cp configs_$SITE/all-$log ansible/group_vars/all 
+  for clients in 1 5 10 15 20 25 30; do
+    mkdir results || true
+    cp configs_$SITE/clients$clients hosts
+    for job in "creates" "creates-touchstream"; do
+      ./teardown.sh
+      $DOCKER -e nfiles=98000 ceph.yml /workloads/${job}.yml
+    done
+    mv results results-$SITE-clients$clients-$log
   done
-  mv results results-$SITE-clients$clients
 done
-
 exit 0

@@ -11,7 +11,7 @@
     shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
     register: result
     until: result.stdout.find("false") != -1
-    retries: 720
+    retries: 2160
 
   - name: get the output for mdtest
     shell: docker logs client
