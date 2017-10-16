@@ -24,10 +24,6 @@
     with_items: 
     - "{{ utilizations.stdout_lines }}"
 
-  - name: delete old results
-    shell: ls -d {{ playbook_dir|dirname }}/results/* | grep -v gitkeep | grep -v visualize
-    register: results
-    ignore_errors: True
   - file: path={{ item }} state=absent
     with_items: 
     - "{{ results.stdout_lines }}"
