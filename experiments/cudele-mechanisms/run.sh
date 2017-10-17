@@ -35,7 +35,7 @@ if [ ! -z $1 ]; then
 fi
 
 for run in 0 1 2; do
-  for nfiles in 10 100 1000 10000 100000 1000000; do
+  for nfiles in 10 100 1000 10000 100000 1000000 10000000; do
     mkdir results || true
     ./teardown.sh
     cp configs_$SITE/hosts hosts

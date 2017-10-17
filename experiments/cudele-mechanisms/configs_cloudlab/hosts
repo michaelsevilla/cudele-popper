@@ -1,16 +1,16 @@
 [osds]
-node-31 ansible_ssh_user=msevilla
-node-32 ansible_ssh_user=msevilla
-node-33 ansible_ssh_user=msevilla
+node-1 ansible_ssh_user=msevilla
+node-2 ansible_ssh_user=msevilla
+node-3 ansible_ssh_user=msevilla
 
 [mons]
-node-30 ansible_ssh_user=msevilla
+node-0 ansible_ssh_user=msevilla
 
 [mdss]
-node-34 ansible_ssh_user=msevilla
+node-4 ansible_ssh_user=msevilla
 
 [clients]
-node-35 ansible_ssh_user=msevilla
+node-5 ansible_ssh_user=msevilla
 
 [graphite]
-node-30 ansible_ssh_user=msevilla
+node-0 ansible_ssh_user=msevilla
