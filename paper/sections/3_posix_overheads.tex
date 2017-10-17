@@ -54,7 +54,7 @@ are stressing the servers more.
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=1.0\linewidth]{graphs/slowdown-interfere.png}
+      \includegraphics[width=1.0\linewidth]{graphs/slowdown-interfere-scale.png}
       \caption{Interference hurts variability}
       \label{fig:overhead-c}
   \end{subfigure}
@@ -160,14 +160,14 @@ read caching and the first client must send \texttt{lookup()}s to the metadata
 server (``interfere" curve on \(y2\) axis). These extra requests increase the
 throughput of the ``interfere" curve because the metadata server can handle the
 extra load but performance suffers.  This degradation is shown in
-Figure~\ref{fig:overhead-c}, where we scale the number of clients and show
-increased variability. The results are normalized to a single
-isolated client and the \(y\) axis is the standard deviation of the runtime of
-all clients.  For the ``interfere" bars, each client creates files in private
-directories and at 30 seconds we launch another process that creates files in
-those directories.  For less than 7 clients, the runtime and deviation is worse
-when clients interfere. At 7 clients, the metadata server is overloaded so the
-directory caching in the ``isolated" bars has no benefit.\\
+Figure~\ref{fig:overhead-c}, where we scale the number of clients and show the
+slowdown of the slowest client.  The results are normalized to a single
+isolated client without a metadata server journal.  For the ``interfere" bars,
+each client creates files in private directories and at 30 seconds we launch
+another process that creates files in those directories. 18 clients is the
+maximum number the metadata server could handle for this metadata-intensive
+workload; at higher client load, the metadata server started complaining about
+laggy and unresponsive requests.\\
 
 % TODO: what is the cost of trimming the cache?
 % TODO: does CephFS still cache inodes when I turn off caching? Why is still keeping inodes in memory? Gah!

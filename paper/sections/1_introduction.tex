@@ -1,28 +1,30 @@
 \section{Introduction}
 
 % What is the problem?
-File system metadata services in HPC have scalability problems. Administrative
-tasks, like checkpointing~\cite{bent_plfs_2009} or scanning the file
-system~\cite{zheng:pdsw2014-batchfs} lead to contention for the same
-directories and inodes ({\it e.g.}, path traversal). Applications perform
-better with dedicated metadata servers~\cite{sevilla:sc15-mantle,
-ren:sc2014-indexfs} but provisioning a metadata server for every client is
-unreasonable. This problem is exacerbated by current trends in HPC, where
-architectures are transitioning from complex storage stacks with burst buffer,
-file system, object store, and tape tiers to more simplified stacks with just a
-burst buffer and object store~\cite{bent:login16-hpc-trends}; this puts more
-pressure on data access because more requests end up hitting the same layer and
-latencies cannot be hidden while data migrates across tiers.
+File system metadata services in HPC have scalability problems because
+administrative tasks, like checkpointing~\cite{bent_plfs_2009} or scanning the
+file system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
+inodes. Applications perform better with dedicated metadata
+servers~\cite{sevilla:sc15-mantle, ren:sc2014-indexfs} but provisioning a
+metadata server for every client is unreasonable. This problem is exacerbated
+by current trends in HPC, where architectures are transitioning from complex
+storage stacks with burst buffer, file system, object store, and tape tiers to
+more simplified stacks with just a burst buffer and object
+store~\cite{bent:login16-hpc-trends}; this puts more pressure on data access
+because more requests end up hitting the same layer and latencies cannot be
+hidden while data migrates across tiers.
 
 \begin{figure}[tb]
 \centering
 \includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
-\caption{ Clients that need better performance can relax consistency on their
-subtree ({e.g.}, HDFS) or even decouple the subtree and move it locally
-({e.g.}, BatchFS, RAMDisk). Decoupled subtrees can further relax durability
-semantics to achieve even better performance. Meanwhile, clients that require
-stronger guarantees ({\it e.g.,} POSIX) can still reside in the same namespace.
+
+\caption{For performance, clients can relax consistency on their subtree
+({e.g.}, HDFS) or even decouple the subtree and move it locally ({e.g.},
+BatchFS, RAMDisk). Decoupled subtrees can further relax durability semantics
+for even better performance. Clients that require stronger guarantees ({\it
+e.g.,} POSIX) can still reside in the same namespace.
 }\label{fig:subtree-policies}
+
 \end{figure}
 
 % What is HPC doing?
@@ -110,15 +112,13 @@ decouple namespaces; specifically that the technique drastically improves
 performance (104\(\times\) speed up) but we go a step further by quantifying
 the costs of merging updates (7\(\times\) slow down) and maintaining durability
 (\(10\times\) slow down). We also show the effect of having a metadata specific
-file format in systems that are based on in-memory data structures. Because
-this paper focuses on file system metadata protocols, we only scale up to 20
-clients executing an extremely metdata intensive workload; this load is the
-maximum capacity of a single metadata server for the platform we chose to
-implement Cudele on.  Partitioning and replicating metadata across a cluster
-can be controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in
-this paper we show the capacity and performance of a metadata server with
-superior metadata protocols, which should be used to inform load balancing
-decisions.
+file format in systems that are based on in-memory data structures.  We scale
+up to 20 clients executing an extremely metadata intensive job because this
+workload exhausts the resources of a single metadata server for the codebase we
+built on.  Partitioning and replicating metadata across a cluster can be
+controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in this
+paper we show the capacity and performance of a metadata server with superior
+metadata protocols, which should be used to inform load balancing decisions.
 
 In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
 cost of POSIX consistency and system-defined durability and

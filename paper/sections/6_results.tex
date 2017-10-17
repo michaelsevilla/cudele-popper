@@ -125,21 +125,76 @@ payloads of this size on an HPC network are reasonable.\\
 \noindent\textbf{Takeaway}: the Cudele mechanisms have overheads and costs
 that can differ {\it by orders of magnitude}. Cudele gives users the ability
 to compose these mechanisms based on their application's correctness
-requirements and performance goals.
+requirements and performance goals.\\
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=1.0\linewidth]{graphs/merge-a.png}
+\caption{ [\href{https://...}{source}] Merging journals serially.}
+\label{fig:merge}
+\end{figure}
+
+%\begin{figure}[t]
+%  \centering
+%  \begin{subfigure}[b]{\linewidth}
+%      \centering
+%      \includegraphics[width=1.0\linewidth]{graphs/merge-a.png}
+%      \caption{Merging journals serially.} \label{fig:merge-a}
+%  \end{subfigure}\\
+%  ~
+%  \begin{subfigure}[b]{\linewidth}
+%      \centering
+%      \includegraphics[width=1.0\linewidth]{graphs/merge-b.png}
+%      \caption{Merging a journal w/ 100K create updates.}
+%      \label{fig:merge-b}
+%  \end{subfigure}
+%  \caption{Merging updates has linear scalability.\label{fig:merge}}
+%\end{figure}
+
+{\it Number of Serialized Merges:} Cudele serializes merge requests at the
+metadata server before applying the updates to the in-memory metadata store.
+Merging concurrently is an optimization for future work, but merges for the
+largest journal size we tested were quite fast.  Furthermore, since we place no
+restrictions on the validity of metadata inserted into the journal, we can
+avoid touching poorly scaling data structures. In other words, we can scale
+linearly if we weaken our consistency by never checking for the existence of
+files before creating files.
+
+Figure~\ref{fig:merge} demonstrates this scalability by showing the runtime
+(\(y\) axis) of merging journals of different sizes (\(x\) axis). The variance
+of the runtime is over 20 serial merges, each hitting a different directory in
+the namespace.  The runtime scales linearly and with low variance because the
+``Create" mechanism that was used to create the journal only appends
+\texttt{open()} requests to the journal. When the updates are merged by the
+metadata server into the in-memory metadata store they never scan growing data
+structures. Had we implemented the ``Create" mechanism to include
+\texttt{lookup()} commands before \texttt{open()} requests, we would have seen
+the poor scaling that we see with the ``RPCs" mechanism.\\
+%Figure~\ref{fig:merge-b} confirms that we do not touch a poorly scaling data
+%structure because the runtimes do not increase as we add more metadata. \\
+
+\noindent\textbf{Takeaway}: the weakest form of consistency for creating files
+({\it i.e.} not checking data structures for the validity of an update or
+existence of a file) shows linear scalability and stable performance.
+
+
 
 \subsection{Use Case 1: Creates in the Same Directory}
 \label{use-case-1}
 
-Clients creating files in private directories is heavily
-studied in HPC~\cite{plfs, cephfs04, indexfs, giga+, batchfs, deltafs,
-sevilla:eurosys, shardfs, mantle}, mostly due to checkpoint-restart~\cite{}.
-But the workload also appears in cloud workloads, where systems like Hadoop use
-the file abstraction to exchange work units to workers or to indicate when jobs
-complete~\cite{}. A more familiar example is uncompressing an archive ({\it
-e.g.}, \texttt{tar xzf}), where the file system services a flash crowd of
-creates across all directories as shown in Figure~\ref{fig:overhead-creates}.
-We use this as a microbenchmark because it allows us to control the size of the
-log, since each create creates a single journal event.
+% CITEME xiao:socc2015-shardfs CITEME HADOOP
+Clients creating files in private directories is heavily studied in
+HPC~\cite{weil:sc2004-dyn-metadata, ren:sc2014-indexfs, patil:fast2011-giga,
+zheng:pdsw2014-batchfs, sevilla:sc15-mantle}, mostly due to
+checkpoint-restart~\cite{bent_plfs_2009}.  But the workload also appears in
+cloud workloads, where systems like Hadoop use the file abstraction to exchange
+work units to workers or to indicate when jobs
+complete~\cite{shvachko:login2012-hdfs-scalability}. A more familiar example is
+uncompressing an archive ({\it e.g.}, \texttt{tar xzf}), where the file system
+services a flash crowd of creates across all directories as shown in
+Figure~\ref{fig:overhead-creates}.  We use this as a microbenchmark because it
+allows us to control the size of the log, since each create creates a single
+journal event.
 
 \begin{figure}[tb]
 \centering
@@ -166,7 +221,7 @@ We compare these semantics because the final metadata states are equivalent.
 Cudele makes no guarantees during execution of the mechanisms or when
 transitioning semantics -- the semantics are guaranteed {\it once the mechanism
 completes}. So if servers fail during a mechanism, metadata or data may be
-lost.\\
+lost.
 
 % DeltaFS vs. BatchFS vs. POSIX: decoupled is faster
 % (5-7x) vs. (90-104x) slower
@@ -176,7 +231,7 @@ lost.\\
 decoupled namespace strategy and shows up to a \(20\times\) speedup over the
 traditional namespaces that use RPCs. Compared to the baseline the slowdown is
 \(5-7\times\) for Strong Consistency, which emulates BatchFS and
-\(90-104\times\) for Weak Consistency, which emulates DeltaFS.\\
+\(90-104\times\) for Weak Consistency, which emulates DeltaFS.
 
 % POSIX (no stream) vs. POSIX: cost of durability < consistency
 {\it Durability \(<<\) Consistency:} The \(1.15\times\) overhead of
@@ -185,7 +240,7 @@ Strong Consistency compared to Strong Consistency, No Fault Tolerance for
 larger than the overhead of durability. This conclusion should be stronger as
 we scale the number of files because the cost of streaming the journal into the
 object store is constant. We omit the same analysis for Weak Consistency
-because the runtimes are so short that the normalized slowdowns are misleading.\\
+because the runtimes are so short that the normalized slowdowns are misleading.
 
 % Weak Consistency benefit not due to metadata format
 {\it Metadata Formats:} Because the metadata formats are the same for
@@ -195,54 +250,6 @@ from relaxing the consistency guarantees and not from the metadata formats.\\
 \noindent\textbf{Takeaway}: Cudele shows the true benefit of eventual
 consistency, where we see over a \(100\times\) slowdown for achieving strong
 consistency, in the worst case.
-
-\subsubsection{Network Bandwidth}
-% 1G - 10G
-\subsubsection{Number of Clients}
-% up to 30 clients
-\subsubsection{Number of Serialized Merges}
-
-\begin{figure}[t]
-  \centering
-  \begin{subfigure}[b]{\linewidth}
-      \centering
-      \includegraphics[width=1.0\linewidth]{graphs/merge-a.png}
-      \caption{Merging journals serially.} \label{fig:merge-a}
-  \end{subfigure}\\
-  ~
-  \begin{subfigure}[b]{\linewidth}
-      \centering
-      \includegraphics[width=1.0\linewidth]{graphs/merge-b.png}
-      \caption{Merging a journal w/ 100K create updates.}
-      \label{fig:merge-b}
-  \end{subfigure}
-  \caption{Merging updates has linear scalability.\label{fig:merge}}
-\end{figure}
-
-Cudele serializes merge requests at the metadata server before applying the
-updates to the in-memory metadata store. Merging concurrently is an
-optimization for future work, but merges for the largest journal size we tested
-were quite fast.  Furthermore, since we place no restrictions on the validity
-of metadata inserted into the journal, we can avoid touching poorly scaling
-data structures. In other words, we can scale linearly if we weaken our
-consistency by never checking for the existence of files before creating files.
-
-Figure~\ref{fig:merge-a} demonstrates this scalability by showing the runtime
-(\(y\) axis) of merging journals of different sizes (\(x\) axis). The variance
-of the runtime is over 20 serial merges, each hitting a different directory in
-the namespace.  The runtime scales linearly and with low variance because the
-``Create" mechanism that was used to create the journal only appends
-\texttt{open()} requests to the journal. When the updates are merged by the
-metadata server into the in-memory metadata store they never scan growing data
-structures. Had we implemented the ``Create" mechanism to include
-\texttt{lookup()} commands before \texttt{open()} requests, we would have seen
-the poor scaling that we see with the ``RPCs" mechanism.
-Figure~\ref{fig:merge-b} confirms that we do not touch a poorly scaling data
-structure because the runtimes do not increase as we add more metadata. \\
-
-\noindent\textbf{Takeaway}: the weakest form of consistency for creating files
-({\it i.e.} not checking data structures for the validity of an update or
-existence of a file) shows linear scalability and stable performance.
 
 %\section{notes}
 %Linking clients into our custom libcephfs
@@ -297,12 +304,14 @@ existence of a file) shows linear scalability and stable performance.
 %lient 0: creates, client 1 create(s)
 
 \subsection{Use Case 2: Creates with Rogue Client}
+
 Clients create files in private directories and a separate client, which we
 call a ``rogue" client, creates files in each directory. This introduces false
 sharing and the metadata server revokes capabilities on directories touched by
 the rogue client. While HPC tries to avoid these situations with
-worklflows~\cite{batchfs, deltafs}, it stills happens in distributed file
-systems when users unintentionally access directories in a shared file system.
+worklflows~\cite{zheng:pdsw2014-batchfs, zheng:pdsw2015-deltafs}, it stills
+happens in distributed file systems when users unintentionally access
+directories in a shared file system.
 
 \begin{figure}[tb]
 \centering
@@ -357,3 +366,27 @@ applications need better and more reliable performance. This is a way of
 controlling consistency.
 
 \subsection{Use Case 3: Read while Writing}
+
+% CITEME
+Scientists use the file system to check the progress of jobs using
+\texttt{ls}~\cite{CITEME}. The number of files or size of the files is
+indicative of the progress. This practice is not too different from systems
+that use the file system to manage the progress of jobs; Hadoop writes to
+temporary files, renames them when complete, and creates a ``DONE" file to
+indicate to the runtime that the task did not fail and should not be
+re-scheduled on another node. In this scenario, Cudele users will not see the
+progress of decoupled namespace since their updates are not globally visible.
+To help scientists judge the progress of their jobs, Cudele has a ``namespace
+sync" that sends batches of updates back to the global namespace at regular
+intervals.
+
+\subsection{Use Case 4: Reading Large Directories} 
+
+% CITEME
+The final uses case is reading large directories. At job completion, scientists
+might use \texttt{ls} again to see the results. This causes great strain on the
+file system as paths need to traversed and the entire directory, with all its
+entries, must be transferred back to the client. Here we show how decoupling a
+large namespace and materializing the view in memory on the client is faster
+than doing RPCs for walks of the file system namespace.
+
