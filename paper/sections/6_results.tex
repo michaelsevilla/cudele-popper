@@ -1,18 +1,36 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-We evaluate Cudele on a 15 node cluster, partitioned into 8 object storage
-servers, 3 metadata servers, and 2 monitor servers. The object storage servers
-double as clients which is fine because clients are CPU and memory bound while
-object storage servers are disk IO bound. All daemons run as a single process
-which is the default setting for Ceph and the nodes have 2 dual core 2GHz
-processors with 8GB of RAM. There are three daemons per object storage server
-(one for each disk formatted with XFS) and they share an SSD for the journal.
-The nodes are running Ubuntu 12.04.4, kernel version 3.2.0-63 but all
-experiments run in Docker containers; this makes it easier to tear down and
-re-initialize the cluster ({\it e.g.}, dropping the kernel cache) between
-experiments. For these experiments, we compare CephFS to our programmable
-consistency and durability modifications, which we call Cudele.
+We did not compare to other HPC systems because we are not claiming that our
+file system metadata protocols are superior. Instead, we use Ceph as a platform
+for exploring related work over the same storage system, which facilitates an
+apples-to-apples comparison of the strategies themselves.  So we run
+experiments on the same cluster and normalize results to control for hardware
+differences and to make our results more generally applicable.  Our goal is not
+to build a file system optimized for HPC workloads and our prototype is not a
+competitor to Lustre. Rather it is a solution for letting the techniques of a
+system like Lustre live in the same namespace as techniques optimized for file
+creates, like BatchFS. 
+
+We evaluate our prototype, which we call Cudele, on two clusters: a 15 node
+in-house cluster with 1 monitor server, 1 metadata server, 8 object storage
+servers, and 8 clients (co-located with object servers); and a 34 node CloudLab
+cluster with 1 monitor server, 1 metadata server, 3 object storage servers, and
+up to 29 clients. For the in-house cluster, We need more object storage servers
+and we have to co-locate clients on the same node because of resource
+contention \footnote{The bandwidth to RADOS is only sufficient with 8 nodes on
+this older hardware, which uses SSDs and nodes that are almost 10 years old.
+The CloudLab cluster performs just as well with and without a highly
+provisioned object storage server cluster.}. All daemons run as a single
+process which is the default setting for Ceph. We develop on Ceph's Jewel
+release, version 10.2.1, which was released in May 2016.
+
+%The in-house cluster has  2 dual core 2GHz processors with 8GB of RAM wh
+%three daemons per object storage server (one for each disk formatted with XFS)
+%and they share an SSD for the journal.  The nodes are running Ubuntu 12.04.4,
+%kernel version 3.2.0-63 but all experiments run in Docker containers; this
+%makes it easier to tear down and re-initialize the cluster ({\it e.g.},
+%dropping the kernel cache) between experiments. 
 
 This paper adheres to The Popper
 Convention\footnote{\url{http://falsifiable.us}}~\cite{jimenez_popper_2016}, so

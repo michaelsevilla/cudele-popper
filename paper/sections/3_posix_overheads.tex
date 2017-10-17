@@ -9,13 +9,17 @@ CPU utilization because of the consistency and durability demands of
 CephFS.}\label{fig:overhead-creates}
 \end{figure}
 
+% CITEME PDSW paper
 In our examination of the overheads of POSIX we benchmark and analyze CephFS,
-the file system that uses the Ceph's object store ({\it i.e.} RADOS) to store
-its data and metadata. We choose CephFS because it is an open-source production
-quality system. This file system is an implementation of one set of design
-decisions and our goal is to highlight the effect that those decisions have on
-performance. During this process we discovered, based on the analysis and
-breakdown of costs, that durability and consistency have high overhead.
+the file system that uses Ceph's object store ({\it i.e.} RADOS) to store its
+data and metadata. Ceph was originally designed for HPC and has proven to be
+useful for HPC workloads~\cite{}. Several features were motivated by HPC
+requirements~\cite{weil:osdi2006-ceph}, so the lessons are useful (and can be
+implemented) in HPC environments.  This file system is an implementation of one
+set of design decisions and our goal is to highlight the effect that those
+decisions have on performance. During this process we discovered, based on the
+analysis and breakdown of costs, that durability and consistency have high
+overhead.
 
 To show how the file system behaves under high metadata load we use a
 create-heavy workload. Create-heavy workloads are studied the most in HPC

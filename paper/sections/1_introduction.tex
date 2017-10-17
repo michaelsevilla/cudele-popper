@@ -79,14 +79,14 @@ the file system namespace.  Figure~\ref{fig:subtree-policies} shows a setup in
 our proposed system where a single global namespace has subtrees for
 applications optimized with techniques from different state-of-the-art HPC
 architectures.  The HDFS\footnote{This is example is not directly evaluated in
-this paper, although a similiar use case is explored in~\S\ref{use-case-1}}
+this paper, although a similar use case is explored in~\S\ref{use-case-1}}
 subtree has weaker consistency than strong consistency because it  does not
 guarantee that all updates are not immediately seen by all servers; the BatchFS
-and RAMDisk subtrees are decoupled from the global namespace and have similiar
+and RAMDisk subtrees are decoupled from the global namespace and have similar
 consistency/durability behavior to those systems; and the POSIX subtree retains
 the rigidity of POSIX's strong consistency.
 
-Our protoype system, Cudele, achieves this by exposing ``mechanisms" that
+Our prototype system, Cudele, achieves this by exposing ``mechanisms" that
 developers use to specify their preferred semantics.  Cudele supports 3 forms
 of consistency (invisible, weak, and strong) and 3 degrees of durability (none,
 local, and global) giving the user a wide range of policies and optimizations
@@ -114,7 +114,7 @@ the costs of merging updates (7\(\times\) slow down) and maintaining durability
 (\(10\times\) slow down). We also show the effect of having a metadata specific
 file format in systems that are based on in-memory data structures.  We scale
 up to 20 clients executing an extremely metadata intensive job because this
-workload exhausts the resources of a single metadata server for the codebase we
+workload exhausts the resources of a single metadata server for the code base we
 built on.  Partitioning and replicating metadata across a cluster can be
 controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in this
 paper we show the capacity and performance of a metadata server with superior
