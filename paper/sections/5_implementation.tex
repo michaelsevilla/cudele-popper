@@ -2,12 +2,12 @@
 \label{sec:implementation}
 
 We use a programmable storage approach~\cite{sevilla:eurosys17} to design
-CudeleFS; namely, we try to leverage components inside Ceph to inherit the
+Cudele; namely, we try to leverage components inside Ceph to inherit the
 robustness and correctness of the internal subsystems. Using this `dirty-slate'
 approach, we only had to implement 4 of the 6 mechanisms from
 Figure~\ref{fig:decouple} and just 1 required changes to the underlying storage
 system itself.  In this section, we first describe a Ceph internal subsystem or
-component and then we show how we use it in CudeleFS.
+component and then we show how we use it in Cudele.
 
 %- no change (rpcs, stream)s, library(create, nonvolatile apply, local/global
 %persist),  change to metadata server (nonvolatile apply)
@@ -26,7 +26,7 @@ store data structure is structured as a tree of directory fragments making it
 easier to read and traverse.\\
 
 % how i used it
-\noindent\textbf{CudeleFS}: the ``RPCs" mechanism uses the metadata store to
+\noindent\textbf{Cudele}: the ``RPCs" mechanism uses the metadata store to
 service requests. Using code designed for recovery, ``Nonvolatile Apply" and
 ``Volatile Apply" replay updates onto the metadata store in memory and in the
 object store, respectively.  When the clients are ready to merge their updates
@@ -45,7 +45,7 @@ writes are fast but reads are slow because state must be reconstructed.
 Specifically, reads are slow because there is more state to read, it is
 unorganized, and many of the updates may be redundant.\\
 
-\noindent\textbf{CudeleFS}: the journal format is used by ``Stream", ``Append Client Journal",
+\noindent\textbf{Cudele}: the journal format is used by ``Stream", ``Append Client Journal",
 ``Local Persist", and ``Global Persist".  ``Stream" is the default
 implementation for achieving global durability in CephFS but the rest of the
 mechanisms are implemented by writing with the journal format.  By writing with
@@ -53,7 +53,7 @@ the same format, the metadata servers can read and use the recovery code to
 materialize the updates from a client's decoupled namespace ({\it i.e.} merge).
 These implementations required no changes to CephFS because the metadata
 servers know how to read the events the library is writing.  By re-using the
-journal subsystem to implement the namespace decoupling, CudeleFS leverages the
+journal subsystem to implement the namespace decoupling, Cudele leverages the
 write/read optimized data structures, the formats for persisting events
 (similar to TableFS's SSTables~\cite{ren:atc2013-tablefs}), and the functions
 for replaying events onto the internal namespace data structures.
@@ -68,7 +68,7 @@ updates to the metadata store, the journal tool reads the journal from object
 store objects and replays the updates on the metadata store in the object
 store.\\
 
-\noindent\textbf{CudeleFS}: the external library the clients link into is based
+\noindent\textbf{Cudele}: the external library the clients link into is based
 on the journal tool. It already had functions for importing, exporting, and
 modifying the updates in the journal so we re-purposed that code to implement
 ``Append Client Journal", ``Volatile Apply", and ``Nonvolatile Apply".  
@@ -135,7 +135,7 @@ bytes\footnote{http://docs.ceph.com/docs/jewel/dev/mds\_internals/data-structure
 The inode cache has code for manipulating inode numbers, such as pre-allocating
 inodes to clients.\\
 
-\noindent\textbf{CudeleFS}: ``Nonvolatile Apply" uses the internal inode cache
+\noindent\textbf{Cudele}: ``Nonvolatile Apply" uses the internal inode cache
 code to allocate inodes to clients that decouple parts of the namespace and to
 skip inodes used by the client at merge time.\\
 
@@ -149,12 +149,12 @@ system namespace subtrees. To implement this, the namespace data structure has
 the ability to recursively apply policies to subtrees and to isolate subtrees
 from each other.  \\
 
-\noindent\textbf{CudeleFS}: uses the large inodes to store consistency and
+\noindent\textbf{Cudele}: uses the large inodes to store consistency and
 durability policies in the directory inode. This approach uses the File Type
 interface from the Malacology programmable store
 system~\cite{sevilla:eurosys17} and it tells clients how to access the
 underlying metadata. The underlying implementation stores executable code in
-the inode that calls the different CudeleFS mechanisms. Of course, there are many
+the inode that calls the different Cudele mechanisms. Of course, there are many
 security and access control aspects of this approach but that is beyond the
 scope of this paper.
 

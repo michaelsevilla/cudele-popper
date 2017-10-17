@@ -13,7 +13,7 @@
 %re-use and composition.  A programmable storage system exposes internal
 %subsystem as building blocks for higher level services. This `dirty-slate'
 %approach limits redundant code and leverages the robustness of the underlying
-%storage system. CudeleFS uses this approach and re-uses some of the building
+%storage system. Cudele uses this approach and re-uses some of the building
 %blocks from the Malacology programmable storage system~\cite{sevilla:eurosys17}
 %to great success and requires only:
 %
@@ -33,10 +33,10 @@
 
 Relaxing consistency and durability semantics in the file system is a
 double-edged sword. While it achieves better performance and scalability, it
-alienates applications that rely on strong consistency and durability. CudeleFS
+alienates applications that rely on strong consistency and durability. Cudele
 lets users assign consistency and durability guarantees to subtrees in
 the global namespace, giving users a wide range of policies and
-optimizations that can be custom fit to the application. Using CudeleFS, we
+optimizations that can be custom fit to the application. Using Cudele, we
 compare related work on the same file system and conclude that strong
 consistency can cause a 104\(\times\) slow down while merging updates and
 maintaining durability only have between a \(7-10\times\) slow down.

@@ -1,37 +1,34 @@
 \section{Introduction}
 
 % What is the problem?
-File system metadata services in HPC have scalability problems. It has been
-shown that HPC workloads are metadata resource intensive because administrative
+File system metadata services in HPC have scalability problems. Administrative
 tasks, like checkpointing~\cite{bent_plfs_2009} or scanning the file
-system~\cite{zheng:pdsw2014-batchfs}, on large data sets lead to contention
-for the same directories and inodes ({\it
-e.g.}, path traversal). Applications perform better with dedicated metadata
-servers~\cite{sevilla:sc15-mantle, ren:sc2014-indexfs} but provisioning a
-metadata server for every client is unreasonable. This problem is exacerbated
-by current trends in HPC, where architectures are transitioning from complex
-storage stacks with burst buffer, file system, object store, and tape tiers to
-more simplified stacks with just a burst buffer and object
-store~\cite{bent:login16-hpc-trends}; this puts more pressure on data access
-because more requests end up hitting the same layer and latencies cannot be 
-hidden while data migrates across tiers.
+system~\cite{zheng:pdsw2014-batchfs} lead to contention for the same
+directories and inodes ({\it e.g.}, path traversal). Applications perform
+better with dedicated metadata servers~\cite{sevilla:sc15-mantle,
+ren:sc2014-indexfs} but provisioning a metadata server for every client is
+unreasonable. This problem is exacerbated by current trends in HPC, where
+architectures are transitioning from complex storage stacks with burst buffer,
+file system, object store, and tape tiers to more simplified stacks with just a
+burst buffer and object store~\cite{bent:login16-hpc-trends}; this puts more
+pressure on data access because more requests end up hitting the same layer and
+latencies cannot be hidden while data migrates across tiers.
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/subtree-policies.png}
-\caption{With CudeleFS, users can assign weaker consistency and durability
-policies to subtrees to get the same performance benefits of state-of-the-art
-HPC architectures, such as those shown in the embedded table, while
-applications that require the stronger guarantees of POSIX can still reside in
-the same namespace.
+\includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
+\caption{ Clients that need better performance can relax consistency on their
+subtree ({e.g.}, HDFS) or even decouple the subtree and move it locally
+({e.g.}, BatchFS, RAMDisk). Decoupled subtrees can further relax durability
+semantics to achieve even better performance. Meanwhile, clients that require
+stronger guarantees ({\it e.g.,} POSIX) can still reside in the same namespace.
 }\label{fig:subtree-policies}
 \end{figure}
-
 
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
 semantics in the file system because weaker guarantees are sufficient for their
-applications. For example, batch style jobs often do not need the strong
+applications. For example, many batch style jobs do not need the strong
 consistency that the file system provides, so
 BatchFS~\cite{zheng:pdsw2014-batchfs} and DeltaFS~\cite{zheng:pdsw2015-deltafs}
 do more client-side processing and merge updates when the job is done. HPC
@@ -52,11 +49,12 @@ bent:slides-twotiers}. Then the file system can change its internal structure
 to optimize performance. For example, the file system could enter a mode that
 prevents other clients from interfering with the decoupled directory.  This
 delayed merge ({\it i.e.} a form of eventual consistency) and relaxed
-durability improves performance and scalability by avoiding the costs of remote procedure calls (RPCs),
-synchronization, false sharing, and serialization.  While the performance
-benefits of decoupling the namespace are obvious, applications that rely on the
-file system's guarantees must be deployed on an entirely different system or
-re-written to coordinate strong consistency/durability themselves.
+durability improves performance and scalability by avoiding the costs of remote
+procedure calls (RPCs), synchronization, false sharing, and serialization.
+While the performance benefits of decoupling the namespace are obvious,
+applications that rely on the file system's guarantees must be deployed on an
+entirely different system or re-written to coordinate strong
+consistency/durability themselves.
 
 %\begin{table}
 %\begin{tabular}{ r | l }
@@ -73,21 +71,24 @@ re-written to coordinate strong consistency/durability themselves.
 %\label{table:namespaces}} \end{table}
 
 % What did we do
-To address this problem, we propose a subtree policy API that lets developers dynamically control the
-consistency and durability guarantees for subtrees in the file system
-namespace. For example, one subtree can adopt weaker consistency semantics
-while another subtree can retain the rigidity of POSIX's strong consistency.
-The subtrees in Figure~\ref{fig:subtree-policies} show a setup in our proposed system where a single global
-namespace has subtrees for applications optimized with techniques from different
-state-of-the-art HPC architectures.  
+To address this problem, we present an API and framework that lets developers
+dynamically control the consistency and durability guarantees for subtrees in
+the file system namespace.  Figure~\ref{fig:subtree-policies} shows a setup in
+our proposed system where a single global namespace has subtrees for
+applications optimized with techniques from different state-of-the-art HPC
+architectures.  The HDFS\footnote{This is example is not directly evaluated in
+this paper, although a similiar use case is explored in~\S\ref{use-case-1}}
+subtree has weaker consistency than strong consistency because it  does not
+guarantee that all updates are not immediately seen by all servers; the BatchFS
+and RAMDisk subtrees are decoupled from the global namespace and have similiar
+consistency/durability behavior to those systems; and the POSIX subtree retains
+the rigidity of POSIX's strong consistency.
 
-In this work, we present CudeleFS, a prototype programmable file system that
-supports different degrees of consistency and durability in a global namespace.
-CudeleFS achieves this by exposing ``mechanisms" that developers use to specify
-their preferred semantics.  CudeleFS supports 3 forms of consistency
-(invisible, weak, and strong) and 3 degrees of durability (none, local, and
-global) giving the user a wide range of policies and optimizations that can be
-custom fit to an application. We make the following contributions:
+Our protoype system, Cudele, achieves this by exposing ``mechanisms" that
+developers use to specify their preferred semantics.  Cudele supports 3 forms
+of consistency (invisible, weak, and strong) and 3 degrees of durability (none,
+local, and global) giving the user a wide range of policies and optimizations
+that can be custom fit to an application. We make the following contributions:
 
 \begin{enumerate}
 
@@ -99,7 +100,7 @@ custom fit to an application. We make the following contributions:
   them to subtrees in the file system namespace.
 
   \item an apples-to-apples comparison of the strategies used in recently proposed research systems against
-  previously unexplored metadata designs, all implemented using CudeleFS.
+  previously unexplored metadata designs, all implemented using Cudele.
 
 \end{enumerate}
 
@@ -109,15 +110,24 @@ decouple namespaces; specifically that the technique drastically improves
 performance (104\(\times\) speed up) but we go a step further by quantifying
 the costs of merging updates (7\(\times\) slow down) and maintaining durability
 (\(10\times\) slow down). We also show the effect of having a metadata specific
-file format in systems that are based on in-memory data structures.
-In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the cost of POSIX
-consistency and system-defined durability and
-Section~\ref{sec:methodology-decoupled-namespaces} presents the CudeleFS
-prototype and API. Section~\ref{sec:implementation} describes the CudeleFS
+file format in systems that are based on in-memory data structures. Because
+this paper focuses on file system metadata protocols, we only scale up to 20
+clients executing an extremely metdata intensive workload; this load is the
+maximum capacity of a single metadata server for the platform we chose to
+implement Cudele on.  Partitioning and replicating metadata across a cluster
+can be controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in
+this paper we show the capacity and performance of a metadata server with
+superior metadata protocols, which should be used to inform load balancing
+decisions.
+
+In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
+cost of POSIX consistency and system-defined durability and
+Section~\ref{sec:methodology-decoupled-namespaces} presents the Cudele
+prototype and API. Section~\ref{sec:implementation} describes the Cudele
 mechanisms and shows how re-using internal subsystems results in an
 implementation of less than 500 lines of code. The evaluation in
 Section~\ref{sec:evaluation} quantifies the overheads and performance gains of
 explored and previously unexplored metadata designs.
-Section~\ref{sec:related-work} places CudeleFS in the context of other related
+Section~\ref{sec:related-work} places Cudele in the context of other related
 work.
 

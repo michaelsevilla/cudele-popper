@@ -5,7 +5,7 @@
 \centering
 \includegraphics[width=90mm]{figures/fig-decouple.png}
 \caption{Applications decouple the namespace, write updates to a local journal,
-and delay metadata updates using the CudeleFS Mechanisms }\label{fig:decouple}
+and delay metadata updates using the Cudele Mechanisms }\label{fig:decouple}
 \end{figure}
 
 \begin{table}
@@ -19,30 +19,30 @@ and delay metadata updates using the CudeleFS Mechanisms }\label{fig:decouple}
   Local Persist     & journal saved to client's disk \\
   Global Persist    & journal saved in object store \\
 \end{tabular}
-\caption{The CudeleFS mechanisms are composed together to form consistency and
+\caption{The Cudele mechanisms are composed together to form consistency and
 durability semantics.\label{table:mechanisms}} 
 \end{table}
 
-In this section we describe CudeleFS, our file system that lets users
+In this section we describe Cudele, our file system that lets users
 assign consistency and durability semantics to subtrees in the global
 namespace. A \textbf{mechanism} is an abstraction and basic building block for
-constructing consistency and durability guarantees. CudeleFS exposes these
+constructing consistency and durability guarantees. Cudele exposes these
 mechanisms and the user composes them together to construct
 \textbf{policies}. These policies are assigned to subtrees and they dictate how
 the file system should handle operations within that subtree.  Below, we
 describe the mechanisms, the policies, and the API for assigning policies to
 subtrees.
 
-\subsection{The CudeleFS Mechanisms}
+\subsection{The Cudele Mechanisms}
 \label{sec:the-cudelesfs-mechanisms}
 
 % describe the figure
-Figure~\ref{fig:decouple} shows the mechanisms (labeled arrows) in CudeleFS and
+Figure~\ref{fig:decouple} shows the mechanisms (labeled arrows) in Cudele and
 which daemon(s) they are performed by.  Table~\ref{table:mechanisms} has a
 description of what each mechanism does.  Decoupled clients use the ``Append Client Journal"
 mechanism to append metadata updates to a local, in-memory journal. Once the
-job is complete, the system calls CudeleFS mechanisms to achieve the desired
-consistency/durability semantics.  CudeleFS provides a library for clients to
+job is complete, the system calls Cudele mechanisms to achieve the desired
+consistency/durability semantics.  Cudele provides a library for clients to
 link into and all operations are performed by the client.  
 
 \subsubsection{Mechanisms Used for Consistency} ``RPCs" send remote procedure
@@ -57,7 +57,7 @@ notice new journal updates in the object store and replay the events onto their
 in-memory metadata stores.  ``Volatile Apply" takes the client's in-memory journal on the
 client and applies the updates directly to the in-memory metadata store maintained
 by the metadata servers. We say volatile because -- in exchange for peak
-performance -- CudeleFS makes no consistency or durability guarantees while
+performance -- Cudele makes no consistency or durability guarantees while
 ``Volatile Apply" is executing.  If a concurrent update from a client occurs
 there is no rule for resolving conflicts and if the client or metadata server
 crashes there may be no way to recover.
@@ -72,7 +72,7 @@ overhead because objects in the metadata store need to be read from and written
 back to the object store.
 
 %The metadata store and journal
-%are different ways of representing the namespace.  CudeleFS presents 6
+%are different ways of representing the namespace.  Cudele presents 6
 %mechanisms: RPCs, Stream, Create, Volatile Apply, Local Persist, and Global
 %Persist. ``RPCs" does round trip remote procedure calls to establish
 %consistency; it is the default implementation for complying with POSIX in
@@ -94,7 +94,7 @@ Persist" and ``Global Persist" is the write bandwidth of the local disk and
 object store, respectively.  These persist mechanisms are part of the library that
 links into the client.
 
-\subsection{Defining Policies in CudeleFS}
+\subsection{Defining Policies in Cudele}
 \label{sec:setting-policies-with-cudele}
 
 \begin{table}[t]
@@ -113,7 +113,7 @@ links into the client.
 \end{tabular}
 
 \caption{Users can explore the consistency (C) and
-durability (D) spectrums by composing CudeleFS mechanisms. 
+durability (D) spectrums by composing Cudele mechanisms. 
 \label{table:spectrum}}
 \end{center}
 \end{table}
@@ -157,10 +157,10 @@ should be considered atomic and there are no guarantees while transitioning
 between policies. For example, updates are not deemed to have ``global" durability until
 they are safely saved in the object store. If a failure occurs during ``global
 persist" or if we inject a new policy that changes a subtree from ``local
-persist" to ``global persist", CudeleFS makes no guarantee until the mechanisms are
+persist" to ``global persist", Cudele makes no guarantee until the mechanisms are
 complete.
 
-\subsection{CudeleFS Namespace API}
+\subsection{Cudele Namespace API}
 \label{sec:cudelefs-namespace-api}
 
 
@@ -186,7 +186,7 @@ policies file supports the following parameters (default values are in parenthes
 
 \end{itemize}
 
-The ``Consistency" and ``Durability" parameters are set to the CudeleFS
+The ``Consistency" and ``Durability" parameters are set to the Cudele
 mechanisms; they can be composed (\(+\)) or run in parallel (\(|\|\)).
 ``Allocated Inodes" is a way for the application to specify how many files it
 intends to create. It is a contract so that the file system can provision
@@ -207,7 +207,7 @@ merge time because the results are more accurate.
 % examples
 Given these default values decoupling the namespace with an empty policies file
 would give the application 100 inodes but the subtree would behave like the
-existing CephFS implementation. To implement DeltaFS on CudeleFS, the user
+existing CephFS implementation. To implement DeltaFS on Cudele, the user
 would use the configuration:
 
 \begin{listing}[h]
