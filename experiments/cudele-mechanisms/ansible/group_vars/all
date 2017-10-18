@@ -36,3 +36,4 @@ ceph_conf_overrides:
      mds cache size: 12000000
    client:
      debug client: 0
+     client cache size: 12000000
