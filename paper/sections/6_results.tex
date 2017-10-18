@@ -12,18 +12,30 @@ competitor to Lustre. Rather it is a solution for letting the techniques of a
 system like Lustre live in the same namespace as techniques optimized for file
 creates, like BatchFS. 
 
-We evaluate our prototype, which we call Cudele, on two clusters: a 15 node
-in-house cluster with 1 monitor server, 1 metadata server, 8 object storage
-servers, and 8 clients (co-located with object servers); and a 34 node CloudLab
-cluster with 1 monitor server, 1 metadata server, 3 object storage servers, and
-up to 29 clients. For the in-house cluster, We need more object storage servers
-and we have to co-locate clients on the same node because of resource
-contention \footnote{The bandwidth to RADOS is only sufficient with 8 nodes on
-this older hardware, which uses SSDs and nodes that are almost 10 years old.
-The CloudLab cluster performs just as well with and without a highly
-provisioned object storage server cluster.}. All daemons run as a single
-process which is the default setting for Ceph. We develop on Ceph's Jewel
-release, version 10.2.1, which was released in May 2016.
+\begin{table}
+\begin{tabular}{ r | l | l}
+  Cluster  & Hardware               & Software \\\hline
+  In-House & 15 nodes, 4 2GHz CPUs  & Ubuntu 12.04, 1 MON\\
+           & 8GB RAM, SSD           & 1 MDS, 8 OSDs, 8 Clients\\
+  CloudLab & 34 nodes, 16 2.4GHz CPUs & Ubuntu 14.04, 1 MON\\
+           & 128GB RAM, SSD         & 1 MDS, 3 OSDs, 29 Clients
+\end{tabular}
+\caption{In-House used for microbenchmarks, CloudLab for Use Cases. MON is
+monitor daemon, MDS is metadata server daemon, and OSDs are object storage
+daemons.\label{table:clusters}} 
+\end{table}
+
+We evaluate our prototype on the two clusters in Table~\ref{table:clusters}.
+Microbenchmarks were run on the in-house clusters while client scalability
+tests were run on CloudLab. We only scale up to 29 clients because that is the
+maximum capacity of a single metadata server. For the in-house cluster, we need
+more object storage servers and we have to co-locate clients on the same node
+because of resource contention \footnote{The bandwidth to RADOS is only
+sufficient with 8 nodes on this older hardware, which uses SSDs and nodes that
+are almost 10 years old.  The CloudLab cluster performs just as well with and
+without a highly provisioned object storage server cluster.}. All daemons run
+as a single process which is the default setting for Ceph. We develop on Ceph's
+Jewel release, version 10.2.1, which was released in May 2016.
 
 %The in-house cluster has  2 dual core 2GHz processors with 8GB of RAM wh
 %three daemons per object storage server (one for each disk formatted with XFS)
@@ -394,17 +406,36 @@ temporary files, renames them when complete, and creates a ``DONE" file to
 indicate to the runtime that the task did not fail and should not be
 re-scheduled on another node. In this scenario, Cudele users will not see the
 progress of decoupled namespace since their updates are not globally visible.
-To help scientists judge the progress of their jobs, Cudele has a ``namespace
-sync" that sends batches of updates back to the global namespace at regular
-intervals.
+To help scientists judge the progress of their jobs, Cudele clients have a
+``namespace sync" that sends batches of updates back to the global namespace at
+regular intervals.
+
+% Does this implementation need to be described in the implementation?
+FigureX shows the performance degradation of a single client writing updates to
+a decoupled namespace and pausing to send updates to the metadata server. We
+scale the namespace sync interval to show the trade-off of frequently pausing
+or writing large logs of updates.  We use an idle core to log the updates and
+to do the network transfer. The client only pauses to fork off a background
+process, which is expensive as the address space needs to copied. The
+alternative is to pause the client completely and write the update to disk but
+since this implementation is limited by the speed of the disk, we choose the
+memory-to-memory copy of the fork appraoch.`
+
+To show the contention at the metadata server, we scale the number of
+concurrent journal merge events in FigureX. The size of each journal is 100K
+files, the maximum recommended directory size for CephFS. We also plot the cost
+of RPCs with and without journaling.
 
 \subsection{Use Case 4: Reading Large Directories} 
 
 % CITEME
-The final uses case is reading large directories. At job completion, scientists
+The final use case is reading large directories. At job completion, scientists
 might use \texttt{ls} again to see the results. This causes great strain on the
 file system as paths need to traversed and the entire directory, with all its
 entries, must be transferred back to the client. Here we show how decoupling a
 large namespace and materializing the view in memory on the client is faster
 than doing RPCs for walks of the file system namespace.
 
+FigureX shows how fast a client can materialize decoupled namespaces in memory.
+This takes the on-disk file system metadata format and parses them into events
+that can be manipulated and appended to. Again, we scale the number of up

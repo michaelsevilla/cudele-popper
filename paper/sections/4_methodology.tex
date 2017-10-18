@@ -1,4 +1,4 @@
-\section{Methodology: Global Namespace with Per-Subtree Consistency/Durability}
+\section{Methodology: Global Namespace, Subtree Consistency/Durability}
 \label{sec:methodology-decoupled-namespaces}
 
 \begin{figure}[tb]
@@ -19,11 +19,11 @@ and delay metadata updates using the Cudele Mechanisms }\label{fig:decouple}
   Local Persist     & journal saved to client's disk \\
   Global Persist    & journal saved in object store \\
 \end{tabular}
-\caption{The Cudele mechanisms are composed together to form consistency and
+\caption{Mechanisms are composed together to form consistency and
 durability semantics.\label{table:mechanisms}} 
 \end{table}
 
-In this section we describe Cudele, our file system that lets users
+In this section we describe Cudele, our API and framework that lets users
 assign consistency and durability semantics to subtrees in the global
 namespace. A \textbf{mechanism} is an abstraction and basic building block for
 constructing consistency and durability guarantees. Cudele exposes these
@@ -33,7 +33,7 @@ the file system should handle operations within that subtree.  Below, we
 describe the mechanisms, the policies, and the API for assigning policies to
 subtrees.
 
-\subsection{The Cudele Mechanisms}
+\subsection{Mechanisms: Building Guarantees}
 \label{sec:the-cudelesfs-mechanisms}
 
 % describe the figure
