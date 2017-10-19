@@ -1,0 +1,16 @@
+[osds]
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+
+[mons]
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+
+[mdss]
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+
+[clients]
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+
+[graphite]
+<CHANGE ME> ansible_ssh_user=<CHANGE ME>
