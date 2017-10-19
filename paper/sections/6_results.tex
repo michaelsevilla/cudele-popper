@@ -414,8 +414,8 @@ regular intervals.
 \includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png} \caption{
 [\href{https://...}{source}] Slowdown of a single client periodically syncing
 updates to the gobal namespace. The crossover point represents the trade-off of
-frequent updates of small journal files and infrequent updates of large journal
-files.\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}} \end{figure}
+frequent updates (with small journal files) and infrequent updates (with larger journal
+files).\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}} \end{figure}
 
 % Does this implementation need to be described in the implementation?
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single
@@ -426,12 +426,12 @@ log the updates and to do the network transfer. The client only pauses to fork
 off a background process, which is expensive as the address space needs to
 copied. The alternative is to pause the client completely and write the update
 to disk but since this implementation is limited by the speed of the disk, we
-choose the memory-to-memory copy of the fork appraoch.`
+choose the memory-to-memory copy of the fork approach.
 
-To show the contention at the metadata server, we scale the number of
-concurrent journal merge events in FigureX. The size of each journal is 100K
-files, the maximum recommended directory size for CephFS. We also plot the cost
-of RPCs with and without journaling.
+To show the contention at the metadata server of this approach, we scale the
+number of concurrent journal merge events in FigureX. The size of each journal
+is 100K files, the maximum recommended directory size for CephFS. We also plot
+the cost of RPCs with and without journaling.
 
 \subsection{Use Case 4: Reading Large Directories} 
 
