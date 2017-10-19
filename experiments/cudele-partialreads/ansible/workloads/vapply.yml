@@ -13,43 +13,52 @@
     shell: docker exec cephfs cephfs-journal-tool journal import /etc/ceph/basejournal.bin
     register: results
   - local_action: lineinfile dest="{{ output }}" line="snapshot,{{ nfiles }},{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},0,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (1)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 1
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},1,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (5)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 5
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},5,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (10)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 10
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},10,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (15)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 15
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},15,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (20)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 20
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},20,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (25)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 25
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},25,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
 
   - name: add events to the in memory journal and save to a file (30)
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events.bin --decoupled_dir mydir --namespace_sync 30
     register: results
   - local_action: lineinfile dest="{{ output }}" line="save,{{ nfiles }},30,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+  - shell: rm -rf /etc/ceph/events*
