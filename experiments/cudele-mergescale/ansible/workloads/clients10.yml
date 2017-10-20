@@ -1,0 +1,46 @@
+- hosts: clients[0]
+  become: True
+  tasks:
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - set_fact: output="/popper/results/summary.txt"
+
+  - name: make a base journal with a bunch of directories
+    shell: docker exec cephfs  mkdir {{ mount_point }}/mydir{{ item }}
+    with_sequence: start=0 end=30
+
+  - name: create the base journal
+    shell: docker exec cephfs cephfs-journal-tool journal export /etc/ceph/myjournal.bin
+
+  - name: import the journal
+    shell: docker exec cephfs cephfs-journal-tool journal import /etc/ceph/myjournal.bin
+
+  - name: add events to the in memory journal and save to a file
+    shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events-{{ item.0 }}.bin --decoupled_dir mydir{{ item.0 }} --start_ino {{ item.1 }} 
+    with_together:
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    - [1099511727780, 1099611727780, 1099711727780, 1099811727780, 1099911727780, 1100011727780, 1100111727780, 1100211727780, 1100311727780, 1100411727780]
+    register: r
+  - local_action: lineinfile dest="{{ output }}" line="v.apply,{{ nfiles }},{{ ansible_date_time.time }},{{ item.delta }}" create="yes"
+    with_items: "{{ r.results }}"
+
+  - name: move that file to the control server
+    fetch: src="/etc/ceph/events-{{ item }}.bin" dest="{{ workload_fetch }}/events-{{ item }}.bin" flat=yes
+    with_sequence: start=0 end=9
+
+- hosts: mdss[0]
+  become: True
+  tasks:
+  - set_fact: output="/popper/results/summary.txt"
+
+  - name: move that file to the metadata server
+    copy: dest="/etc/ceph/events-{{ item }}.bin" src="{{ workload_fetch }}/events-{{ item }}.bin"
+    with_sequence: start=0 end=9
+
+  - name: move the secret sauce merger
+    copy: dest="/etc/ceph/parallel_merge.sh" src="/workloads/parallel_merge.sh" mode=750
+
+#  - shell: docker exec ceph-{{ ansible_hostname }}-mds /etc/ceph/parallel_merge.sh {{ ansible_hostname }} 9
+#    register: r
+#  - local_action: lineinfile dest="{{ output }}" line="merge,{{ nfiles }},{{ ansible_date_time.time }},{{ r.delta }}" create="yes"

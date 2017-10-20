@@ -35,15 +35,15 @@ if [ ! -z $1 ]; then
 fi
 
 #for run in 0 1 2; do
-  #for nfiles in 10 100 1000 10000 100000 200000 400000 600000 800000 1000000 10000000; do
-  for nfiles in 10; do
+  for nclients in 10 15 20 25 30; do
     mkdir results || true
-    #./teardown.sh
+    ./teardown.sh
     cp configs_$SITE/hosts hosts
-    #$DOCKER -e nfiles=$nfiles ceph.yml monitor.yml /workloads/vapply.yml
-    $DOCKER -e nfiles=$nfiles /workloads/vapply.yml
+    $DOCKER -e nfiles=100000 ceph.yml /workloads/clients${nclients}.yml
+    #$DOCKER -e nfiles=$nfiles /workloads/vapply.yml
+    break
+    mv results results-$SITE-${nclients}clients
   done
-  mv results results-$SITE
 #done
 
 exit 0
