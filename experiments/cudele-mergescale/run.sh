@@ -34,16 +34,11 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-#for run in 0 1 2; do
-  for nclients in 10 15 20 25 30; do
-    mkdir results || true
-    ./teardown.sh
-    cp configs_$SITE/hosts hosts
-    $DOCKER -e nfiles=100000 ceph.yml /workloads/clients${nclients}.yml
-    #$DOCKER -e nfiles=$nfiles /workloads/vapply.yml
-    break
-    mv results results-$SITE-${nclients}clients
-  done
-#done
+mkdir results || true
+for nclients in 30 25 20 15 10 5; do
+  ./teardown.sh
+  cp configs_$SITE/hosts hosts
+  $DOCKER -e nfiles=100000 -e nclients=$nclients ceph.yml /workloads/merge.yml #/workloads/clients${nclients}.yml
+done
 
 exit 0

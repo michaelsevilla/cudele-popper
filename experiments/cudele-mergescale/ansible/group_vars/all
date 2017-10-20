@@ -33,7 +33,7 @@ ceph_conf_overrides:
      mds bal mode: 2
      mds log max expiring: 40
      mds log max segments: 120
-     mds cache size: 12000000
+     mds cache size: 2000000000
    client:
      debug client: 0
-     client cache size: 12000000
+     client cache size: 2000000000

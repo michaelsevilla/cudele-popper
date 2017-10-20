@@ -1,0 +1,21 @@
+- hosts: mdss[0]
+  become: True
+  tasks:
+
+  - set_fact: output="/popper/results/summary.txt"
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+
+  - fail: msg="Uh oh. Please define nclients"
+    when: nclients is not defined
+
+  - name: move the secret sauce merger
+    copy: dest="/etc/ceph/parallel_merge.sh" src="/workloads/parallel_merge.sh" mode=750
+
+  - shell: cp /mnt/ssd/events* /etc/ceph
+    ignore_errors: true
+
+  - shell: docker exec ceph-{{ ansible_hostname }}-mds /etc/ceph/parallel_merge.sh {{ ansible_hostname }} {{ nclients }} 10
+    register: r
+  - local_action: lineinfile dest="{{ output }}" line="merge,{{ nfiles }},{{ nclients }},{{ ansible_date_time.time }},{{ r.delta }}" create="yes"

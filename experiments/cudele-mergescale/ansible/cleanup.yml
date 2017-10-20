@@ -84,7 +84,6 @@
   roles:
   - role: cleanup
     delete:
-    - /etc/ceph/
     - /var/lib/ceph
     - /tmp/graphite
   tasks:
@@ -92,6 +91,7 @@
       ignore_errors: True
     - shell: docker rm iperf-server iperf-client
       ignore_errors: True
+    - shell: rm -rf /etc/ceph/*
 
 - hosts: osds
   become: True
