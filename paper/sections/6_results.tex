@@ -69,19 +69,17 @@ to an experiment and its artifacts.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/slowdown-mechanisms.png}
-\caption{
-[\href{https://...}{source}]
-The performance of the Cudele mechanisms normalized to the runtime of the
-``Append Client Journal" mechanism (the runtime of writing \(n\) file creates
-to the client's in-memory journal).  \label{fig:slowdown-mechanisms}}
+\caption{ [\href{https://...}{source}] Microbenchmark: performance of each
+mechanism. Results are normalized to the runtime of the ``Append Client
+Journal" mechanism (the runtime of writing \(n\) file creates to the client's
+in-memory journal).  \label{fig:slowdown-mechanisms}}
 \end{figure}
 
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/behavior-journal-size.png}
-\caption{
-[\href{https://...}{source}]
-The size of the client's journal scales with the number of
+\caption{ [\href{https://...}{source}] Microbenchmark: storage footprint on
+client. The size of the client's journal scales with the number of
 updates.\label{fig:behavior-journal-size}}
 \end{figure}
 
@@ -157,58 +155,6 @@ that can differ {\it by orders of magnitude}. Cudele gives users the ability
 to compose these mechanisms based on their application's correctness
 requirements and performance goals.\\
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=1.0\linewidth]{graphs/merge-a.png}
-\caption{ [\href{https://...}{source}] Merging journals serially.}
-\label{fig:merge}
-\end{figure}
-
-%\begin{figure}[t]
-%  \centering
-%  \begin{subfigure}[b]{\linewidth}
-%      \centering
-%      \includegraphics[width=1.0\linewidth]{graphs/merge-a.png}
-%      \caption{Merging journals serially.} \label{fig:merge-a}
-%  \end{subfigure}\\
-%  ~
-%  \begin{subfigure}[b]{\linewidth}
-%      \centering
-%      \includegraphics[width=1.0\linewidth]{graphs/merge-b.png}
-%      \caption{Merging a journal w/ 100K create updates.}
-%      \label{fig:merge-b}
-%  \end{subfigure}
-%  \caption{Merging updates has linear scalability.\label{fig:merge}}
-%\end{figure}
-
-{\it Number of Serialized Merges:} Cudele serializes merge requests at the
-metadata server before applying the updates to the in-memory metadata store.
-Merging concurrently is an optimization for future work, but merges for the
-largest journal size we tested were quite fast.  Furthermore, since we place no
-restrictions on the validity of metadata inserted into the journal, we can
-avoid touching poorly scaling data structures. In other words, we can scale
-linearly if we weaken our consistency by never checking for the existence of
-files before creating files.
-
-Figure~\ref{fig:merge} demonstrates this scalability by showing the runtime
-(\(y\) axis) of merging journals of different sizes (\(x\) axis). The variance
-of the runtime is over 20 serial merges, each hitting a different directory in
-the namespace.  The runtime scales linearly and with low variance because the
-``Create" mechanism that was used to create the journal only appends
-\texttt{open()} requests to the journal. When the updates are merged by the
-metadata server into the in-memory metadata store they never scan growing data
-structures. Had we implemented the ``Create" mechanism to include
-\texttt{lookup()} commands before \texttt{open()} requests, we would have seen
-the poor scaling that we see with the ``RPCs" mechanism.\\
-%Figure~\ref{fig:merge-b} confirms that we do not touch a poorly scaling data
-%structure because the runtimes do not increase as we add more metadata. \\
-
-\noindent\textbf{Takeaway}: the weakest form of consistency for creating files
-({\it i.e.} not checking data structures for the validity of an update or
-existence of a file) shows linear scalability and stable performance.
-
-
-
 \subsection{Use Case 1: Creates in the Same Directory}
 \label{use-case-1}
 
@@ -229,11 +175,9 @@ journal event.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/slowdown-strong-v-weak.png}
-\caption{
-[\href{https://...}{source}]
-The RPC per metadata update of ``Strong Consistency" has a large
-overhead compared to the decoupled namespace strategy of ``Weak
-Consistency".\label{fig:slowdown-strong-weak}}
+\caption{ [\href{https://...}{source}] Use Case 1: the RPC per metadata update
+(strong consistency) has a large overhead compared to decoupled namespaces
+(weak consistency.)\label{fig:slowdown-strong-weak}}
 \end{figure}
 
 Figure~\ref{fig:slowdown-strong-weak} shows the runtime of systems employing
@@ -346,12 +290,12 @@ directories in a shared file system.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/slowdown-allow-block.png}
-\caption{
-[\href{https://...}{source}]
-Using the ``allow" and ``block" API, users can isolate directories from
-interfering clients. Variance with blocking turned on is the same as
-``isolated" from Figure~\ref{fig:overhead-b}.
+\caption{ [\href{https://...}{source}] Use Case 2: using the ``allow" and
+``block" API, users can isolate directories from interfering clients. Variance
+with blocking turned on is the same as ``isolated" from
+Figure~\ref{fig:overhead-b}.
 \label{fig:slowdown-allow-block}}
+
 \end{figure}
 
 % setup: 2cs sep dirs, 2cs DN, 1c malicious write
@@ -412,7 +356,7 @@ regular intervals.
 
 \begin{figure}[tb] \centering
 \includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png} \caption{
-[\href{https://...}{source}] Slowdown of a single client periodically syncing
+[\href{https://...}{source}] Use Case 3: slowdown of a single client periodically syncing
 updates to the gobal namespace. The crossover point represents the trade-off of
 frequent updates (with small journal files) and infrequent updates (with larger journal
 files).\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}} \end{figure}
@@ -429,9 +373,35 @@ to disk but since this implementation is limited by the speed of the disk, we
 choose the memory-to-memory copy of the fork approach.
 
 To show the contention at the metadata server of this approach, we scale the
-number of concurrent journal merge events in FigureX. The size of each journal
-is 100K files, the maximum recommended directory size for CephFS. We also plot
-the cost of RPCs with and without journaling.
+number of journal merge events, each hitting different directories
+in the namespace, in FigureX. The size of each journal is 100K files, the
+maximum recommended directory size for CephFS. We also plot the cost of RPCs
+with and without journaling.
+
+Merge requests are serialized at the metadata server; merging concurrently is
+an optimization for future work. The current implementation has race conditions
+because the metadata server recovery code was not designed to run in parallel
+({\it i.e.} the metadata server never recovers with multiple threads). As a
+result, the metadata server versions inodes and directory entries to ensure
+that the recovered metadata is consistent.
+
+Performance is better than RPCs because we place no restrictions on the
+validity of metadata inserted into the journal and avoid touching poorly
+scaling data structures. In other words, we can scale linearly if we weaken our
+consistency by never checking for the existence of files before creating files.
+only appends \texttt{open()} requests to the journal. When the updates are
+merged by the metadata server into the in-memory metadata store they never scan
+growing data structures.  Had we implemented the ``Create" mechanism to include
+\texttt{lookup()} commands before \texttt{open()} requests, we would have seen
+the poor scaling that we see with the ``RPCs" mechanism.\\
+
+\noindent\textbf{Takeaway}: the weakest form of consistency for creating files
+({\it i.e.} not checking data structures for the validity of an update or
+existence of a file) shows linear scalability and stable performance.
+
+
+
+
 
 \subsection{Use Case 4: Reading Large Directories} 
 
