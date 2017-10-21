@@ -359,7 +359,19 @@ regular intervals.
 [\href{https://...}{source}] Use Case 3: slowdown of a single client periodically syncing
 updates to the gobal namespace. The crossover point represents the trade-off of
 frequent updates (with small journal files) and infrequent updates (with larger journal
-files).\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}} \end{figure}
+files).\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}}
+\end{figure}
+
+\begin{figure}[tb] \centering
+\includegraphics[width=1.0\linewidth]{graphs/mergescale.png} \caption{
+[\href{https://...}{source}] Use Case 3: performance of merging client journals
+at the metadata server. Performance is better than RPCs because (1) there are
+less messages on the network and (2) the consistency/durability code paths in
+the metadata server are bypassed. Merges are serialized and read from the local
+disk, so keeping client journals in memory or on SSD will improve the
+performance of ``decoupled" even more.  \ref{fig:mergescale}.
+\label{fig:mergescale-sync}}
+\end{figure}
 
 % Does this implementation need to be described in the implementation?
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single
@@ -373,10 +385,12 @@ to disk but since this implementation is limited by the speed of the disk, we
 choose the memory-to-memory copy of the fork approach.
 
 To show the contention at the metadata server of this approach, we scale the
-number of journal merge events, each hitting different directories
-in the namespace, in FigureX. The size of each journal is 100K files, the
-maximum recommended directory size for CephFS. We also plot the cost of RPCs
-with and without journaling.
+number of journal merge events, each hitting different directories in the
+namespace, in Figure~\ref{fig:mergescale}. The size of each journal is 100K
+files, the maximum recommended directory size for CephFS. We also plot the cost
+of RPCs with and without journaling; recall from Figure~\ref{fig:overhead-c}
+that the scalability that max number of clients that the default metadata
+server could support with RPCs is 18.
 
 Merge requests are serialized at the metadata server; merging concurrently is
 an optimization for future work. The current implementation has race conditions
@@ -399,10 +413,6 @@ the poor scaling that we see with the ``RPCs" mechanism.\\
 ({\it i.e.} not checking data structures for the validity of an update or
 existence of a file) shows linear scalability and stable performance.
 
-
-
-
-
 \subsection{Use Case 4: Reading Large Directories} 
 
 % CITEME
@@ -416,3 +426,10 @@ than doing RPCs for walks of the file system namespace.
 FigureX shows how fast a client can materialize decoupled namespaces in memory.
 This takes the on-disk file system metadata format and parses them into events
 that can be manipulated and appended to. Again, we scale the number of up
+
+\subsection{Discussion}
+\begin{itemize}
+  \item Composable guarantees: applications control their performance (knobs you didn't have before)
+  \item Hardware features: adding hardware in strategic places
+  \item Performance Prediction: quantifies the cost of each mechanism
+\end{itemize}
