@@ -37,13 +37,6 @@ without a highly provisioned object storage server cluster.}. All daemons run
 as a single process which is the default setting for Ceph. We develop on Ceph's
 Jewel release, version 10.2.1, which was released in May 2016.
 
-%The in-house cluster has  2 dual core 2GHz processors with 8GB of RAM wh
-%three daemons per object storage server (one for each disk formatted with XFS)
-%and they share an SSD for the journal.  The nodes are running Ubuntu 12.04.4,
-%kernel version 3.2.0-63 but all experiments run in Docker containers; this
-%makes it easier to tear down and re-initialize the cluster ({\it e.g.},
-%dropping the kernel cache) between experiments. 
-
 This paper adheres to The Popper
 Convention\footnote{\url{http://falsifiable.us}}~\cite{jimenez_popper_2016}, so
 experiments presented here are available in the repository for this
@@ -53,26 +46,16 @@ Experiments can be examined in more detail, or even re-run, by visiting the
 notebook that shows the analysis and source code for that graph, which points
 to an experiment and its artifacts.
 
-%\begin{figure*}[tb]
-%\centering
-%\includegraphics[width=180mm]{graphs/slowdown.png}
-%\caption{Compared to the \texttt{create} phase, saving and persisting
-%updates (\texttt{create+save} and \texttt{create+save+persist}) experience only
-%a 4.79\(\times\) and 8.66\(\times\) slowdown, in the worst case for 100K files.
-%In contrast, maintaining \texttt{global} consistency is 905.70\(\times\)
-%slower.  The disadvantage of decoupling the namespace is the merge phase where
-%updates are applied to the metadata store (\texttt{create+apply}, resulting in a
-%905.70\(\times\) slowdown for 100K files.}\label{fig:global-v-decoupled}
-%\end{figure*}
-
 \subsection{Microbenchmarks}
+\label{sec:microbenchmarks}
 \begin{figure}[tb]
 \centering
-\includegraphics[width=1.0\linewidth]{graphs/slowdown-mechanisms.png}
+\includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
 \caption{ [\href{https://...}{source}] Microbenchmark: performance of each
-mechanism. Results are normalized to the runtime of the ``Append Client
-Journal" mechanism (the runtime of writing \(n\) file creates to the client's
-in-memory journal).  \label{fig:slowdown-mechanisms}}
+mechanism (left) and building consistency/durability guarantees (right) for
+100K files on a single client. Results are normalized to the runtime of writing
+files creates to the client's in-memory journal.
+\label{fig:composable-mechanisms}}
 \end{figure}
 
 \begin{figure}[tb]
@@ -83,31 +66,30 @@ client. The size of the client's journal scales with the number of
 updates.\label{fig:behavior-journal-size}}
 \end{figure}
 
-Figure~\ref{fig:slowdown-mechanisms} shows the runtime of the Cudele
+Figure~\ref{fig:composable-mechanisms} shows the runtime of the Cudele
 mechanisms for a single client creating files in the same directory, normalized
-to the time it takes to write \(n\) file create updates to the client's
-in-memory journal ({\it i.e.} the ``Append Client Journal" mechanism). Bars
-above \(10^0\) are slower than the ``Append Client Journal" mechanism.
+to the time it takes to write 100K file create updates to the client's
+in-memory journal ({\it i.e.} the ``Append Client Journal" mechanism).
 ``Stream" is an approximation of the overhead and is calculated by subtracting
 the runtime of the job with the journal turned off from the runtime with the
-journal turned on.  The largest workload we tested is 100K file creates in the
-same directory.  This is the maximum recommended size of a directory in CephFS;
-preliminary experiments with larger directory sizes show memory problems.
+journal turned on.  100K is the maximum recommended size of a directory in
+CephFS; preliminary experiments with larger directory sizes show memory
+problems.
 
-{\it Poorly Scaling Data Structures:} Despite doing the same amount of
-work, mechanisms that rely on poorly scaling data structures have large
-slowdowns for the larger number of creates. For example, ``RPCs" which relies
-on the internal CephFS directory structures, goes from a \(40\times\) slowdown
-for 10K files to a \(90\times\) slowdown for 100K files. It is a well-known
-problem that directory data structures do not scale when creating files in the
-same directory~\cite{ren:sc2014-indexfs} and any mechanism that uses these data
-structures will experience similar slowdowns. Other mechanisms that write
-events to a journal ({\it e.g.} the persists, ``Volatile Apply") experience a
-much less drastic slowdown because the journal data structure does not need to
-be scanned for every operation. Events are written to the end of the journal without
-even checking the validity ({\it e.g.}, if the file already exists for a create),
-which is another form of relaxed consistency because the file system assumes the
-application has resolved conflicting updates in a different way.
+{\it Poorly Scaling Data Structures:} Despite doing the same amount of work,
+mechanisms that rely on poorly scaling data structures have large slowdowns for
+the larger number of creates. For example, ``RPCs" which relies on the internal
+CephFS directory structures has a \(90\times\) slowdown for 100K files. It is a
+well-known problem that directory data structures do not scale when creating
+files in the same directory~\cite{ren:sc2014-indexfs} and any mechanism that
+uses these data structures will experience similar slowdowns. Other mechanisms
+that write events to a journal ({\it e.g.} the persists, ``Volatile Apply")
+experience a much less drastic slowdown because the journal data structure does
+not need to be scanned for every operation. Events are written to the end of
+the journal without even checking the validity ({\it e.g.}, if the file already
+exists for a create), which is another form of relaxed consistency because the
+file system assumes the application has resolved conflicting updates in a
+different way.
 
 % RPCs vs. apply: calls to metadata server vs. RADOS
 {\it Overhead of RPCs:} ``RPCs" is \(66\times\) slower than ``Volatile
@@ -136,7 +118,7 @@ state but using ``Nonvolatile Apply" is clearly inferior.
 % persist vs. save: one disk vs. many
 {\it Parallelism of the Object Store:} Comparing ``Local" and ``Global
 persist" demonstrates the bandwidth advantages of storing the journal in a
-distributed object store. For 100K file creates, the ``Global Persist"
+distributed object store. The ``Global Persist"
 performance is \(1.5\times\) faster because the object store is leveraging the
 collective bandwidth of the disks in the cluster. This benefit comes from the
 object store itself but should be acknowledged when making decisions for the
@@ -150,13 +132,13 @@ metadata creates and suggests that updates for a million files would be
 \(2.5\text{KB}*1\text{ million files} = 2.38\text{GB}\). Transfer times for
 payloads of this size on an HPC network are reasonable.\\
 
-\noindent\textbf{Takeaway}: the Cudele mechanisms have overheads and costs
-that can differ {\it by orders of magnitude}. Cudele gives users the ability
-to compose these mechanisms based on their application's correctness
-requirements and performance goals.\\
+\noindent\textbf{Takeaway}: measuring the mechanisms individually shows that
+their overheads and costs can differ {\it by orders of magnitude}. Cudele gives
+users the ability to quantify the performance impact of different
+consistency/durability guarantees.\\
 
 \subsection{Use Case 1: Creates in the Same Directory}
-\label{use-case-1}
+\label{sec:use-case-1}
 
 % CITEME xiao:socc2015-shardfs CITEME HADOOP
 Clients creating files in private directories is heavily studied in
@@ -172,58 +154,49 @@ Figure~\ref{fig:overhead-creates}.  We use this as a microbenchmark because it
 allows us to control the size of the log, since each create creates a single
 journal event.
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=1.0\linewidth]{graphs/slowdown-strong-v-weak.png}
-\caption{ [\href{https://...}{source}] Use Case 1: the RPC per metadata update
-(strong consistency) has a large overhead compared to decoupled namespaces
-(weak consistency.)\label{fig:slowdown-strong-weak}}
-\end{figure}
+%\begin{figure}[tb]
+%\centering
+%\includegraphics[width=1.0\linewidth]{graphs/slowdown-strong-v-weak.png}
+%\caption{ [\href{https://...}{source}] Use Case 1: the RPC per metadata update
+%(strong consistency) has a large overhead compared to decoupled namespaces
+%(weak consistency.)\label{fig:slowdown-strong-weak}}
+%\end{figure}
 
-Figure~\ref{fig:slowdown-strong-weak} shows the runtime of systems employing
-weak and strong consistency, normalized to the runtime of the ``Append Client Journal"
-mechanism (again, just creating files in the client's in-memory journal).  We
-use the following compositions from the mechanisms in
-Table~\ref{table:spectrum}:  Strong Consistency = ``RPCs" + ``Stream"; Strong
-Consistency, No Fault Tolerance = ``RPCs"; Weak Consistency = ``Append Client Journal" +
-``Local Persist"; and Weak Consistency, No Fault Tolerance = ``Append Client Journal" +
-``Local Persist" + ``Volatile Apply".
+The graph on the right of Figure~\ref{fig:composable-mechanisms} shows how
+applications can compose mechanisms together to get the consistency/durability
+guarantees they need.  We label the \(x\)-axis with systems that employ these
+semantics, as described in Figure~\ref{fig:subtree-policies}.  Again, the
+runtime of different semantics for subtrees in the same global namespace
+normalized to the runtime of the ``Append Client Journal" mechanism (again,
+just creating files in the client's in-memory journal).  We makes no guarantees
+during execution of the mechanisms or when transitioning semantics -- the
+semantics are guaranteed {\it once the mechanism completes}. So if servers fail
+during a mechanism, metadata or data may be lost.
 
-% Final file system metadata states are equivalent No guarantees while
-% transitioning mechanisms
-We compare these semantics because the final metadata states are equivalent.
-Cudele makes no guarantees during execution of the mechanisms or when
-transitioning semantics -- the semantics are guaranteed {\it once the mechanism
-completes}. So if servers fail during a mechanism, metadata or data may be
-lost.
+%% DeltaFS vs. BatchFS vs. POSIX: decoupled is faster
+%% (5-7x) vs. (90-104x) slower
+%% Does not scale?
+%% Strong Consistency > 10X slower than Weak Consistency 
+%{\it Speedups of Decoupled Namespaces:} Weak consistency uses the
+%decoupled namespace strategy and shows up to a \(20\times\) speedup over the
+%traditional namespaces that use RPCs. Compared to the baseline the slowdown is
+%\(5-7\times\) for Strong Consistency, which emulates BatchFS and
+%\(90-104\times\) for Weak Consistency, which emulates DeltaFS.
 
-% DeltaFS vs. BatchFS vs. POSIX: decoupled is faster
-% (5-7x) vs. (90-104x) slower
-% Does not scale?
-% Strong Consistency > 10X slower than Weak Consistency 
-{\it Speedups of Decoupled Namespaces:} Weak consistency uses the
-decoupled namespace strategy and shows up to a \(20\times\) speedup over the
-traditional namespaces that use RPCs. Compared to the baseline the slowdown is
-\(5-7\times\) for Strong Consistency, which emulates BatchFS and
-\(90-104\times\) for Weak Consistency, which emulates DeltaFS.
-
-% POSIX (no stream) vs. POSIX: cost of durability < consistency
-{\it Durability \(<<\) Consistency:} The \(1.15\times\) overhead of
-Strong Consistency compared to Strong Consistency, No Fault Tolerance for
-100K files is negligible. It suggests that the overhead of consistency is much
-larger than the overhead of durability. This conclusion should be stronger as
-we scale the number of files because the cost of streaming the journal into the
-object store is constant. We omit the same analysis for Weak Consistency
-because the runtimes are so short that the normalized slowdowns are misleading.
+{\it Durability \(<<\) Consistency:} The performance of these semantics
+suggests that the overhead of consistency is much larger than the overhead of
+durability. This conclusion should be stronger as we scale the number of files
+because the cost of streaming the journal into the object store is constant.
 
 % Weak Consistency benefit not due to metadata format
 {\it Metadata Formats:} Because the metadata formats are the same for
 all schemes we argue that the performance gain for decoupled namespaces comes
 from relaxing the consistency guarantees and not from the metadata formats.\\
 
-\noindent\textbf{Takeaway}: Cudele shows the true benefit of eventual
-consistency, where we see over a \(100\times\) slowdown for achieving strong
-consistency, in the worst case.
+\noindent\textbf{Takeaway}: we confirm the performance benefits of other
+well-established research systems but, more importantly, we show that the
+Cudele mechanisms we propose are useful for building evaluating different
+consistency/durability semantics.
 
 %\section{notes}
 %Linking clients into our custom libcephfs

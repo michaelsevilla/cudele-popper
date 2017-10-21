@@ -146,9 +146,11 @@ labels here based on the points emphasized in the papers.  To compose the
 mechanisms users inject which mechanisms to run and which to use in parallel
 using a domain specific language.  Although we can achieve all permutations of
 the different guarantees in Table~\ref{table:spectrum}, not all of them make
-sense. For example, it makes little sense to do \texttt{append client journal+RPCs} since
-both mechanisms do the same thing or \texttt{stream+save} since ``global"
-durability is stronger and has more overhead than ``local" durability. 
+sense. For example, it makes little sense to do \texttt{append client
+journal+RPCs} since both mechanisms do the same thing or \texttt{stream+save}
+since ``global" durability is stronger and has more overhead than ``local"
+durability. The cost of each mechanism and the semantics described above are
+quantified in Sections~\S\ref{sec:microbenchmarks} and~\S\ref{sec:use-case-1}.
 
 % talk of eventual consistency
 The consistency and durability properties in Table~\ref{table:spectrum} are not
