@@ -1,26 +1,21 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-We scale
-up to 20 clients executing an extremely metadata intensive job because this
-workload exhausts the resources of a single metadata server for the code base we
-built on.  Partitioning and replicating metadata across a cluster can be
-controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in this
-paper we show the capacity and performance of a metadata server with superior
-metadata protocols, which should be used to inform load balancing decisions.
-
-
-
-We did not compare to other HPC systems because we are not claiming that our
-file system metadata protocols are superior. Instead, we use Ceph as a platform
-for exploring related work over the same storage system, which facilitates an
-apples-to-apples comparison of the strategies themselves.  So we run
-experiments on the same cluster and normalize results to control for hardware
-differences and to make our results more generally applicable.  Our goal is not
-to build a file system optimized for HPC workloads and our prototype is not a
-competitor to Lustre. Rather it is a solution for letting the techniques of a
-system like Lustre live in the same namespace as techniques optimized for file
-creates, like BatchFS. 
+Cudele lets users construct consistency/durability guarantees using
+well-established research techniques from other systems; so instead of
+evaluating the scalability and performance of the techniques
+themselves\footnote{ This is the reason we did not compare to other HPC or data
+center systems; we are not claiming that our file system metadata protocols are
+superior.}, we show that (1) the mechanisms we propose are useful for
+constructing semantics used by real systems, (2) the techniques can work
+side-by-side in the same namespace, and (3) the combination of these techniques
+can help the system scale farther when subtrees are coupled to the correct type
+of application.  We scope the evaluation to one metadata server and scale the
+clients, which execute an extremely metadata intensive job in parallel. This
+type of analysis shows the capacity and performance of a metadata server with
+superior metadata protocols, which should be used to inform load balancing
+across a metadata cluster. Load balancing with partitioning and replication can
+be explored with something like Mantle~\cite{sevilla:sc15-mantle}.
 
 \begin{table}
 \begin{tabular}{ r | l | l}
@@ -45,7 +40,9 @@ sufficient with 8 nodes on this older hardware, which uses SSDs and nodes that
 are almost 10 years old.  The CloudLab cluster performs just as well with and
 without a highly provisioned object storage server cluster.}. All daemons run
 as a single process which is the default setting for Ceph. We develop on Ceph's
-Jewel release, version 10.2.1, which was released in May 2016.
+Jewel release, version 10.2.1, which was released in May 2016.  We run
+experiments on the same cluster and normalize results to control for hardware
+differences and to make our results more generally applicable.  
 
 This paper adheres to The Popper
 Convention\footnote{\url{http://falsifiable.us}}~\cite{jimenez_popper_2016}, so
