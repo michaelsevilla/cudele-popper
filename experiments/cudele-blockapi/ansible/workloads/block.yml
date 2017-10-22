@@ -1,0 +1,22 @@
+---
+- hosts: clients, interfere
+  tasks:
+  - name: remove old testdir
+    shell: docker exec cephfs mv {{ mount_point }}/testdir {{ mount_point }}/testdir-nfiles-{{ nfiles }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}-{{ ansible_hostname }}
+    ignore_errors: True
+  
+  - name: create the decoupled directories
+    shell: docker exec cephfs mkdir -p {{ mount_point }}/testdir/nfiles-{{ nfiles }}-{{ ansible_hostname }}
+
+- hosts: mdss[0]
+  tasks:    
+    - set_fact:
+        mds: docker exec ceph-{{ ansible_hostname }}-mds ceph daemon mds.{{ ansible_hostname }} 
+
+    - name: get the client ids
+      shell: "{{ mds }} session ls"
+      register: result
+
+    - name: get some json
+      shell: "{{ mds }} decouple testdir/nfiles-{{ nfiles }}-{{ (item).client_metadata.hostname }} {{ (item).id}} {{ nfiles }}"
+      with_items: "{{ result.stdout | from_json }}"
