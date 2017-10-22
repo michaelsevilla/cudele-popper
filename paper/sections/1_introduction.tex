@@ -84,7 +84,7 @@ by all servers; the BatchFS and RAMDisk subtrees are decoupled from the global
 namespace and have similar consistency/durability behavior to those systems;
 and the POSIX subtree retains the rigidity of POSIX's strong consistency.
 Subtrees without policies inherit the consistency/durability semantics of the
-parent and future work will examine embeddable or composable policies.
+parent and future work will examine embeddable or inheritable policies.
 
 Our prototype system, Cudele, achieves this by exposing ``mechanisms" that
 developers use to specify their preferred semantics.  Cudele supports 3 forms

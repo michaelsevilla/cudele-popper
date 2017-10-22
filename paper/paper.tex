@@ -6,6 +6,14 @@
 \usepackage{arydshln}
 \usepackage{subcaption}
 \usepackage{times}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+\usepackage[noadjust]{cite}
 
 
 
@@ -38,7 +46,10 @@
 \begin{document}
 \title{Cudele: An API and Framework for Programmable \\Consistency and Durability in a Global Namespace}
 
-\author{Paper 382}
+\author{
+\IEEEauthorblockN{Michael A. Sevilla, Ivo Jimenez, Noah Watkins, Jeff LeFevre, Peter Alvaro, Shel Finkelstein, Carlos Maltzahn}
+\IEEEauthorblockN{University of California, Santa Cruz}
+\IEEEauthorblockN{\{msevilla, ivo, jayhawk, jlefevre\}@soe.ucsc.edu, \{palvaro, shel\}@ucsc.edu, \{carlosm\}@soe.ucsc.edu}}
 %\orcid{1234-5678-9012}
 %\affiliation{%
 %  \institution{Institute for Clarity in Documentation}

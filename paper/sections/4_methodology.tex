@@ -14,8 +14,8 @@ and delay metadata updates using the Cudele Mechanisms }\label{fig:decouple}
   RPCs              & round trip remote procedure calls \\
   Stream            & stream journal into object store \\
   Append Client Journal & events appended to in-memory journal \\
-  Volatile Apply    & apply to metadata store in obj store \\
-  Nonvolatile Apply & apply to metadata store in memory \\
+  Volatile Apply & apply to metadata store in memory \\
+  Nonvolatile Apply    & apply to metadata store in obj store \\
   Local Persist     & journal saved to client's disk \\
   Global Persist    & journal saved in object store \\
 \end{tabular}
@@ -137,7 +137,7 @@ client node recovers, and ``global", where all updates are always recoverable.
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
 Table~\ref{table:spectrum}.  POSIX-compliant systems like CephFS and IndexFS
-have global consistency and durability ~\footnote{This is the normal case.
+have global consistency and durability~\footnote{This is the normal case.
 IndexFS also has bulk merge which would transition the system into ``weak
 consistency"}; DeltaFS uses ``invisible" consistency and ``local" durability
 and BatchFS uses ``weak" consistency and ``local" durability. These systems
@@ -209,32 +209,6 @@ merge time because the results are more accurate.
 % examples
 Given these default values decoupling the namespace with an empty policies file
 would give the application 100 inodes but the subtree would behave like the
-existing CephFS implementation. To implement DeltaFS on Cudele, the user
-would use the configuration:
-
-\begin{listing}[h]
-\begin{minted}[xleftmargin=21pt,fontsize=\footnotesize,
-               tabsize=4]{js}
-{     
-    "allocated_inodes": "100000"
-    "interfere_policy": "block"
-    "consistency": "append_client_journal"
-    "durability": "local_persist"
-}
-\end{minted}
-\end{listing}
-
-BatchFS merges updates into the global namespace after the job is complete.
-This can be achieved with by composing two mechanisms: 
-
-\begin{listing}[h]
-\begin{minted}[xleftmargin=21pt,fontsize=\footnotesize,
-               tabsize=4]{js}
-{     
-  "allocated_inodes": "100000"
-  "interfere_policy": "block"
-  "consistency": "append_client_journal+volatile_apply"
-  "durability": "local_persist"
-}
-\end{minted}
-\end{listing}
+existing CephFS implementation.  BatchFS merges updates into the global
+namespace after the job is complete.  This can be achieved with by composing
+two mechanisms: 

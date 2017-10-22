@@ -4,12 +4,12 @@
 Cudele lets users construct consistency/durability guarantees using
 well-established research techniques from other systems; so instead of
 evaluating the scalability and performance of the techniques
-themselves\footnote{ This is the reason we did not compare to other HPC or data
+themselves\footnote{This is the reason we did not compare to other HPC or data
 center systems; we are not claiming that our file system metadata protocols are
 superior.}, we show that (1) the mechanisms we propose are useful for
 constructing semantics used by real systems, (2) the techniques can work
 side-by-side in the same namespace, and (3) the combination of these techniques
-can help the system scale farther when subtrees are coupled to the correct type
+can help the system scale further when subtrees are coupled to the correct type
 of application.  We scope the evaluation to one metadata server and scale the
 clients, which execute an extremely metadata intensive job in parallel. This
 type of analysis shows the capacity and performance of a metadata server with
@@ -17,37 +17,29 @@ superior metadata protocols, which should be used to inform load balancing
 across a metadata cluster. Load balancing with partitioning and replication can
 be explored with something like Mantle~\cite{sevilla:sc15-mantle}.
 
-\begin{table}
-\begin{tabular}{ r | l | l}
-  Cluster  & Hardware               & Software \\\hline
-  In-House & 15 nodes, 4 2GHz CPUs  & Ubuntu 12.04, 1 MON\\
-           & 8GB RAM, SSD           & 1 MDS, 8 OSDs, 8 Clients\\
-  CloudLab & 34 nodes, 16 2.4GHz CPUs & Ubuntu 14.04, 1 MON\\
-           & 128GB RAM, SSD         & 1 MDS, 3 OSDs, 29 Clients
-\end{tabular}
-\caption{In-House used for microbenchmarks, CloudLab for Use Cases. MON is
-monitor daemon, MDS is metadata server daemon, and OSDs are object storage
-daemons.\label{table:clusters}} 
-\end{table}
+%\begin{table}
+%\begin{tabular}{ r | l | l}
+%  Cluster  & Hardware               & Software \\\hline
+%  In-House & 15 nodes, 4 2GHz CPUs  & Ubuntu 12.04, 1 MON\\
+%           & 8GB RAM, SSD           & 1 MDS, 8 OSDs, 8 Clients\\
+%  CloudLab & 34 nodes, 16 2.4GHz CPUs & Ubuntu 14.04, 1 MON\\
+%           & 128GB RAM, SSD         & 1 MDS, 3 OSDs, 29 Clients
+%\end{tabular}
+%\caption{In-House used for microbenchmarks, CloudLab for Use Cases. MON is
+%monitor daemon, MDS is metadata server daemon, and OSDs are object storage
+%daemons.\label{table:clusters}} 
+%\end{table}
 
-We evaluate our prototype on the two clusters in Table~\ref{table:clusters}.
-Microbenchmarks were run on the in-house clusters while client scalability
-tests were run on CloudLab. We only scale up to 29 clients because that is the
-maximum capacity of a single metadata server. For the in-house cluster, we need
-more object storage servers and we have to co-locate clients on the same node
-because of resource contention \footnote{The bandwidth to RADOS is only
-sufficient with 8 nodes on this older hardware, which uses SSDs and nodes that
-are almost 10 years old.  The CloudLab cluster performs just as well with and
-without a highly provisioned object storage server cluster.}. All daemons run
-as a single process which is the default setting for Ceph. We develop on Ceph's
-Jewel release, version 10.2.1, which was released in May 2016.  We run
-experiments on the same cluster and normalize results to control for hardware
-differences and to make our results more generally applicable.  
+We run experiments on the same cluster and normalize results to control for
+hardware differences and to make our results more generally applicable.  We use
+a CloudLab cluster of 34 nodes, each with 16 2.4 GHz CPUs, 128GB RAM, and SSDs.
+Each node uses Ubuntu 14.04 and has 1 monitor server, 3 object storage daemons,
+1 metadata server, and 29 clients.  All daemons run as a single process which
+is the default setting for Ceph. We develop on Ceph's Jewel release, version
+10.2.1, which was released in May 2016.  
 
-This paper adheres to The Popper
-Convention\footnote{\url{http://falsifiable.us}}~\cite{jimenez_popper_2016}, so
-experiments presented here are available in the repository for this
-article\footnote{Links have been removed for double-blind submission}.
+This paper adheres to The Popper Convention~\cite{jimenez_popper_2016}, so
+experiments presented here are available in the repository for this article.
 Experiments can be examined in more detail, or even re-run, by visiting the
 \texttt{[source]} link next to each figure. That link points to a Jupyter
 notebook that shows the analysis and source code for that graph, which points
@@ -58,7 +50,7 @@ to an experiment and its artifacts.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
-\caption{ [\href{https://...}{source}] Microbenchmark: performance of each
+\caption{[\href{https://www.google.com}{source}] Microbenchmark: performance of each
 mechanism (left) and building consistency/durability guarantees (right) for
 100K files on a single client. Results are normalized to the runtime of writing
 files creates to the client's in-memory journal.
@@ -135,16 +127,47 @@ globally persisting metadata updates.
 {\it Journal Size:} We measure the amount of storage per journal update to be
 about 2.5\text{KB}. The storage footprint scales linearly with the number of
 metadata creates and suggests that updates for a million files would be
-\(2.5\text{KB}*1\text{ million files} = 2.38\text{GB}\). Transfer times for
-payloads of this size in most HPC/data cente networks are reasonable.\\
+\(2.5\text{KB}*1\texttt{ million files} = 2.38\text{GB}\). Transfer times for
+payloads of this size in most HPC/data cente networks are reasonable.
 
-\noindent\textbf{Takeaway}: measuring the mechanisms individually shows that
+\textbf{Takeaway}: measuring the mechanisms individually shows that
 their overheads and costs can differ {\it by orders of magnitude}. Cudele gives
 users the ability to quantify the performance impact of different
 consistency/durability guarantees.\\
 
 \subsection{Use Case 1: Creates in the Same Directory}
 \label{sec:use-case-1}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{.3\linewidth}
+      \centering
+      \includegraphics[width=1.0\linewidth]{graphs/mergescale.png}
+      \caption{Use Case 1} \label{fig:mergescale}
+  \end{subfigure}
+  \begin{subfigure}[b]{.3\linewidth}
+      \centering
+      \includegraphics[width=1.0\linewidth]{graphs/block-allow.png}
+      \caption{Use Case 2}
+      \label{fig:block-allow}
+  \end{subfigure}
+  \begin{subfigure}[b]{.3\linewidth}
+      \centering
+      \includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png}
+      \caption{Use Case 3}
+      \label{fig:slowdown-sync}
+  \end{subfigure}
+  \caption{The performance and features of Cudele. (a) shows the performance of
+merging client journals at the metadata server. Performance is better than RPCs
+because there are less messages and consistency/durability code paths are
+bypassed. (b) shows how the allow/block API can isolate directories from
+interfering clients.  (c) shows the slowdown of a single client periodically
+syncing updates to the gobal namespace. The inflection point is the trade-off
+of frequent updates vs. larger journal files.\label{fig:use-cases}}
+\end{figure*}
+
+
+
 
 % CITEME xiao:socc2015-shardfs CITEME HADOOP
 Clients creating files in private directories is heavily studied in
@@ -197,9 +220,9 @@ because the cost of streaming the journal into the object store is constant.
 % Weak Consistency benefit not due to metadata format
 {\it Metadata Formats:} Because the metadata formats are the same for
 all schemes we argue that the performance gain for decoupled namespaces comes
-from relaxing the consistency guarantees and not from the metadata formats.\\
+from relaxing the consistency guarantees and not from the metadata formats.
 
-\noindent\textbf{Takeaway}: we confirm the performance benefits of other
+\textbf{Takeaway}: we confirm the performance benefits of other
 well-established research systems but, more importantly, we show that the
 Cudele mechanisms we propose are useful for building and evaluating different
 consistency/durability semantics.
@@ -266,36 +289,14 @@ worklflows~\cite{zheng:pdsw2014-batchfs, zheng:pdsw2015-deltafs}, it stills
 happens in distributed file systems when users unintentionally access
 directories in a shared file system.
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=1.0\linewidth]{graphs/block-allow.png}
-\caption{ [\href{https://...}{source}] Use Case 2: using the ``allow" and
-``block" API, users can isolate directories from interfering clients. Variance
-with blocking turned on is the same as ``isolated" from
-Figure~\ref{fig:overhead-b}.
-\label{fig:slowdown-allow-block}}
-
-\end{figure}
-
 % setup: 2cs sep dirs, 2cs DN, 1c malicious write
-Next we show how Cudele can be programmed to block interfering clients. We
-use the same problematic workload from Figure~\ref{fig:overhead-b}, where
-clients write to their own private directories and another client interferes with a stream of creates at
-30 seconds.  We also have another client write to a decoupled namespace and
-merge its updates at 90 seconds.  We equip each client directory with the
-configuration:
-
-\begin{listing}[tb]
-\begin{minted}[xleftmargin=21pt,
-               tabsize=4]{js}
-{     
-    "allocated_inodes": "100000"
-    "interfere_policy": "block"
-    "consistency": "RPCs"
-    "durability": "stream"
-}
-\end{minted}
-\end{listing}
+Next we show how Cudele can be programmed to block interfering clients. We use
+the same problematic workload from Figure~\ref{fig:overhead-b}, where clients
+write to their own private directories and another client interferes with a
+stream of creates at 30 seconds.  We also have another client write to a
+decoupled namespace and merge its updates at 90 seconds.  We equip each client
+directory with the configuration: allocated\_inodes=100K,
+interfere\_policy=block, consistency=RPCs, and durability=stream.
 
 Each directory functions with ``RPCs"
 and ``Stream" enabled -- which is the default implementation of CephFS. The only
@@ -305,16 +306,16 @@ Note that IndexFS does a similar operation with leases except clients block.
 
 % results
 To show the benefits of this isolations, our results in
-Figure~\ref{fig:slowdown-allow-block} are plotted alongside the variance bars from
+Figure~\ref{fig:allow-block} are plotted alongside the variance bars from
 Figure~\ref{fig:overhead-b}. Because ``allow"/``interfere and
 ``block"/``isolated" have the same variability we draw the following three
 conclusions: (1) clients that use the API to block interfering clients  get
 the same performance as isolated clients, (2) there is a negligible effect on
 performance for the extra work the metadata server does to return
 \texttt{-EBUSY}, and (3) merging updates from the decoupled client has a
-negligible effect on performance.\\
+negligible effect on performance.
 
-\noindent\textbf{Takeaway}: the API lets users isolate directories when
+\textbf{Takeaway}: the API lets users isolate directories when
 applications need better and more reliable performance. This is a way of
 controlling consistency.
 
@@ -333,25 +334,6 @@ To help scientists judge the progress of their jobs, Cudele clients have a
 ``namespace sync" that sends batches of updates back to the global namespace at
 regular intervals.
 
-\begin{figure}[tb] \centering
-\includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png} \caption{
-[\href{https://...}{source}] Use Case 3: slowdown of a single client periodically syncing
-updates to the gobal namespace. The crossover point represents the trade-off of
-frequent updates (with small journal files) and infrequent updates (with larger journal
-files).\ref{fig:slowdown-sync}.  \label{fig:slowdown-sync}}
-\end{figure}
-
-\begin{figure}[tb] \centering
-\includegraphics[width=1.0\linewidth]{graphs/mergescale.png} \caption{
-[\href{https://...}{source}] Use Case 3: performance of merging client journals
-at the metadata server. Performance is better than RPCs because (1) there are
-less messages on the network and (2) the consistency/durability code paths in
-the metadata server are bypassed. Merges are serialized and read from the local
-disk, so keeping client journals in memory or on SSD will improve the
-performance of ``decoupled" even more.  \ref{fig:mergescale}.
-\label{fig:mergescale-sync}}
-\end{figure}
-
 % Does this implementation need to be described in the implementation?
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single
 client writing updates to a decoupled namespace and pausing to send updates to
@@ -367,7 +349,7 @@ To show the contention at the metadata server of this approach, we scale the
 number of journal merge events, each hitting different directories in the
 namespace, in Figure~\ref{fig:mergescale}. The size of each journal is 100K
 files, the maximum recommended directory size for CephFS. We also plot the cost
-of RPCs with and without journaling; recall from Figure~\ref{fig:overhead-c}
+of RPCs with and without journaling; recall from Figure~\ref{fig:overhead}
 that the scalability that max number of clients that the default metadata
 server could support with RPCs is 18.
 
@@ -386,29 +368,50 @@ only appends \texttt{open()} requests to the journal. When the updates are
 merged by the metadata server into the in-memory metadata store they never scan
 growing data structures.  Had we implemented the ``Create" mechanism to include
 \texttt{lookup()} commands before \texttt{open()} requests, we would have seen
-the poor scaling that we see with the ``RPCs" mechanism.\\
+the poor scaling that we see with the ``RPCs" mechanism.
 
-\noindent\textbf{Takeaway}: the weakest form of consistency for creating files
+\textbf{Takeaway}: the weakest form of consistency for creating files
 ({\it i.e.} not checking data structures for the validity of an update or
 existence of a file) shows linear scalability and stable performance.
 
-\subsection{Use Case 4: Reading Large Directories} 
+%\subsection{Use Case 4: Reading Large Directories} 
+%
+%% CITEME
+%The final use case is reading large directories. At job completion, scientists
+%might use \texttt{ls} again to see the results. This causes great strain on the
+%file system as paths need to traversed and the entire directory, with all its
+%entries, must be transferred back to the client. Here we show how decoupling a
+%large namespace and materializing the view in memory on the client is faster
+%than doing RPCs for walks of the file system namespace.
+%
+%FigureX shows how fast a client can materialize decoupled namespaces in memory.
+%This takes the on-disk file system metadata format and parses them into events
+%that can be manipulated and appended to. Again, we scale the number of up
 
-% CITEME
-The final use case is reading large directories. At job completion, scientists
-might use \texttt{ls} again to see the results. This causes great strain on the
-file system as paths need to traversed and the entire directory, with all its
-entries, must be transferred back to the client. Here we show how decoupling a
-large namespace and materializing the view in memory on the client is faster
-than doing RPCs for walks of the file system namespace.
-
-FigureX shows how fast a client can materialize decoupled namespaces in memory.
-This takes the on-disk file system metadata format and parses them into events
-that can be manipulated and appended to. Again, we scale the number of up
-
-\subsection{Discussion}
-\begin{itemize}
-  \item Composable guarantees: applications control their performance (knobs you didn't have before)
-  \item Hardware features: adding hardware in strategic places
-  \item Performance Prediction: quantifies the cost of each mechanism
-\end{itemize}
+%\subsection{Discussion}
+%
+%Cudele and the experiments we present here prompt many avenues for future work.
+%The first is embeddable policies, where child subtrees have specialized
+%features but still maintain the guarantees  of their parent subtrees. We
+%already show how applciations can compose guarantees and control their
+%performance, knobs that we did not have before, but embeddable policies are a
+%way to compose the policies themsleves.  For example, a RAMDisk subtree is
+%POSIX-compliant but relaxes durability constraints, so it can reside under a
+%POSIX subtree that is strongly consistent. These embeddable policies should be
+%controlled and enforced by Cudele.
+%
+%Second is the opportunity for adding hardware in strategic places to speed up
+%the mechanisms that the application needs. In Figure~\ref{fig:mergescale} the
+%performance of merging updates at the metadata server is limited by the speed
+%of the disk. So applications that rely on merging many updates should consider
+%equipping the metadata server with SSDs or more memory. This is a form of
+%co-design that takes a ``dirty-slate" approach.
+%
+%Finally, performance prediction benefits from our cost quantification of each
+%mechanism. Applications can use Cudele to microbenchmark their components and
+%software, similar to what we did in Secion~\S\ref{sec:microbenchmarks}. Using
+%those results, they can predict how much slower their system will be if they
+%adopt stronger consistency or durability. This can also be a verification tool
+%where performance that varies wildly from the predicted performance can be a
+%red flag that something is wrong or that the bottleneck is not in the
+%consistency or durability plane.
