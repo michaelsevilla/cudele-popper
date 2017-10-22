@@ -37,17 +37,19 @@ fi
 ./teardown.sh; rm -rf results
 for log in "log"; do
   cp configs_$SITE/all-$log ansible/group_vars/all 
-  for clients in 1 5 10 15 16 17 18 19 20; do
-    mkdir results || true
-    cp configs_$SITE/clients$clients hosts
-    for job in "creates-touchstream" "creates"; do
-      ./teardown.sh
-      $DOCKER -e nfiles=98000 \
-              ceph.yml \
-              /workloads/block.yml \
-              /workloads/${job}.yml
+  for clients in 1 5 10 15 18 19 20; do
+    for run in 0 1 2; do
+      mkdir results || true
+      cp configs_$SITE/clients$clients hosts
+      for job in "creates-touchstream" "creates"; do
+        ./teardown.sh
+        $DOCKER -e nfiles=98000 \
+                ceph.yml \
+                /workloads/block.yml \
+                /workloads/${job}.yml
+      done
+      mv results results-$SITE-clients$clients-$log-run$run
     done
-    mv results results-$SITE-clients$clients-$log
   done
 done
 exit 0
