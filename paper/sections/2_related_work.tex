@@ -16,87 +16,88 @@ system~\cite{roselli:atec2000-FS-workloads}.  Unfortunately, scaling file
 system metadata is a well-known problem and solutions for scaling data IO do
 not work for metadata IO~\cite{roselli:atec2000-FS-workloads,
 abad:techreport2012-fstrace, abad:ucc2012-mimesis,
-alam:pdsw2011-metadata-scaling, weil:osdi2006-ceph}. There are two approaches
-for improving the performance of metadata access.
+alam:pdsw2011-metadata-scaling, weil:osdi2006-ceph}. 
+%There are two approaches
+%for improving the performance of metadata access.
+%
+%\subsection{Metadata Load Balancing}
+%
+%% approaches to load balancing (strong = more resuorces per unit work, weak =
+%% fixed resource per work unit)
+%% CITEME
+%One approach for improving metadata performance and scalability is to alleviate
+%overloaded servers by load balancing metadata IO across a cluster. Common
+%techniques include partitioning metadata when there are many writes and
+%replicating metadata when there are many reads. For example, IndexFS~\cite{ren:sc2014-indexfs} partitions
+%directories and clients write to different partitions by grabbing leases and
+%caching ancestor metadata for path traversal; it does well for strong scaling
+%because servers can keep more inodes in the cache which results in less RPCs.
+%Alternatively, ShardFS replicates directory state so servers do not need to
+%contact peers for path traversal; it does well for read workloads because all
+%file operations only require 1 RPC and for weak scaling because requests will
+%never incur extra RPCs due to a full cache.  CephFS employs both techniques to
+%a lesser extent; directories can be replicated or sharded but the caching and
+%replication policies do not change depending on the balancing technique.
+%Despite the performance benefits these techniques add complexity and jeopardize
+%the robustness and performance characteristics of the metadata service because
+%the systems now need (1) policies to guide the migration decisions and (2)
+%mechanisms to address inconsistent states across servers.
+%
+%% policies
+%Setting policies for migrations is arguably more difficult than adding the
+%migration mechanisms themselves.  For example, IndexFS and CephFS use the
+%GIGA+~\cite{patil:fast2011-giga} technique for partitioning directories at a predefined
+%threshold and using lazy synchronization to redirect queries to the server that
+%``owns" the targeted metadata.  Determining when to partition directories and
+%when to migrate the directory fragments are policies that vary between systems:
+%GIGA+ partitions directories when the size reaches a certain number of files
+%and migrates directory fragments immediately; CephFS partitions directories
+%when they reach a threshold size or when the write temperature reaches a
+%certain value and migrates directory fragments when the hosting server has more
+%load than the other servers in the metadata cluster. Another policy is when and
+%how to replicate directory state; ShardFS replicates immediately and
+%pessimistically while CephFS replicates only when the read temperature reaches
+%a threshold.  There is a wide range of policies and it is difficult to maneuver
+%tunables and hard-coded design decisions.
+%
+%% addressing inconsistency
+%In addition to the policies, distributing metadata across a cluster requires
+%distributed transactions and cache coherence protocols to ensure strong
+%consistency ({e.g.}, POSIX).  For example, ShardFS pessimistically replicates
+%directory state and uses optimistic concurrency control for conflicts; namely
+%it does the operation and if there is a conflict at verification time it falls
+%back to two-phase locking.  Another example is IndexFS's inode cache which
+%reduces RPCs by caching ancestor paths -- the locality of this cache can be
+%thrashed by random reads but performs well for metadata writes. For
+%consistency, writes to directories in IndexFS block until the lease expires
+%while writes to directories in ShardFS are slow for everyone as it either
+%requires serialization or locking with many servers; reads in IndexFS are
+%subject to cache locality while reads in ShardFS always resolve to 1 RPC.
+%Another example of the overheads of addressing inconsistency is how CephFS
+%maintains client sessions and inode caches for capabilities (which in turn make
+%metadata access faster). When metadata is exchanged between metadata servers
+%these sessions/caches must be flushed and new statistics exchanged with a
+%scatter-gather process; this halts updates on the directories and blocks until
+%the authoritative metadata server responds.  These protocols are discussed in
+%more detail in the next section but their inclusion here is a testament to the
+%complexity of migrating metadata.
+%
+%%For metadata writes it does a distributed transaction; monotonic writes with
+%%concurrent clients fail and do pessimistic locking through a mediated lock
+%%server to ensure strong consistency, non-monotonic writes grab locks at every
+%%server. Zooming in on monotonic writes: if permissions increase it executes on
+%%a primary then non-primary, if permissions decrease it executes on all
+%%non-primary then on primary.
+%
+%The conclusion we have drawn from this related work is that metadata protocols
+%have a bigger impact on performance and scalability than load balancing.  
+%Understanding these protocols helps load balancing and gives us a better
+%understanding of the metrics we should use to make migration decisions ({\it
+%e.g.}, which operations reflect the state of the system), what types of
+%requests cause the most load, and how an overloaded system reacts ({\it e.g.},
+%increasing latencies, lower throughput, etc.).
 
-\subsection{Metadata Load Balancing}
-
-% approaches to load balancing (strong = more resuorces per unit work, weak =
-% fixed resource per work unit)
-% CITEME
-One approach for improving metadata performance and scalability is to alleviate
-overloaded servers by load balancing metadata IO across a cluster. Common
-techniques include partitioning metadata when there are many writes and
-replicating metadata when there are many reads. For example, IndexFS~\cite{ren:sc2014-indexfs} partitions
-directories and clients write to different partitions by grabbing leases and
-caching ancestor metadata for path traversal; it does well for strong scaling
-because servers can keep more inodes in the cache which results in less RPCs.
-Alternatively, ShardFS replicates directory state so servers do not need to
-contact peers for path traversal; it does well for read workloads because all
-file operations only require 1 RPC and for weak scaling because requests will
-never incur extra RPCs due to a full cache.  CephFS employs both techniques to
-a lesser extent; directories can be replicated or sharded but the caching and
-replication policies do not change depending on the balancing technique.
-Despite the performance benefits these techniques add complexity and jeopardize
-the robustness and performance characteristics of the metadata service because
-the systems now need (1) policies to guide the migration decisions and (2)
-mechanisms to address inconsistent states across servers.
-
-% policies
-Setting policies for migrations is arguably more difficult than adding the
-migration mechanisms themselves.  For example, IndexFS and CephFS use the
-GIGA+~\cite{patil:fast2011-giga} technique for partitioning directories at a predefined
-threshold and using lazy synchronization to redirect queries to the server that
-``owns" the targeted metadata.  Determining when to partition directories and
-when to migrate the directory fragments are policies that vary between systems:
-GIGA+ partitions directories when the size reaches a certain number of files
-and migrates directory fragments immediately; CephFS partitions directories
-when they reach a threshold size or when the write temperature reaches a
-certain value and migrates directory fragments when the hosting server has more
-load than the other servers in the metadata cluster. Another policy is when and
-how to replicate directory state; ShardFS replicates immediately and
-pessimistically while CephFS replicates only when the read temperature reaches
-a threshold.  There is a wide range of policies and it is difficult to maneuver
-tunables and hard-coded design decisions.
-
-% addressing inconsistency
-In addition to the policies, distributing metadata across a cluster requires
-distributed transactions and cache coherence protocols to ensure strong
-consistency ({e.g.}, POSIX).  For example, ShardFS pessimistically replicates
-directory state and uses optimistic concurrency control for conflicts; namely
-it does the operation and if there is a conflict at verification time it falls
-back to two-phase locking.  Another example is IndexFS's inode cache which
-reduces RPCs by caching ancestor paths -- the locality of this cache can be
-thrashed by random reads but performs well for metadata writes. For
-consistency, writes to directories in IndexFS block until the lease expires
-while writes to directories in ShardFS are slow for everyone as it either
-requires serialization or locking with many servers; reads in IndexFS are
-subject to cache locality while reads in ShardFS always resolve to 1 RPC.
-Another example of the overheads of addressing inconsistency is how CephFS
-maintains client sessions and inode caches for capabilities (which in turn make
-metadata access faster). When metadata is exchanged between metadata servers
-these sessions/caches must be flushed and new statistics exchanged with a
-scatter-gather process; this halts updates on the directories and blocks until
-the authoritative metadata server responds.  These protocols are discussed in
-more detail in the next section but their inclusion here is a testament to the
-complexity of migrating metadata.
-
-%For metadata writes it does a distributed transaction; monotonic writes with
-%concurrent clients fail and do pessimistic locking through a mediated lock
-%server to ensure strong consistency, non-monotonic writes grab locks at every
-%server. Zooming in on monotonic writes: if permissions increase it executes on
-%a primary then non-primary, if permissions decrease it executes on all
-%non-primary then on primary.
-
-The conclusion we have drawn from this related work is that metadata protocols
-have a bigger impact on performance and scalability than load balancing.  
-Understanding these protocols helps load balancing and gives us a better
-understanding of the metrics we should use to make migration decisions ({\it
-e.g.}, which operations reflect the state of the system), what types of
-requests cause the most load, and how an overloaded system reacts ({\it e.g.},
-increasing latencies, lower throughput, etc.).
-
-\subsection{Relaxing POSIX}
+%\subsection{Relaxing POSIX}
 
 % POSIX 
 POSIX workloads require strong consistency and many file systems improve

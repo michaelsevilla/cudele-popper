@@ -14,19 +14,6 @@ store~\cite{bent:login16-hpc-trends}; this puts more pressure on data access
 because more requests end up hitting the same layer and latencies cannot be
 hidden while data migrates across tiers.
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
-
-\caption{For performance, clients can relax consistency on their subtree
-({e.g.}, HDFS) or even decouple the subtree and move it locally ({e.g.},
-BatchFS, RAMDisk). Decoupled subtrees can further relax durability semantics
-for even better performance. Clients that require stronger guarantees ({\it
-e.g.,} POSIX) can still reside in the same namespace.
-}\label{fig:subtree-policies}
-
-\end{figure}
-
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
 semantics in the file system because weaker guarantees are sufficient for their
@@ -38,8 +25,19 @@ developers are turning to these non-POSIX solutions because their applications
 are well-understood ({\it e.g.}, well-defined read/write phases,
 synchronization only needed during certain phases, workflows describing
 computation, etc.) and because these applications wreak havoc on file systems designed for
-general-purpose workloads ({\it e.g.}, checkpoint-restart's N-N and N-1 create
-patterns).
+general-purpose workloads ({\it e.g.}, checkpoint-restart's N:N and N:1 create
+patterns~\cite{bent_plfs_2009}).
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
+\caption{ Illustration of subtrees with different semantics co-existing in a
+global namespace.  For performance, clients can relax consistency on their
+subtree (HDFS) or even decouple the subtree and move it locally (BatchFS,
+RAMDisk). Decoupled subtrees can further relax durability for even better
+performance.  Clients that require stronger guarantees (POSIX) can still reside
+in the same namespace.  }\label{fig:subtree-policies}
+\end{figure}
 
 % One example
 One popular approach for relaxing consistency and durability is to ``decouple
@@ -75,17 +73,18 @@ consistency/durability themselves.
 % What did we do
 To address this problem, we present an API and framework that lets developers
 dynamically control the consistency and durability guarantees for subtrees in
-the file system namespace.  Figure~\ref{fig:subtree-policies} shows a setup in
-our proposed system where a single global namespace has subtrees for
-applications optimized with techniques from different state-of-the-art HPC
+the file system namespace.  Figure~\ref{fig:subtree-policies} shows a potential
+setup in our proposed system where a single global namespace has subtrees for
+applications optimized with techniques from different state-of-the-art
 architectures.  The HDFS\footnote{HDFS itself is not directly evaluated in this
 paper, although the HDFS semantics and their performance is explored
 in~\S\ref{sec:use-case-1}} subtree has weaker consistency than strong
-consistency because it  does not guarantee that all updates are not immediately
-seen by all servers; the BatchFS and RAMDisk subtrees are decoupled from the
-global namespace and have similar consistency/durability behavior to those
-systems; and the POSIX subtree retains the rigidity of POSIX's strong
-consistency.
+consistency because it does not guarantee that all updates are immediately seen
+by all servers; the BatchFS and RAMDisk subtrees are decoupled from the global
+namespace and have similar consistency/durability behavior to those systems;
+and the POSIX subtree retains the rigidity of POSIX's strong consistency.
+Subtrees without policies inherit the consistency/durability semantics of the
+parent and future work will examine embeddable or composable policies.
 
 Our prototype system, Cudele, achieves this by exposing ``mechanisms" that
 developers use to specify their preferred semantics.  Cudele supports 3 forms
@@ -95,15 +94,18 @@ that can be custom fit to an application. We make the following contributions:
 
 \begin{enumerate}
 
-  \item a prototype that lets developers choose from a range of
-  consistency and durability semantics (9 permutations), allowing them to dynamically custom
-  fit the storage system to the application.
+  \item A framework and API for assigning consistency/durability policies 
+  to subtrees in the file system namespace; this lets users dynamically navigate
+  the tradeoffs of different metadata protocols.
 
-  \item an API for selecting consistency/durability policies and assigning
-  them to subtrees in the file system namespace.
+  \item This framework lets subtrees with different semantics co-exist in a
+  global namespace. This is different than multiple mount points because
+  there is no need to provision storage clusters for applications
+  ({\it e.g.}, HDFS, CephFS) or move data between these systems.
 
-  \item an apples-to-apples comparison of the strategies used in recently proposed research systems against
-  previously unexplored metadata designs, all implemented using Cudele.
+  \item A prototype that lets developers custom fit subtrees to applications
+  dynamically; this helps data center systems scale further than systems that
+  use one strategy for the entire namespace.
 
 \end{enumerate}
 
@@ -112,12 +114,14 @@ Our results confirm the assertions of ``clean-state" research systems that
 decouple namespaces; specifically that the technique drastically improves
 performance (104\(\times\) speed up) but we go a step further by quantifying
 the costs of merging updates (7\(\times\) slow down) and maintaining durability
-(\(10\times\) slow down). We also show the effect of having a metadata specific
-file format in systems that are based on in-memory data structures.  Our
-prototype is built on Ceph because it was originally designed for HPC and has
-proven to be useful for HPC workloads~\cite{}. Several features were motivated
-by HPC requirements~\cite{weil:osdi2006-ceph}, so the lessons are useful (and
-can be implemented) in HPC environments. More importantly,  we use Ceph as a
+(\(10\times\) slow down). In our prototype, we get an 8\(\times\) speedup and
+can scale to twice as many servers when we assign a more relaxed form of
+consistency and durability to a subtree with a create heavy workload.
+Meanwhile, other subtrees in the namespace maintain strong consistency and
+durability with RPCs per operation.
+
+We build on Ceph because it is used in cloud-based and data center
+systems and has a presence in HPC~\cite{}.  More importantly,  we use Ceph as a
 platform for exploring related work over the same storage system, which
 facilitates an apples-to-apples comparison of the strategies themselves.  
 

@@ -65,13 +65,13 @@ files creates to the client's in-memory journal.
 \label{fig:composable-mechanisms}}
 \end{figure}
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=1.0\linewidth]{graphs/behavior-journal-size.png}
-\caption{ [\href{https://...}{source}] Microbenchmark: storage footprint on
-client. The size of the client's journal scales with the number of
-updates.\label{fig:behavior-journal-size}}
-\end{figure}
+%\begin{figure}[tb]
+%\centering
+%\includegraphics[width=1.0\linewidth]{graphs/behavior-journal-size.png}
+%\caption{ [\href{https://...}{source}] Microbenchmark: storage footprint on
+%client. The size of the client's journal scales with the number of
+%updates.\label{fig:behavior-journal-size}}
+%\end{figure}
 
 Figure~\ref{fig:composable-mechanisms} shows the runtime of the Cudele
 mechanisms for a single client creating files in the same directory, normalized
@@ -132,12 +132,11 @@ object store itself but should be acknowledged when making decisions for the
 application; the size of the object store can help mitigate the overheads of
 globally persisting metadata updates.
 
-{\it Journal Size:} Figure~\ref{fig:behavior-journal-size} shows the
-amount of storage per journal update (\(y\) axis) for the range of file creates
-we tested (\(x\) axis). The increase in file size is linear with the number of
+{\it Journal Size:} We measure the amount of storage per journal update to be
+about 2.5\text{KB}. The storage footprint scales linearly with the number of
 metadata creates and suggests that updates for a million files would be
 \(2.5\text{KB}*1\text{ million files} = 2.38\text{GB}\). Transfer times for
-payloads of this size on an HPC network are reasonable.\\
+payloads of this size in most HPC/data cente networks are reasonable.\\
 
 \noindent\textbf{Takeaway}: measuring the mechanisms individually shows that
 their overheads and costs can differ {\it by orders of magnitude}. Cudele gives
@@ -202,7 +201,7 @@ from relaxing the consistency guarantees and not from the metadata formats.\\
 
 \noindent\textbf{Takeaway}: we confirm the performance benefits of other
 well-established research systems but, more importantly, we show that the
-Cudele mechanisms we propose are useful for building evaluating different
+Cudele mechanisms we propose are useful for building and evaluating different
 consistency/durability semantics.
 
 %\section{notes}
@@ -269,7 +268,7 @@ directories in a shared file system.
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=1.0\linewidth]{graphs/blockallow.png}
+\includegraphics[width=1.0\linewidth]{graphs/block-allow.png}
 \caption{ [\href{https://...}{source}] Use Case 2: using the ``allow" and
 ``block" API, users can isolate directories from interfering clients. Variance
 with blocking turned on is the same as ``isolated" from

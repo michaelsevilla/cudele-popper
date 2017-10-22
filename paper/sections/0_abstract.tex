@@ -1,19 +1,20 @@
 \begin{abstract}
 
-HPC developers are abandoning POSIX because the synchronization and
-serialization overheads of providing strong consistency and durability are too
-costly -- and often unnecessary -- for their applications.  Unfortunately,
-designing near-POSIX file systems excludes applications that rely on strong
-consistency or durability, forcing developers to re-write their applications or
-deploy them on a different system.  We present a file system and API that lets
-clients specify their consistency/durability requirements and assign them to
-subtrees in the namespace, allowing users to optimize subtrees within the same
-namespace for different workloads.  We draw conclusions about the performance
-impact of unexplored consistency/durability metadata designs and show that
-maintaining strong consistency can cause about a 100\(\times\) slow down
-compared to relaxed consistency and no durability. Comparatively, merging
-updates after a period of relaxed consistency (less than a 10\(\times\) slow
-down) and maintaining durability (about a 10\(\times\) slow down) have more
-reasonable costs.
+Data center scale application developers are abandoning POSIX because the file
+system metadata synchronization and serialization overheads of providing strong
+consistency and durability are too costly -- and often unnecessary -- for their
+applications.  Unfortunately, designing near-POSIX file systems excludes
+applications that rely on strong consistency or durability, forcing developers
+to re-write their applications or deploy them on a different system. Mounting
+multiple systems in the global namespace forces users to (1) provision separate
+storage clusters and (2) manually move data across systems.  We present a
+framework and API that lets clients dynamically specify their
+consistency/durability requirements and assign them to subtrees in the
+namespace, allowing users to optimize subtrees within the same namespace for
+different workloads.  We confirm the performance benefits of techniques
+presented in related work but also explore new consistency/durability metadata
+designs, all over the same storage system.  By custom fitting a subtree to a
+create-heavy application, we show an 8\(\times\) speedup and scale further
+(twice as many servers) than the system we implemented our prototype on.
 
 \end{abstract}
