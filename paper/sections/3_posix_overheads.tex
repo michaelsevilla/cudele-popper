@@ -1,4 +1,4 @@
-\section{POSIX Overheads}
+\section{POSIX IO Overheads}
 \label{sec:posix-overheads}
 
 \begin{figure}[tb]
@@ -10,7 +10,7 @@ CephFS.}\label{fig:overhead-creates}
 \end{figure}
 
 % CITEME PDSW paper
-In our examination of the overheads of POSIX we benchmark and analyze CephFS,
+In our examination of the overheads of POSIX IO we benchmark and analyze CephFS,
 the file system that uses Ceph's object store ({\it i.e.} RADOS) to store its
 data and metadata. To show how the file system behaves under high metadata load
 we use a create-heavy workload. Create-heavy workloads are studied the most in
@@ -66,7 +66,7 @@ are stressing the servers more.
 \end{figure*}
 
 % what is durability
-While durability is not specified by POSIX, users expect that files they create
+While durability is not specified by POSIX IO, users expect that files they create
 or modify survive failures.  We define three types of durability: global,
 local, and none.  Global
 durability means that the client or server can fail at any time and metadata
@@ -130,7 +130,7 @@ distributed file system.
 \subsection{Strong Consistency}
 \label{sec:strong-consistency}
 
-Access to metadata in a POSIX-compliant file system is strongly consistent, so
+Access to metadata in a POSIX IO-compliant file system is strongly consistent, so
 reads and writes to the same inode or directory are globally ordered.  The
 synchronization and serialization machinery needed to ensure that all clients
 see the same state has high overhead.\\

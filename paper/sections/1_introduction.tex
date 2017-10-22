@@ -21,7 +21,7 @@ applications. For example, many batch style jobs do not need the strong
 consistency that the file system provides, so
 BatchFS~\cite{zheng:pdsw2014-batchfs} and DeltaFS~\cite{zheng:pdsw2015-deltafs}
 do more client-side processing and merge updates when the job is done. HPC
-developers are turning to these non-POSIX solutions because their applications
+developers are turning to these non-POSIX IO solutions because their applications
 are well-understood ({\it e.g.}, well-defined read/write phases,
 synchronization only needed during certain phases, workflows describing
 computation, etc.) and because these applications wreak havoc on file systems designed for
@@ -35,7 +35,7 @@ patterns~\cite{bent_plfs_2009}).
 global namespace.  For performance, clients can relax consistency on their
 subtree (HDFS) or even decouple the subtree and move it locally (BatchFS,
 RAMDisk). Decoupled subtrees can further relax durability for even better
-performance.  Clients that require stronger guarantees (POSIX) can still reside
+performance.  Clients that require stronger guarantees (POSIX IO) can still reside
 in the same namespace.  }\label{fig:subtree-policies}
 \end{figure}
 
@@ -82,7 +82,7 @@ in~\S\ref{sec:use-case-1}} subtree has weaker consistency than strong
 consistency because it does not guarantee that all updates are immediately seen
 by all servers; the BatchFS and RAMDisk subtrees are decoupled from the global
 namespace and have similar consistency/durability behavior to those systems;
-and the POSIX subtree retains the rigidity of POSIX's strong consistency.
+and the POSIX IO subtree retains the rigidity of POSIX IO's strong consistency.
 Subtrees without policies inherit the consistency/durability semantics of the
 parent and future work will examine embeddable or inheritable policies.
 
@@ -126,7 +126,7 @@ platform for exploring related work over the same storage system, which
 facilitates an apples-to-apples comparison of the strategies themselves.  
 
 In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
-cost of POSIX consistency and system-defined durability and
+cost of POSIX IO consistency and system-defined durability and
 Section~\ref{sec:methodology-decoupled-namespaces} presents the Cudele
 prototype and API. Section~\ref{sec:implementation} describes the Cudele
 mechanisms and shows how re-using internal subsystems results in an

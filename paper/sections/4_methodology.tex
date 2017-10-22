@@ -75,7 +75,7 @@ back to the object store.
 %are different ways of representing the namespace.  Cudele presents 6
 %mechanisms: RPCs, Stream, Create, Volatile Apply, Local Persist, and Global
 %Persist. ``RPCs" does round trip remote procedure calls to establish
-%consistency; it is the default implementation for complying with POSIX in
+%consistency; it is the default implementation for complying with POSIX IO in
 %CephFS. ``Stream" has the metadata servers stream a journal of metadata updates
 %into the object store. ``Append Client Journal" allows clients to append metadata events to an
 %in-memory journal. ``Volatile apply" 
@@ -136,7 +136,7 @@ client node recovers, and ``global", where all updates are always recoverable.
 
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
-Table~\ref{table:spectrum}.  POSIX-compliant systems like CephFS and IndexFS
+Table~\ref{table:spectrum}.  POSIX IO-compliant systems like CephFS and IndexFS
 have global consistency and durability~\footnote{This is the normal case.
 IndexFS also has bulk merge which would transition the system into ``weak
 consistency"}; DeltaFS uses ``invisible" consistency and ``local" durability
