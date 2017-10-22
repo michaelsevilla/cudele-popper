@@ -23,10 +23,10 @@ i.e.} in the collective memory of the metadata server cluster) and as objects
 in the object store. In the object store, directories and their inodes are
 stored together in objects to improve the performance of scans.  The metadata
 store data structure is structured as a tree of directory fragments making it
-easier to read and traverse.\\
+easier to read and traverse.
 
 % how i used it
-\noindent\textbf{Cudele}: the ``RPCs" mechanism uses the metadata store to
+\textbf{Cudele}: the ``RPCs" mechanism uses the metadata store to
 service requests. Using code designed for recovery, ``Nonvolatile Apply" and
 ``Volatile Apply" replay updates onto the metadata store in memory and in the
 object store, respectively.  When the clients are ready to merge their updates
@@ -43,9 +43,9 @@ it is a log of metadata updates that can materialize the namespace when the
 updates are replayed onto the metadata store. The journal is a ``pile system";
 writes are fast but reads are slow because state must be reconstructed.
 Specifically, reads are slow because there is more state to read, it is
-unorganized, and many of the updates may be redundant.\\
+unorganized, and many of the updates may be redundant.
 
-\noindent\textbf{Cudele}: the journal format is used by ``Stream", ``Append Client Journal",
+\textbf{Cudele}: the journal format is used by ``Stream", ``Append Client Journal",
 ``Local Persist", and ``Global Persist".  ``Stream" is the default
 implementation for achieving global durability in CephFS but the rest of the
 mechanisms are implemented by writing with the journal format.  By writing with
@@ -66,9 +66,9 @@ modify the journal. It can read the journal, export the journal as a file,
 erase events, and apply updates to the metadata store.  To apply journal
 updates to the metadata store, the journal tool reads the journal from object
 store objects and replays the updates on the metadata store in the object
-store.\\
+store.
 
-\noindent\textbf{Cudele}: the external library the clients link into is based
+\textbf{Cudele}: the external library the clients link into is based
 on the journal tool. It already had functions for importing, exporting, and
 modifying the updates in the journal so we re-purposed that code to implement
 ``Append Client Journal", ``Volatile Apply", and ``Nonvolatile Apply".  
@@ -133,9 +133,9 @@ is configurable so as not to saturate the memory on the metadata server --
 inodes in CephFS are about 1400
 bytes\footnote{http://docs.ceph.com/docs/jewel/dev/mds\_internals/data-structures/}.
 The inode cache has code for manipulating inode numbers, such as pre-allocating
-inodes to clients.\\
+inodes to clients.
 
-\noindent\textbf{Cudele}: ``Nonvolatile Apply" uses the internal inode cache
+\textbf{Cudele}: ``Nonvolatile Apply" uses the internal inode cache
 code to allocate inodes to clients that decouple parts of the namespace and to
 skip inodes used by the client at merge time.\\
 
@@ -147,9 +147,9 @@ across the object store or for managing subtrees for load balancing. These
 policies adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has
 the ability to recursively apply policies to subtrees and to isolate subtrees
-from each other.  \\
+from each other.
 
-\noindent\textbf{Cudele}: uses the large inodes to store consistency and
+\textbf{Cudele}: uses the large inodes to store consistency and
 durability policies in the directory inode. This approach uses the File Type
 interface from the Malacology programmable store
 system~\cite{sevilla:eurosys17} and it tells clients how to access the

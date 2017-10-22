@@ -95,44 +95,52 @@ that can be custom fit to an application. We make the following contributions:
 \begin{enumerate}
 
   \item A framework and API for assigning consistency/durability policies 
-  to subtrees in the file system namespace; this lets users dynamically navigate
+  to subtrees in the file system namespace; this lets users navigate
   the tradeoffs of different metadata protocols.
 
   \item This framework lets subtrees with different semantics co-exist in a
-  global namespace. This is different than multiple mount points because
-  there is no need to provision storage clusters for applications
-  ({\it e.g.}, HDFS, CephFS) or move data between these systems.
+  global namespace. We show how this scales further and performs better than
+  systems that use one strategy for the entire namespace 
 
-  \item A prototype that lets developers custom fit subtrees to applications
-  dynamically; this helps data center systems scale further than systems that
-  use one strategy for the entire namespace.
+  \item A prototype that lets users custom fit subtrees to applications
+  dynamically. 
 
 \end{enumerate}
 
+The last contribution lays the groundwork for future work on our prototype. It
+improves the current practice of mounting different storage systems in a global
+namespace because there is no need to provision dedicated storage clusters to
+applications or move data between these systems.  For example, the results of a
+Hadoop job do not need to be migrated into CephFS for other processing; instead
+the user can change the semantics of the HDFS subtree into a CephFS subtree.
+This may cause metadata/data movement to make things strongly consistent again
+but this is superior to moving all data across file system boundaries. We
+enable studies that adjust these semantics over {\it time and space}, where
+subtrees can change their semantics and migrate around the cluster without ever
+moving the data they reference.
+
 % Results
-Our results confirm the assertions of ``clean-state" research systems that
-decouple namespaces; specifically that the technique drastically improves
-performance (104\(\times\) speed up) but we go a step further by quantifying
-the costs of merging updates (7\(\times\) slow down) and maintaining durability
-(\(10\times\) slow down). In our prototype, we get an 8\(\times\) speedup and
-can scale to twice as many servers when we assign a more relaxed form of
-consistency and durability to a subtree with a create heavy workload.
-Meanwhile, other subtrees in the namespace maintain strong consistency and
-durability with RPCs per operation.
+The results in this paper lay the groundwork for such a system and confirm the
+assertions of ``clean-state" research that decouple namespaces; specifically
+that the technique drastically improves performance (104\(\times\) speed up).
+We go a step further by quantifying the costs of merging updates (7\(\times\)
+slow down) and maintaining durability (\(10\times\) slow down). In our
+prototype, we get an 8\(\times\) speedup and can scale to twice as many servers
+when we assign a more relaxed form of consistency and durability to a subtree
+with a create-heavy workload.  We build on Ceph because it is used in
+cloud-based and data center systems and has a presence in HPC~\cite{}.  More
+importantly,  we use Ceph as a platform for exploring related work over the
+same storage system, which facilitates an apples-to-apples comparison of the
+strategies themselves.  
 
-We build on Ceph because it is used in cloud-based and data center
-systems and has a presence in HPC~\cite{}.  More importantly,  we use Ceph as a
-platform for exploring related work over the same storage system, which
-facilitates an apples-to-apples comparison of the strategies themselves.  
-
-In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
-cost of POSIX IO consistency and system-defined durability and
-Section~\ref{sec:methodology-decoupled-namespaces} presents the Cudele
-prototype and API. Section~\ref{sec:implementation} describes the Cudele
-mechanisms and shows how re-using internal subsystems results in an
-implementation of less than 500 lines of code. The evaluation in
-Section~\ref{sec:evaluation} quantifies the overheads and performance gains of
-explored and previously unexplored metadata designs.
-Section~\ref{sec:related-work} places Cudele in the context of other related
-work.
+%In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
+%cost of POSIX IO consistency and system-defined durability and
+%Section~\ref{sec:methodology-decoupled-namespaces} presents the Cudele
+%prototype and API. Section~\ref{sec:implementation} describes the Cudele
+%mechanisms and shows how re-using internal subsystems results in an
+%implementation of less than 500 lines of code. The evaluation in
+%Section~\ref{sec:evaluation} quantifies the overheads and performance gains of
+%explored and previously unexplored metadata designs.
+%Section~\ref{sec:related-work} places Cudele in the context of other related
+%work.
 

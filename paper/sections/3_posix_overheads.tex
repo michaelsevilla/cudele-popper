@@ -89,20 +89,20 @@ memory or CPU resources, larger values for these tunables results in better
 performance.
 
 % purpose of the journal
-As shown in Figure~\ref{fig:journal}, in addition to the metadata journal,
-CephFS also represents metadata in RADOS as a metadata store, where directories
-and their file inodes are stored as objects.  The metadata server applies the
-updates in the journal to the metadata store when the journal reaches a certain
-size. The metadata store is optimized for recovery ({\it i.e.} reading) while
-the metadata journal is write-optimized.
+In addition to the metadata journal, CephFS also represents metadata in RADOS
+as a metadata store, where directories and their file inodes are stored as
+objects.  The metadata server applies the updates in the journal to the
+metadata store when the journal reaches a certain size. The metadata store is
+optimized for recovery ({\it i.e.} reading) while the metadata journal is
+write-optimized.
 
-\begin{figure}[tb] \centering
-\includegraphics[width=1\linewidth]{./figures/journal.png} 
-\caption{CephFS has two views of the file system namespace: a journal of
-metadata updates and a metadata store. For fault tolerance, they are stored in
-the object store as segments and fragments, respectively.
-\label{fig:journal}}
-\end{figure}
+%\begin{figure}[tb] \centering
+%\includegraphics[width=1\linewidth]{./figures/journal.png} 
+%\caption{CephFS has two views of the file system namespace: a journal of
+%metadata updates and a metadata store. For fault tolerance, they are stored in
+%the object store as segments and fragments, respectively.
+%\label{fig:journal}}
+%\end{figure}
 
 % Effects on performance
 Figure~\ref{fig:overhead-a} shows the
