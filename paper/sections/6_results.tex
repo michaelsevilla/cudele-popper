@@ -1,6 +1,16 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
+We scale
+up to 20 clients executing an extremely metadata intensive job because this
+workload exhausts the resources of a single metadata server for the code base we
+built on.  Partitioning and replicating metadata across a cluster can be
+controlled with something like Mantle~\cite{sevilla:sc15-mantle}, but in this
+paper we show the capacity and performance of a metadata server with superior
+metadata protocols, which should be used to inform load balancing decisions.
+
+
+
 We did not compare to other HPC systems because we are not claiming that our
 file system metadata protocols are superior. Instead, we use Ceph as a platform
 for exploring related work over the same storage system, which facilitates an

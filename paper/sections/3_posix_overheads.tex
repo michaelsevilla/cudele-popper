@@ -12,25 +12,21 @@ CephFS.}\label{fig:overhead-creates}
 % CITEME PDSW paper
 In our examination of the overheads of POSIX we benchmark and analyze CephFS,
 the file system that uses Ceph's object store ({\it i.e.} RADOS) to store its
-data and metadata. Ceph was originally designed for HPC and has proven to be
-useful for HPC workloads~\cite{}. Several features were motivated by HPC
-requirements~\cite{weil:osdi2006-ceph}, so the lessons are useful (and can be
-implemented) in HPC environments.  This file system is an implementation of one
-set of design decisions and our goal is to highlight the effect that those
-decisions have on performance. During this process we discovered, based on the
-analysis and breakdown of costs, that durability and consistency have high
-overhead.
+data and metadata. To show how the file system behaves under high metadata load
+we use a create-heavy workload. Create-heavy workloads are studied the most in
+HPC research because of the checkpoint/restart use case but they also happen to
+stress the underlying storage system the most.  During this process we
+discovered, based on the analysis and breakdown of costs, that durability and
+consistency have high overhead but we urge the read to keep in mind that this
+file system is an implementation of one set of design decisions and our goal
+here is to highlight the effect that those decisions have on performance.
 
-To show how the file system behaves under high metadata load we use a
-create-heavy workload. Create-heavy workloads are studied the most in HPC
-research because of the checkpoint/restart use case but they also happen to
-stress the underlying storage system the most.
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
-the Linux kernel.  The \texttt{untar} phase, which is characterized by many creates, has
-the highest resource usage which suggests that it is stressing the consistency
-and journaling subsystems of the metadata server the most. Traditional file
-system techniques for improving performance, such as caching inodes, do not
-help for create-heavy workloads.
+the Linux kernel.  The \texttt{untar} phase, which is characterized by many
+creates, has the highest resource usage which suggests that it is stressing the
+consistency and journaling subsystems of the metadata server the most.
+Traditional file system techniques for improving performance, such as caching
+inodes, do not help for create-heavy workloads.
 
 In this section, we quantify the costs of strong consistency and global
 durability in CephFS. At the end of each subsection we compare the approach to
