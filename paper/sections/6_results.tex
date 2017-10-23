@@ -79,18 +79,17 @@ CephFS directory structures has a \(90\times\) slowdown for 100K files. It is a
 well-known problem that directory data structures do not scale when creating
 files in the same directory~\cite{ren:sc2014-indexfs} and any mechanism that
 uses these data structures will experience similar slowdowns. Other mechanisms
-that write events to a journal ({\it e.g.} the persists, ``Volatile Apply")
-experience a much less drastic slowdown because the journal data structure does
-not need to be scanned for every operation. Events are written to the end of
-the journal without even checking the validity ({\it e.g.}, if the file already
-exists for a create), which is another form of relaxed consistency because the
-file system assumes the application has resolved conflicting updates in a
-different way.
+that write events to a journal) experience a much less drastic slowdown because
+the journal data structure does not need to be scanned for every operation.
+Events are written to the end of the journal without even checking the validity
+({\it e.g.}, if the file already exists for a create), which is another form of
+relaxed consistency because the file system assumes the application has
+resolved conflicting updates in a different way.
 
 % RPCs vs. apply: calls to metadata server vs. RADOS
 {\it Overhead of RPCs:} ``RPCs" is \(66\times\) slower than ``Volatile
 Apply" because sending individual metadata updates over the network is costly.
-While ``RPCs" sends a request for every file create, ``Nonvolatile Apply"
+While ``RPCs" sends a request for every file create, ``Volatile Apply"
 writes all the updates to the in-memory journal and applies them to the
 in-memory data structures in the metadata server. While communicating the
 decoupled namespace directly to the metadata server is faster, communicating
