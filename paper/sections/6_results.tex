@@ -352,16 +352,17 @@ controlling consistency.
 % CITEME
 The final use case shows how the API gives users fine-grained control of the
 consistency semantics for niche or {\it ad-hoc} workflows.  Scientists use the
-file system to check the progress of jobs using \texttt{ls}~\cite{CITEME}. The
-number of files or size of the files is indicative of the progress. This
-practice is not too different from systems that use the file system to manage
-the progress of jobs; Hadoop writes to temporary files, renames them when
-complete, and creates a ``DONE" file to indicate to the runtime that the task
-did not fail and should not be re-scheduled on another node. In this scenario,
-Cudele users will not see the progress of decoupled namespaces since their
-updates are not globally visible.  To help scientists judge the progress of
-their jobs, Cudele clients have a ``namespace sync" that sends batches of
-updates back to the global namespace at regular intervals.
+file system to check the progress of jobs using \texttt{ls} even though this
+operation is notoriously heavy-weight~\cite{carns:ipdps09-pvfs,
+eshel:fast10-panache} . The number of files or size of the files is indicative
+of the progress. This practice is not too different from systems that use the
+file system to manage the progress of jobs; Hadoop writes to temporary files,
+renames them when complete, and creates a ``DONE" file to indicate to the
+runtime that the task did not fail and should not be re-scheduled on another
+node. In this scenario, Cudele users will not see the progress of decoupled
+namespaces since their updates are not globally visible.  To help scientists
+judge the progress of their jobs, Cudele clients have a ``namespace sync" that
+sends batches of updates back to the global namespace at regular intervals.
 
 % Does this implementation need to be described in the implementation?
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single

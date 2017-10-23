@@ -63,14 +63,16 @@ the file system namespace.  Figure~\ref{fig:subtree-policies} shows a potential
 setup in our proposed system where a single global namespace has subtrees for
 applications optimized with techniques from different state-of-the-art
 architectures.  The HDFS\footnote{HDFS itself is not directly evaluated in this
-paper, although the HDFS semantics and their performance is explored
-in~\S\ref{sec:use-case-1}} subtree has weaker consistency than strong
-consistency because it does not guarantee that all updates are immediately seen
-by all servers; the BatchFS and RAMDisk subtrees are decoupled from the global
-namespace and have similar consistency/durability behavior to those systems;
-and the POSIX IO subtree retains the rigidity of POSIX IO's strong consistency.
-Subtrees without policies inherit the consistency/durability semantics of the
-parent and future work will examine embeddable or inheritable policies.
+paper, although the semantics and their performance is explored
+in~\S\ref{sec:use-case-1}.} subtree has weaker than strong consistency because
+for performance it lets clients read files opened for
+writing~\cite{hakimzadeh:dais14-hdfs-consistency}, which means that not all
+updates are immediately seen by all servers; the BatchFS and RAMDisk subtrees
+are decoupled from the global namespace and have similar consistency/durability
+behavior to those systems; and the POSIX IO subtree retains the rigidity of
+POSIX IO's strong consistency.  Subtrees without policies inherit the
+consistency/durability semantics of the parent and future work will examine
+embeddable or inheritable policies.
 
 Our prototype system, Cudele, achieves this by exposing ``mechanisms" that
 developers use to specify their preferred semantics.  Cudele supports 3 forms
@@ -82,11 +84,11 @@ that can be custom fit to an application. We make the following contributions:
 
   \item A framework and API for assigning consistency/durability policies 
   to subtrees in the file system namespace; this lets users navigate
-  the trade-offs of different metadata protocols.
+  the trade-offs of different metadata protocols on the same storage system.
 
   \item This framework lets subtrees with different semantics co-exist in a
   global namespace. We show how this scales further and performs better than
-  systems that use one strategy for the entire namespace 
+  systems that use one strategy for the entire namespace .
 
   \item A prototype that lets users custom fit subtrees to applications
   dynamically. 
@@ -94,7 +96,7 @@ that can be custom fit to an application. We make the following contributions:
 \end{enumerate}
 
 The last contribution lays the groundwork for future work on our prototype. It
-improves the current practice of mounting different storage systems in a global
+is better than the current practice of mounting different storage systems in a global
 namespace because there is no need to provision dedicated storage clusters to
 applications or move data between these systems.  For example, the results of a
 Hadoop job do not need to be migrated into CephFS for other processing; instead
@@ -111,13 +113,11 @@ assertions of ``clean-state" research that decouple namespaces; specifically
 that the technique drastically improves performance (104\(\times\) speed up).
 We go a step further by quantifying the costs of merging updates (7\(\times\)
 slow down) and maintaining durability (\(10\times\) slow down). In our
-prototype, we get an 8\(\times\) speedup and can scale to twice as many servers
+prototype, we get an 8\(\times\) speedup and can scale to twice as many clients
 when we assign a more relaxed form of consistency and durability to a subtree
-with a create-heavy workload.  We build on Ceph because it is used in
-cloud-based and data center systems and has a presence in HPC~\cite{}.  More
-importantly,  we use Ceph as a platform for exploring related work over the
-same storage system, which facilitates an apples-to-apples comparison of the
-strategies themselves.  
+with a create-heavy workload.  We use Ceph as a prototyping platform because it
+is used in cloud-based and data center systems and has a presence in
+HPC~\cite{wang:pdsw13-ceph-hpc}. 
 
 %In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
 %cost of POSIX IO consistency and system-defined durability and
