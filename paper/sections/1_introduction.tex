@@ -1,7 +1,7 @@
 \section{Introduction}
 
 % What is the problem?
-File system metadata services in HPC and data center applications  have
+File system metadata services in HPC and large-scale data centers have
 scalability problems because common tasks, like
 checkpointing~\cite{bent_plfs_2009} or scanning the file
 system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
@@ -63,9 +63,9 @@ applications optimized with techniques from different state-of-the-art
 architectures.  The HDFS\footnote{HDFS itself is not directly evaluated in this
 paper, although the semantics and their performance is explored
 in~\S\ref{sec:use-case-1}.} subtree has weaker than strong consistency because
-for performance it lets clients read files opened for
+it lets clients read files opened for
 writing~\cite{hakimzadeh:dais14-hdfs-consistency}, which means that not all
-updates are immediately seen by all servers; the BatchFS and RAMDisk subtrees
+updates are immediately seen by all clients; the BatchFS and RAMDisk subtrees
 are decoupled from the global namespace and have similar consistency/durability
 behavior to those systems; and the POSIX IO subtree retains the rigidity of
 POSIX IO's strong consistency.  Subtrees without policies inherit the
