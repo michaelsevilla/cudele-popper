@@ -74,10 +74,10 @@ will not be lost. Local durability means that metadata can be lost if the
 client or server stays down after a failure. None means that metadata is volatile
 and that the system provides no guarantees when clients or servers fail. 
 None is different than local durability because regardless of the type failure,
-metadata will be lost when components die in a None configuration.\\
+metadata will be lost when components die in a None configuration.
 
 % - sequential IO, trim redundant operations
-\noindent\textbf{CephFS Design}: a journal of metadata updates that streams into
+\textbf{CephFS Design}: a journal of metadata updates that streams into
 the resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
 WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to grow to large which
 ensures (1) sequential writes into the object store and (2) the ability for daemons to
@@ -114,9 +114,9 @@ the metadata server periodically stops serving requests to flush ({\it i.e.}
 apply journal updates) to the metadata store.  The journal overhead is
 sufficient enough to slow down metadata throughput but not so much as to
 overwhelm the bandwidth of the object store. We measured our peak bandwidth to
-be 100MB/s, which is the speed of our network link.\\
+be 100MB/s, which is the speed of our network link.
 
-\noindent\textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS,
+\textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS,
 to the best of our knowledge, when a client or server fails there is no recovery
 scheme. For BatchFS, if a client fails when it is writing to the local
 log-structured merged tree (implemented as an SSTable) then those batched
@@ -133,9 +133,9 @@ distributed file system.
 Access to metadata in a POSIX IO-compliant file system is strongly consistent, so
 reads and writes to the same inode or directory are globally ordered.  The
 synchronization and serialization machinery needed to ensure that all clients
-see the same state has high overhead.\\
+see the same state has high overhead.
 
-\noindent\textbf{CephFS Design}: capabilities keep metadata strongly
+\textbf{CephFS Design}: capabilities keep metadata strongly
 consistent. To reduce the number of RPCs needed for consistency, clients can
 obtain capabilities for reading, creating and updating inodes, as well as caching reads,
 buffering writes, changing the file size, and performing lazy IO.
@@ -167,12 +167,12 @@ each client creates files in private directories and at 30 seconds we launch
 another process that creates files in those directories. 18 clients is the
 maximum number the metadata server could handle for this metadata-intensive
 workload; at higher client load, the metadata server started complaining about
-laggy and unresponsive requests.\\
+laggy and unresponsive requests.
 
 % TODO: what is the cost of trimming the cache?
 % TODO: does CephFS still cache inodes when I turn off caching? Why is still keeping inodes in memory? Gah!
 
-\noindent\textbf{Comparison to decoupled namespaces}: Decoupled namespaces
+\textbf{Comparison to decoupled namespaces}: Decoupled namespaces
 merge batches of metadata operations into the global namespaces when the job
 completes.  In BatchFS the merge is delayed by the application using an API to
 switch between asynchronous to synchronous mode. The merge itself is explicitly
