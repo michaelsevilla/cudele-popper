@@ -9,31 +9,28 @@ CPU utilization because of the consistency and durability demands of
 CephFS.}\label{fig:overhead-creates}
 \end{figure}
 
-% CITEME PDSW paper
-In our examination of the overheads of POSIX IO we benchmark and analyze CephFS,
-the file system that uses Ceph's object store ({\it i.e.} RADOS) to store its
-data and metadata. To show how the file system behaves under high metadata load
-we use a create-heavy workload. Create-heavy workloads are studied the most in
-HPC research because of the checkpoint/restart use case but they also happen to
-stress the underlying storage system the most.  During this process we
+In our examination of the overheads of POSIX IO we benchmark and analyze
+CephFS, the file system that uses Ceph's object store ({\it i.e.} RADOS) to
+store its data and metadata. To show how the file system behaves under high
+metadata load we use a create-heavy workload.  During this process we
 discovered, based on the analysis and breakdown of costs, that durability and
-consistency have high overhead but we urge the read to keep in mind that this
+consistency have high overhead but we urge the reader to keep in mind that this
 file system is an implementation of one set of design decisions and our goal
 here is to highlight the effect that those decisions have on performance.
 
-% CITE ME Lustre paralle
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
 the Linux kernel.  The \texttt{untar} phase, which is characterized by many
 creates, has the highest resource usage (combined CPU, network, and disk)
 because of the number of RPCs needed for consistency and durability. The RPCs
 are also serialized because the metadata server is single threaded; although
-naive, this design is common because of the complexity of multi-threaded
-metadata servers.  Traditional file system techniques for improving
-performance, such as caching inodes, do not help for create-heavy workloads.
-In this section, we quantify the costs of consistency and durability in CephFS.
-At the end of each subsection we compare the approach to ``decoupled
-namespaces", the technique in related work that detaches subtrees from the
-global namespace to relax consistency/durability guarantees. 
+na\"{\i}ve, this design is common because of the complexity of multi-threaded
+metadata servers~\cite{konstantinos:pdsw2014-lustre-metadata}.  Traditional
+file system techniques for improving performance, such as caching inodes, do
+not help for create-heavy workloads.  In this section, we quantify the costs of
+consistency and durability in CephFS.  At the end of each subsection we compare
+the approach to ``decoupled namespaces", the technique in related work that
+detaches subtrees from the global namespace to relax consistency/durability
+guarantees. 
 
 \subsection{Durability}
 \label{sec:durability}
@@ -116,17 +113,17 @@ sufficient enough to slow down metadata throughput but not so much as to
 overwhelm the bandwidth of the object store. We measured our peak bandwidth to
 be 100MB/s, which is the speed of our network link.
 
-% CITEME: SSTables
-\textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS,
-to the best of our knowledge, when a client or server fails there is no recovery
+\textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS, to the
+best of our knowledge, when a client or server fails there is no recovery
 scheme. For BatchFS, if a client fails when it is writing to the local
-log-structured merged tree (implemented as an SSTable) then those batched
-metadata operations are lost. For DeltaFS, if the client fails then, on restart,
-the computation does the work again -- since the snapshots of the namespace are
-never globally consistent and there is no ground truth.  On the server side,
-BatchFS and DeltaFS use IndexFS. IndexFS writes metadata to SSTables, which
-initially reside in memory but are later flushed to the underlying
-distributed file system.
+log-structured merged tree (implemented as an
+SSTable~\cite{ren:atc2013-tablefs}) then those batched metadata operations are
+lost. For DeltaFS, if the client fails then, on restart, the computation does
+the work again -- since the snapshots of the namespace are never globally
+consistent and there is no ground truth.  On the server side, BatchFS and
+DeltaFS use IndexFS. IndexFS writes metadata to SSTables, which initially
+reside in memory but are later flushed to the underlying distributed file
+system.
 
 \subsection{Strong Consistency}
 \label{sec:strong-consistency}

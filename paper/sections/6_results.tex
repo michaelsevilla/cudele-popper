@@ -162,15 +162,15 @@ namespace. The inflection point is the trade-off of frequent updates vs. larger
 journal files.\label{fig:use-cases}}
 \end{figure*}
 
-% CITEME xiao:socc2015-shardfs CITEME HADOOP
 First we show how we can build application-specific subtrees by composing
-mechanisms and that this approach results in more a scalable global
-namespace. We start with clients creating files in private directories because
-this workload is heavily studied in HPC~\cite{weil:sc2004-dyn-metadata,
+mechanisms and that this approach results in more a scalable global namespace.
+We start with clients creating files in private directories because this
+workload is heavily studied in HPC~\cite{weil:sc2004-dyn-metadata,
 ren:sc2014-indexfs, patil:fast2011-giga, zheng:pdsw2014-batchfs,
 sevilla:sc15-mantle}, mostly due to checkpoint-restart~\cite{bent_plfs_2009}.
-But the workload also appears in cloud workloads, where systems like Hadoop use
-the file abstraction to exchange work units to workers or to indicate when jobs
+But the workload also appears in cloud workloads~\cite{xiao:socc15-shardfs},
+where systems like Hadoop use the file abstraction to exchange work units to
+workers or to indicate when jobs
 complete~\cite{shvachko:login2012-hdfs-scalability}. A more familiar example is
 uncompressing an archive ({\it e.g.}, \texttt{tar xzf}), where the file system
 services a flash crowd of creates across all directories as shown in
@@ -259,7 +259,8 @@ mechanism.
 
 \textbf{Takeaway}: the ability to couple well-established techniques to
 specific applications allows the global namespace to scale further and perform
-better.
+better. In our case, RPCs overwhelm the system but decoupling/shipping a
+journal of updates improves scalability by 2\(\times\).
 
 %\section{notes}
 %Linking clients into our custom libcephfs
@@ -349,7 +350,6 @@ controlling consistency.
 
 \subsection{Use Case 3: Read while Writing}
 
-% CITEME
 The final use case shows how the API gives users fine-grained control of the
 consistency semantics for niche or {\it ad-hoc} workflows.  Scientists use the
 file system to check the progress of jobs using \texttt{ls} even though this
