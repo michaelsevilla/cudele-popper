@@ -13,11 +13,11 @@ component and then we show how we use it in Cudele.
 %persist),  change to metadata server (nonvolatile apply)
 
 % how it works in CephFS, how I used it
-\subsection{Metadata Store}
-\label{sec:metadata-store}
+%\subsection{Metadata Store}
+%\label{sec:metadata-store}
 
 % how it works in CephFS
-In CephFS, the metadata store is a data structure that represents the file
+\textbf{Metadata Store}: In CephFS, the metadata store is a data structure that represents the file
 system namespace. This data structure is stored in two places: in memory ({\it
 i.e.} in the collective memory of the metadata server cluster) and as objects
 in the object store. In the object store, directories and their inodes are
@@ -35,10 +35,10 @@ the metadata server.
 
 %\noindent\textbf{Used to Implement}: RPCs, Stream, Volatile Apply
 
-\subsection{Journal}
-\label{sec:journal}
+%\subsection{Journal}
+%\label{sec:journal}
 
-The journal is the second way that CephFS represents the file system namespace;
+\textbf{Journal}: The journal is the second way that CephFS represents the file system namespace;
 it is a log of metadata updates that can materialize the namespace when the
 updates are replayed onto the metadata store. The journal is a ``pile system";
 writes are fast but reads are slow because state must be reconstructed.
@@ -58,10 +58,10 @@ write/read optimized data structures, the formats for persisting events
 (similar to TableFS's SSTables~\cite{ren:atc2013-tablefs}), and the functions
 for replaying events onto the internal namespace data structures.
 
-\subsection{Journal Tool}
-\label{sec:journal-tool}
+%\subsection{Journal Tool}
+%\label{sec:journal-tool}
 
-The journal tool is used for disaster recovery and lets administrators view and
+\textbf{Journal Tool}: The journal tool is used for disaster recovery and lets administrators view and
 modify the journal. It can read the journal, export the journal as a file,
 erase events, and apply updates to the metadata store.  To apply journal
 updates to the metadata store, the journal tool reads the journal from object
@@ -120,10 +120,10 @@ modifying the updates in the journal so we re-purposed that code to implement
 %children tell us which dentry names an inode has and the inode locations map
 %the parent inode to its child inode and dentry.  
 
-\subsection{Inode Cache}
-\label{sec:inode-cache}
+%\subsection{Inode Cache}
+%\label{sec:inode-cache}
 
-In CephFS, the inode cache reduces the number of RPCs between clients and
+\textbf{Inode Cache}: In CephFS, the inode cache reduces the number of RPCs between clients and
 metadata servers. Without contention clients can resolve metadata reads locally
 thus reducing the number of operations ({\it e.g.}, \texttt{lookup()}s).  For example, if a client or
 metadata server is not caching the directory inode, all creates within that
@@ -137,12 +137,12 @@ inodes to clients.
 
 \textbf{Cudele}: ``Nonvolatile Apply" uses the internal inode cache
 code to allocate inodes to clients that decouple parts of the namespace and to
-skip inodes used by the client at merge time.\\
+skip inodes used by the client at merge time.
 
-\subsection{Large Inodes}
-\label{sec:large-inodes}
+%\subsection{Large Inodes}
+%\label{sec:large-inodes}
 
-In CephFS, inodes already store policies, like how the file is striped
+\textbf{Large Inodes}: In CephFS, inodes already store policies, like how the file is striped
 across the object store or for managing subtrees for load balancing. These
 policies adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has

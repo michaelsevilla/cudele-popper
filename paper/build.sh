@@ -2,6 +2,7 @@
 
 rm -r _minted-paper paper.aux paper.bbl paper.blg paper.log paper.out paper.synctex.gz build.log >> /dev/null 2>&1
 set -x
+cp biblio/references.bib paper.bib
 
 # Build the paper
 docker run --rm \

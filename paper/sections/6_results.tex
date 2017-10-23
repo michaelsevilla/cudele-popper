@@ -28,31 +28,30 @@ explored with something like Mantle~\cite{sevilla:sc15-mantle}.
 %daemons.\label{table:clusters}} 
 %\end{table}
 
-We run experiments on the same cluster and normalize results to control for
-hardware differences and to make our results more generally applicable and
-reproducible\footnote{ This paper adheres to The Popper
-Convention~\cite{jimenez_popper_2016}, so experiments presented here are
-available in the repository for this article.  Experiments can be examined in
-more detail, or even re-run, by visiting the \texttt{[source]} link next to
-each figure. That link points to a Jupyter notebook that shows the analysis and
-source code for that graph, which points to an experiment and its artifacts.}.
-We use a CloudLab cluster of 34 nodes, each with 16 2.4 GHz CPUs, 128GB RAM,
-and SSDs.  Each node uses Ubuntu 14.04 and We develop on Ceph's Jewel release,
-version 10.2.1, which was released in May 2016. All daemons run as a single
-process (the default setting for Ceph) and the Ceph
-components\footnote{http://docs.ceph.com/docs/jewel/rados/} are: 1 monitor, 3
-object storage daemons, 1 metadata server, and 29 clients.
+%We run experiments on the same cluster and normalize results to control for
+%hardware differences and to make our results more generally applicable and
+%reproducible\footnote{ This paper adheres to The Popper
+%Convention~\cite{jimenez_popper_2016}, so experiments presented here are
+%available in the repository for this article.  Experiments can be examined in
+%more detail, or even re-run, by visiting the \texttt{[source]} link next to
+%each figure. That link points to a Jupyter notebook that shows the analysis and
+%source code for that graph, which points to an experiment and its artifacts.}.
+%We use a CloudLab cluster of 34 nodes, each with 16 2.4 GHz CPUs, 128GB RAM,
+%and SSDs.  Each node uses Ubuntu 14.04 and We develop on Ceph's Jewel release,
+%version 10.2.1, which was released in May 2016. All daemons run as a single
+%process (the default setting for Ceph) and the Ceph
+%components\footnote{http://docs.ceph.com/docs/jewel/rados/} are: 1 monitor, 3
+%object storage daemons, 1 metadata server, and 29 clients.
 
 \subsection{Microbenchmarks}
 \label{sec:microbenchmarks}
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
-\caption{[\href{https://www.google.com}{source}] Performance of each
-mechanism (left) and building consistency/durability guarantees (right) for
-100K files creates from a single client. Results are normalized to the runtime of writing
-events to the client's in-memory journal.
-\label{fig:composable-mechanisms}}
+\caption{Performance of each mechanism (left) and building
+consistency/durability guarantees (right) for 100K files creates from a single
+client. Results are normalized to the runtime of writing events to the client's
+in-memory journal.  \label{fig:composable-mechanisms}}
 \end{figure}
 
 %\begin{figure}[tb]
