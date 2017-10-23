@@ -48,10 +48,10 @@ explored with something like Mantle~\cite{sevilla:sc15-mantle}.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
-\caption{Performance of each mechanism (left) and building
-consistency/durability guarantees (right) for 100K files creates from a single
-client. Results are normalized to the runtime of writing events to the client's
-in-memory journal.  \label{fig:composable-mechanisms}}
+\caption{Performance of each mechanism (left) and building the
+consistency/durability semantics of real-world systems (right) for 100K files
+creates from a single client. Results are normalized to the runtime of writing
+events to the client's in-memory journal.  \label{fig:composable-mechanisms}}
 \end{figure}
 
 %\begin{figure}[tb]
@@ -154,7 +154,7 @@ implemented.
       \label{fig:slowdown-sync}
   \end{subfigure}
 \caption{The performance and features of Cudele. (a) shows the cost of
-merging client journals at the metadata server. Merging is better than RPCs
+merging client journals at the metadata server. Shipping and merging journals of updates scales better than RPCs
 because there are less messages and consistency/durability code paths are
 bypassed. In (b), the allow/block API isolates directories from interfering
 clients. (c) is the slowdown of a single client syncing updates to the global

@@ -1,18 +1,19 @@
 \section{Introduction}
 
 % What is the problem?
-File system metadata services in HPC have scalability problems because
-administrative tasks, like checkpointing~\cite{bent_plfs_2009} or scanning the
-file system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
+File system metadata services in HPC and data center applications  have
+scalability problems because administrative tasks, like
+checkpointing~\cite{bent_plfs_2009} or scanning the file
+system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
 inodes. Applications perform better with dedicated metadata
 servers~\cite{sevilla:sc15-mantle, ren:sc2014-indexfs} but provisioning a
 metadata server for every client is unreasonable. This problem is exacerbated
-by current trends in HPC, where architectures are transitioning from complex
-storage stacks with burst buffer, file system, object store, and tape tiers to
-more simplified stacks with just a burst buffer and object
-store~\cite{bent:login16-hpc-trends}; this puts more pressure on data access
-because more requests end up hitting the same layer and latencies cannot be
-hidden while data migrates across tiers.
+by current trends; for example, HPC architectures are transitioning from
+complex storage stacks with burst buffer, file system, object store, and tape
+tiers to more simplified stacks with just a burst buffer and object
+store~\cite{bent:login16-hpc-trends}. These types of trends put more pressure
+on data access because more requests end up hitting the same layer and
+latencies cannot be hidden while data migrates across tiers.
 
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
@@ -20,24 +21,21 @@ semantics in the file system because weaker guarantees are sufficient for their
 applications. For example, many batch style jobs do not need the strong
 consistency that the file system provides, so
 BatchFS~\cite{zheng:pdsw2014-batchfs} and DeltaFS~\cite{zheng:pdsw2015-deltafs}
-do more client-side processing and merge updates when the job is done. HPC
-developers are turning to these non-POSIX IO solutions because their applications
-are well-understood ({\it e.g.}, well-defined read/write phases,
-synchronization only needed during certain phases, workflows describing
-computation, etc.) and because these applications wreak havoc on file systems designed for
-general-purpose workloads ({\it e.g.}, checkpoint-restart's N:N and N:1 create
-patterns~\cite{bent_plfs_2009}).
+do more client-side processing and merge updates when the job is done.
+Developers in these domains are turning to these non-POSIX IO solutions because
+their applications are well-understood ({\it e.g.}, well-defined read/write
+phases, synchronization only needed during certain phases, workflows describing
+computation, etc.) and because these applications wreak havoc on file systems
+designed for general-purpose workloads ({\it e.g.}, checkpoint-restart's N:N
+and N:1 create patterns~\cite{bent_plfs_2009}).
 
-\begin{figure}[tb]
-\centering
+\begin{figure}[tb] \centering
 \includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
-\caption{ Illustration of subtrees with different semantics co-existing in a
+\caption{Illustration of subtrees with different semantics co-existing in a
 global namespace.  For performance, clients can relax consistency on their
-subtree (HDFS) or even decouple the subtree and move it locally (BatchFS,
-RAMDisk). Decoupled subtrees can further relax durability for even better
-performance. 
-}\label{fig:subtree-policies}
-\end{figure}
+subtree (HDFS) or decouple the subtree and move it locally (BatchFS, RAMDisk).
+Decoupled subtrees can relax durability for even better performance.
+}\label{fig:subtree-policies} \end{figure}
 
 % One example
 One popular approach for relaxing consistency and durability is to ``decouple

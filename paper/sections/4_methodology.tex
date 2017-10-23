@@ -4,9 +4,10 @@
 \begin{figure}[tb]
 \centering
 \includegraphics[width=90mm]{figures/fig-decouple.png}
-\caption{Applications decouple the namespace, write updates to a local journal,
-and delay updates using the \textbf{mechanisms} shown here; they are described
-in Table~\ref{table:mechanisms}.}\label{fig:decouple}
+\caption{Illustration of the \textbf{mechanisms} used by applications to build
+consistency/durability semantics. Descriptions are provided in
+Table~\ref{table:mechanisms} and the underlined words in
+Section~\S\ref{sec:the-cudelesfs-mechanisms}.}\label{fig:decouple}
 \end{figure}
 
 \begin{table}
@@ -20,8 +21,7 @@ in Table~\ref{table:mechanisms}.}\label{fig:decouple}
   Local Persist     & journal saved to client's disk \\
   Global Persist    & journal saved in object store \\
 \end{tabular}
-\caption{Mechanisms are composed together to form consistency and
-durability semantics.\label{table:mechanisms}} 
+\caption{Descriptions of the mechanisms. Example compositions are shown in Table~\ref{table:spectrum}.\label{table:mechanisms}} 
 \end{table}
 
 In this section we describe Cudele, our API and framework that lets users

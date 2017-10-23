@@ -74,7 +74,7 @@ regardless of the type failure, metadata will be lost when components die in a
 None configuration.
 
 % - sequential IO, trim redundant operations
-\textbf{CephFS Design}: a journal of metadata updates that streams into the
+\textbf{CephFS Design}: A journal of metadata updates that streams into the
 resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
 WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to be large
 (on the order of MBs) which ensures (1) sequential writes into the object store
@@ -133,7 +133,7 @@ reads and writes to the same inode or directory are globally ordered.  The
 synchronization and serialization machinery needed to ensure that all clients
 see the same state has high overhead.
 
-\textbf{CephFS Design}: capabilities keep metadata strongly
+\textbf{CephFS Design}: Capabilities keep metadata strongly
 consistent. To reduce the number of RPCs needed for consistency, clients can
 obtain capabilities for reading, creating and updating inodes, as well as caching reads,
 buffering writes, changing the file size, and performing lazy IO.
