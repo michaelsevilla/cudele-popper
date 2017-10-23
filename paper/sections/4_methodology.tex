@@ -5,7 +5,8 @@
 \centering
 \includegraphics[width=90mm]{figures/fig-decouple.png}
 \caption{Applications decouple the namespace, write updates to a local journal,
-and delay metadata updates using the Cudele Mechanisms }\label{fig:decouple}
+and delay updates using the \textbf{mechanisms} shown here; they are described
+in Table~\ref{table:mechanisms}.}\label{fig:decouple}
 \end{figure}
 
 \begin{table}
@@ -27,11 +28,11 @@ In this section we describe Cudele, our API and framework that lets users
 assign consistency and durability semantics to subtrees in the global
 namespace. A \textbf{mechanism} is an abstraction and basic building block for
 constructing consistency and durability guarantees. Cudele exposes these
-mechanisms and the user composes them together to construct
-\textbf{policies}. These policies are assigned to subtrees and they dictate how
-the file system should handle operations within that subtree.  Below, we
-describe the mechanisms, the policies, and the API for assigning policies to
-subtrees.
+mechanisms and the user composes them together to construct \textbf{policies}.
+These policies are assigned to subtrees and they dictate how the file system
+should handle operations within that subtree.  Below, we describe the
+mechanisms (which are \underline{underlined}), the policies, and the API for assigning
+policies to subtrees.
 
 \subsection{Mechanisms: Building Guarantees}
 \label{sec:the-cudelesfs-mechanisms}
@@ -39,35 +40,41 @@ subtrees.
 % describe the figure
 Figure~\ref{fig:decouple} shows the mechanisms (labeled arrows) in Cudele and
 which daemon(s) they are performed by.  Table~\ref{table:mechanisms} has a
-description of what each mechanism does.  Decoupled clients use the ``Append Client Journal"
-mechanism to append metadata updates to a local, in-memory journal. Once the
-job is complete, the system calls Cudele mechanisms to achieve the desired
-consistency/durability semantics.  Cudele provides a library for clients to
-link into and all operations are performed by the client.  
+description of what each mechanism does.  Decoupled clients use the
+\underline{Append Client Journal} mechanism to append metadata updates to a
+local, in-memory journal. This is fast because clients do not need to check for
+consistency when writing events and the metadata server blindly applies the
+updates because it assumes the events were already checked for consistency. The
+trade-off here is performance; it is a dangerous approach but could be
+implemented safely if the clients or metadata server are configured to check
+the validity of events before writing them.  Once the job is complete, the
+system calls Cudele mechanisms to achieve the desired consistency/durability
+semantics.  Cudele provides a library for clients to link into and all
+operations are performed by the client.  
 
-\subsubsection{Mechanisms Used for Consistency} ``RPCs" send remote procedure
+\subsubsection{Mechanisms Used for Consistency} \underline{RPCs} send remote procedure
 calls for every metadata operation from the client to the metadata server,
 assuming the request cannot be satisfied by the inode cache. This mechanism is
 part of the default CephFS implementation and is the strongest form of
-consistency because clients see metadata updates right away.  ``Nonvolatile
-Apply" replays the client's journal onto the metadata cluster's metadata store.
+consistency because clients see metadata updates right away.  \underline{Nonvolatile
+Apply} replays the client's journal onto the metadata cluster's metadata store.
 The client's in-memory journal is written into the object store and the
 metadata servers are restarted. When the metadata servers re-initialize, they
 notice new journal updates in the object store and replay the events onto their
-in-memory metadata stores.  ``Volatile Apply" takes the client's in-memory journal on the
+in-memory metadata stores.  \underline{Volatile Apply} takes the client's in-memory journal on the
 client and applies the updates directly to the in-memory metadata store maintained
 by the metadata servers. We say volatile because -- in exchange for peak
 performance -- Cudele makes no consistency or durability guarantees while
-``Volatile Apply" is executing.  If a concurrent update from a client occurs
+Volatile Apply is executing.  If a concurrent update from a client occurs
 there is no rule for resolving conflicts and if the client or metadata server
 crashes there may be no way to recover.
 
 % difference between apply and volatile apply
-The biggest difference between ``Volatile Apply" and ``Nonvolatile Apply" is
-the medium they use to communicate. ``Volatile Apply" applies updates directly
-to the metadata servers' metadata store while ``Nonvolatile Apply" uses the
+The biggest difference between Volatile Apply and Nonvolatile Apply is
+the medium they use to communicate. Volatile Apply applies updates directly
+to the metadata servers' metadata store while Nonvolatile Apply uses the
 object store to communicate the journal of updates from the client to the
-metadata servers.  ``Nonvolatile Apply" is safer but has a large performance
+metadata servers.  Nonvolatile Apply is safer but has a large performance
 overhead because objects in the metadata store need to be read from and written
 back to the object store.
 
@@ -84,13 +91,13 @@ back to the object store.
 %store from the client.  Next, we discuss how these mechanisms can be composed
 %to get different consistency and durability semantics. 
 
-\subsubsection{Mechanisms Used for Durability} ``Stream" is one of the
+\subsubsection{Mechanisms Used for Durability} \underline{Stream} is one of the
 mechanisms used by default in CephFS.  Using existing configuration settings in
-Ceph we can turn ``Stream" on and off.  If it is off, then the metadata servers
-will not save journals in the object store. For ``Local Persist", clients write
-serialized log events to a file on local disk and for ``Global Persist",
-clients push the journal into the objects store. The overheads for both ``Local
-Persist" and ``Global Persist" is the write bandwidth of the local disk and
+Ceph we can turn Stream on and off.  If it is off, then the metadata servers
+will not save journals in the object store. For \underline{Local Persist}, clients write
+serialized log events to a file on local disk and for \underline{Global Persist},
+clients push the journal into the objects store. The overheads for both Local
+Persist and Global Persist is the write bandwidth of the local disk and
 object store, respectively.  These persist mechanisms are part of the library that
 links into the client.
 
@@ -118,21 +125,20 @@ durability (D) spectrum by composing Cudele mechanisms.
 \end{center}
 \end{table}
 
-
-
 % describe table
-The spectrum of consistency and durability guarantees that users can
-construct is shown in Table~\ref{table:spectrum}. The columns are the different
+The spectrum of consistency and durability guarantees that users can construct
+is shown in Table~\ref{table:spectrum}. The columns are the different
 consistency semantics and the rows cover the spectrum of durability guarantees.
 For consistency: ``invisible" means the system does not handle merging updates
 into a global namespace and it is assumed that middleware or the application
-manages consistency lazily; ``weak" merges updates at some time in the
-future ({\it e.g.}, when the system has time, when the number of updates reaches a
+manages consistency lazily; ``weak" merges updates at some time in the future
+({\it e.g.}, when the system has time, when the number of updates reaches a
 certain threshold, when the client is done writing, etc.); and updates in
 ``strong" consistency are seen immediately by all clients. For durability,
 ``none" means that updates are volatile and will be lost on a failure. Stronger
 guarantees are made with ``local", which means updates will be retained if the
-client node recovers, and ``global", where all updates are always recoverable.
+client node recovers and reads the updates from local storage, and ``global",
+where all updates are always recoverable.
 
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
@@ -156,23 +162,24 @@ quantified in Sections~\S\ref{sec:microbenchmarks} and~\S\ref{sec:use-case-1}.
 The consistency and durability properties in Table~\ref{table:spectrum} are not
 guaranteed until all mechanisms in the cell are complete. The compositions
 should be considered atomic and there are no guarantees while transitioning
-between policies. For example, updates are not deemed to have ``global" durability until
-they are safely saved in the object store. If a failure occurs during ``global
-persist" or if we inject a new policy that changes a subtree from ``local
-persist" to ``global persist", Cudele makes no guarantee until the mechanisms are
-complete.
+between policies. For example, updates are not deemed to have ``global"
+durability until they are safely saved in the object store. If a failure occurs
+during Global Persist or if we inject a new policy that changes a subtree from
+Local Persist to Global Persist, Cudele makes no guarantee until the mechanisms
+are complete. Despite this, production systems that use Cudele should state
+up-front what the transition guarantees are for subtrees.
 
 \subsection{Cudele Namespace API}
 \label{sec:cudelefs-namespace-api}
 
-
-
 % the interface
-Users control consistency and durability for subtrees by contacting the monitor
-daemon with a directory path and presenting a policies configuration file.
-For example, (msevilla/mydir, policies.yml) would decouple the path
-``msevilla/mydir" and would apply the policies in ``policies.yml".  The
-policies file supports the following parameters (default values are in parenthesis):
+Users control consistency and durability for subtrees by contacting a daemon in
+the system called a monitor, which manages cluster state changes.  Users
+present a directory path and a policies configuration that gets distributed and
+versioned by the monitor to all daemons in the system. For example,
+(msevilla/mydir, policies.yml) would decouple the path ``msevilla/mydir" and
+would apply the policies in ``policies.yml".  The policies file supports the
+following parameters (default values are in parenthesis):
 
 \begin{itemize}
 

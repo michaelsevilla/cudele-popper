@@ -21,12 +21,15 @@ consistency have high overhead but we urge the read to keep in mind that this
 file system is an implementation of one set of design decisions and our goal
 here is to highlight the effect that those decisions have on performance.
 
+% CITE ME Lustre paralle
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
 the Linux kernel.  The \texttt{untar} phase, which is characterized by many
-creates, has the highest resource usage which suggests that it is stressing the
-consistency and journaling subsystems of the metadata server the most.
-Traditional file system techniques for improving performance, such as caching
-inodes, do not help for create-heavy workloads.
+creates, has the highest resource usage (combined CPU, network, and disk)
+because of the number of RPCs needed for consistency and durability. The RPCs are
+also serialized because the metadata server is single threaded; although naive,
+this design is common because of the complexity of multi-threaded metadata
+servers.  Traditional file system techniques for improving performance, such as
+caching inodes, do not help for create-heavy workloads.
 
 In this section, we quantify the costs of strong consistency and global
 durability in CephFS. At the end of each subsection we compare the approach to
@@ -48,7 +51,7 @@ are stressing the servers more.
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=1.0\linewidth]{graphs/behavior-interfere.png}
+      \includegraphics[width=1.2\linewidth]{graphs/behavior-interfere.png}
       \caption{Interference forces \texttt{lookup()}s}
       \label{fig:overhead-b}
   \end{subfigure}
@@ -66,27 +69,28 @@ are stressing the servers more.
 \end{figure*}
 
 % what is durability
-While durability is not specified by POSIX IO, users expect that files they create
-or modify survive failures.  We define three types of durability: global,
-local, and none.  Global
-durability means that the client or server can fail at any time and metadata
-will not be lost. Local durability means that metadata can be lost if the
-client or server stays down after a failure. None means that metadata is volatile
-and that the system provides no guarantees when clients or servers fail. 
-None is different than local durability because regardless of the type failure,
-metadata will be lost when components die in a None configuration.
+While durability is not specified by POSIX IO, users expect that files they
+create or modify survive failures.  We define three types of durability:
+global, local, and none.  Global durability means that the client or server can
+fail at any time and metadata will not be lost because it is ``safe" ({\it
+i.e.} striped or replicated across a cluster). Local durability means that
+metadata can be lost if the client or server stays down after a failure. None
+means that metadata is volatile and that the system provides no guarantees when
+clients or servers fail.  None is different than local durability because
+regardless of the type failure, metadata will be lost when components die in a
+None configuration.
 
 % - sequential IO, trim redundant operations
-\textbf{CephFS Design}: a journal of metadata updates that streams into
-the resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
-WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to grow to large which
-ensures (1) sequential writes into the object store and (2) the ability for daemons to
-trim redundant or irrelevant journal entries.  The journal is striped over
-objects where multiple journal updates can reside on the same object. There are
-two tunables for controlling the journal: the segment size and the number of
-parallel segments that can be written in parallel. Unless the journal saturates 
-memory or CPU resources, larger values for these tunables results in better
-performance.
+\textbf{CephFS Design}: a journal of metadata updates that streams into the
+resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
+WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to grow large
+(on the order of MBs) which ensures (1) sequential writes into the object store
+and (2) the ability for daemons to trim redundant or irrelevant journal
+entries.  The journal is striped over objects where multiple journal updates
+can reside on the same object. There are two tunables for controlling the
+journal: the segment size and the number of segments that can be written in
+parallel. Unless the journal saturates memory or CPU resources, larger values
+for these tunables results in better performance.
 
 % purpose of the journal
 In addition to the metadata journal, CephFS also represents metadata in RADOS
@@ -116,6 +120,7 @@ sufficient enough to slow down metadata throughput but not so much as to
 overwhelm the bandwidth of the object store. We measured our peak bandwidth to
 be 100MB/s, which is the speed of our network link.
 
+% CITEME: SSTables
 \textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS,
 to the best of our knowledge, when a client or server fails there is no recovery
 scheme. For BatchFS, if a client fails when it is writing to the local
@@ -151,13 +156,14 @@ client immediately reads all the inodes in the cache ({\it i.e.} \texttt{ls
 
 % benefits PROBLEM -- IS THIS THE METADATA PROTOCOL OR JUST THE OVERLOADEDNESS?
 The benefits of caching the directory inode when creating files is shown in
-Figure~\ref{fig:overhead-b}.  If only one client is creating files in a
-directory (``isolated" curve on \(y1\) axis) then that client can lookup the
-existence of new files locally before issuing a create request to the metadata
-server. If another client starts creating files in the same directory
-(``interfere" curve on \(y1\) axis) then the directory inode transitions out of
-read caching and the first client must send \texttt{lookup()}s to the metadata
-server (``interfere" curve on \(y2\) axis). These extra requests increase the
+Figure~\ref{fig:overhead-b}. The colors show the behavior of the client for two
+different runs.  If only one client is creating files in a directory
+(``isolated" curve on \(y1\) axis) then that client can lookup the existence of
+new files locally before issuing a create request to the metadata server. If
+another client starts creating files in the same directory (``interfere" curve
+on \(y1\) axis) then the directory inode transitions out of read caching and
+the first client must send \texttt{lookup()}s to the metadata server
+(``interfere" curve on \(y2\) axis). These extra requests increase the
 throughput of the ``interfere" curve because the metadata server can handle the
 extra load but performance suffers.  This degradation is shown in
 Figure~\ref{fig:overhead-c}, where we scale the number of clients and show the

@@ -48,10 +48,10 @@ object storage daemons, 1 metadata server, and 29 clients.
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
-\caption{[\href{https://www.google.com}{source}] Microbenchmark: performance of each
+\caption{[\href{https://www.google.com}{source}] Performance of each
 mechanism (left) and building consistency/durability guarantees (right) for
-100K files on a single client. Results are normalized to the runtime of writing
-files creates to the client's in-memory journal.
+100K files creates from a single client. Results are normalized to the runtime of writing
+events to the client's in-memory journal.
 \label{fig:composable-mechanisms}}
 \end{figure}
 
@@ -126,7 +126,7 @@ globally persisting metadata updates.
 about 2.5\text{KB}. The storage footprint scales linearly with the number of
 metadata creates and suggests that updates for a million files would be 2.5KB
 \(*\) 1 million files \(=\) 2.38GB. Transfer times for payloads of this size in
-most HPC/data cente networks are reasonable.
+most HPC/data center networks are reasonable.
 
 \textbf{Takeaway}: measuring the mechanisms individually shows that
 their overheads and costs can differ {\it by orders of magnitude}. Cudele gives
@@ -159,21 +159,20 @@ consistency/durability guarantees.\\
 merging client journals at the metadata server. Merging is better than RPCs
 because there are less messages and consistency/durability code paths are
 bypassed. In (b), the allow/block API isolates directories from interfering
-clients. (c) is the slowdown of a single client syncing updates to the gobal
+clients. (c) is the slowdown of a single client syncing updates to the global
 namespace. The inflection point is the trade-off of frequent updates vs. larger
 journal files.\label{fig:use-cases}}
 \end{figure*}
 
-
-
-
 % CITEME xiao:socc2015-shardfs CITEME HADOOP
-Clients creating files in private directories is heavily studied in
-HPC~\cite{weil:sc2004-dyn-metadata, ren:sc2014-indexfs, patil:fast2011-giga,
-zheng:pdsw2014-batchfs, sevilla:sc15-mantle}, mostly due to
-checkpoint-restart~\cite{bent_plfs_2009}.  But the workload also appears in
-cloud workloads, where systems like Hadoop use the file abstraction to exchange
-work units to workers or to indicate when jobs
+First we show how we can build application-specific subtrees by composing
+mechanisms and that this approach results in more a scalable global
+namespace. We start with clients creating files in private directories because
+this workload is heavily studied in HPC~\cite{weil:sc2004-dyn-metadata,
+ren:sc2014-indexfs, patil:fast2011-giga, zheng:pdsw2014-batchfs,
+sevilla:sc15-mantle}, mostly due to checkpoint-restart~\cite{bent_plfs_2009}.
+But the workload also appears in cloud workloads, where systems like Hadoop use
+the file abstraction to exchange work units to workers or to indicate when jobs
 complete~\cite{shvachko:login2012-hdfs-scalability}. A more familiar example is
 uncompressing an archive ({\it e.g.}, \texttt{tar xzf}), where the file system
 services a flash crowd of creates across all directories as shown in
@@ -316,7 +315,7 @@ better.
 %
 %lient 0: creates, client 1 create(s)
 
-\subsection{Use Case 2: Creates with Interferring Client}
+\subsection{Use Case 2: Creates with Interfering Client}
 
 Next we show how Cudele can be programmed to block interfering clients using
 the same problematic workload from Figure~\ref{fig:overhead-b}. In this
@@ -334,8 +333,8 @@ server, in our case 18 clients, is too high.
 Figure~\ref{fig:block-allow} plots the overhead of the slowest client and the
 error bars are the standard deviation of 3 runs.  ``Interfere (Fig 3c)" is the
 result from Figure~\ref{fig:overhead-b}; ``Interfere" uses the allow/block API
-to return \texttt{-EBUSY} to interferring clients; and ``Isolated" is the
-baseline performance without an interferring Each subtree has ``RPCs" and
+to return \texttt{-EBUSY} to interfering clients; and ``Isolated" is the
+baseline performance without an interfering. Each subtree has ``RPCs" and
 ``Stream" enabled.  Results results are normalized to the runtime of a single
 client creating files in a directory. Note that IndexFS has a similar behavior
 to ``interfere" with leases, except clients block. 
@@ -353,17 +352,18 @@ consistency.
 \subsection{Use Case 3: Read while Writing}
 
 % CITEME
-Scientists use the file system to check the progress of jobs using
-\texttt{ls}~\cite{CITEME}. The number of files or size of the files is
-indicative of the progress. This practice is not too different from systems
-that use the file system to manage the progress of jobs; Hadoop writes to
-temporary files, renames them when complete, and creates a ``DONE" file to
-indicate to the runtime that the task did not fail and should not be
-re-scheduled on another node. In this scenario, Cudele users will not see the
-progress of decoupled namespaces since their updates are not globally visible.
-To help scientists judge the progress of their jobs, Cudele clients have a
-``namespace sync" that sends batches of updates back to the global namespace at
-regular intervals.
+The final use case shows how the API gives users fine-grained control of the
+consistency semantics for niche or {\it ad-hoc} workflows.  Scientists use the
+file system to check the progress of jobs using \texttt{ls}~\cite{CITEME}. The
+number of files or size of the files is indicative of the progress. This
+practice is not too different from systems that use the file system to manage
+the progress of jobs; Hadoop writes to temporary files, renames them when
+complete, and creates a ``DONE" file to indicate to the runtime that the task
+did not fail and should not be re-scheduled on another node. In this scenario,
+Cudele users will not see the progress of decoupled namespaces since their
+updates are not globally visible.  To help scientists judge the progress of
+their jobs, Cudele clients have a ``namespace sync" that sends batches of
+updates back to the global namespace at regular intervals.
 
 % Does this implementation need to be described in the implementation?
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single
@@ -402,15 +402,15 @@ First is quantifying the benefits of dynamically changing the semantics of a
 subtree from stronger to weaker guarantees (or vice versa), as described in the
 introduction. Second is embeddable policies, where child subtrees have
 specialized features but still maintain the guarantees  of their parent
-subtrees. We already show how applciations can compose guarantees and control
+subtrees. We already show how applications can compose guarantees and control
 their performance, knobs that we did not have before, but embeddable policies
-are a way to compose the policies themsleves.  For example, a RAMDisk subtree
+are a way to compose the policies themselves.  For example, a RAMDisk subtree
 is POSIX IO-compliant but relaxes durability constraints, so it can reside
 under a POSIX IO subtree that is strongly consistent. These embeddable policies
 should be controlled and enforced by Cudele.  Finally, performance prediction
 benefits from our cost quantification of each mechanism. Applications can use
 Cudele to microbenchmark their components and software, similar to what we did
-in Secion~\S\ref{sec:microbenchmarks}. Using those results, they can predict
+in Section~\S\ref{sec:microbenchmarks}. Using those results, they can predict
 how much slower their system will be if they adopt stronger consistency or
 durability.  This is a form of co-design that takes a ``dirty-slate" approach
 but building just the guarantees the application needs from existing

@@ -56,20 +56,6 @@ applications that rely on the file system's guarantees must be deployed on an
 entirely different system or re-written to coordinate strong
 consistency/durability themselves.
 
-%\begin{table}
-%\begin{tabular}{ r | l }
-%  Subtree         & Example \\\hline
-%  (1)   & \{Index, Batch\}FS~\cite{ren:sc2014-indexfs, zheng:pdsw2014-batchfs} \\
-%  (2)   & \{Index, Ceph\}FS~\cite{ren:sc2014-indexfs, weil:sc2004-dyn-metadata} \\
-%  (3)   & RAMDisk \\
-%  (4)   & DeltaFS~\cite{zheng:pdsw2015-deltafs} \\
-%\end{tabular}
-%
-%\caption{State-of-the-art systems in HPC improve file system metadata
-%performance by relaxing consistency and durability guarantees. Note that
-%IndexFS also supports weak consistency with bulk inserts.
-%\label{table:namespaces}} \end{table}
-
 % What did we do
 To address this problem, we present an API and framework that lets developers
 dynamically control the consistency and durability guarantees for subtrees in
@@ -96,7 +82,7 @@ that can be custom fit to an application. We make the following contributions:
 
   \item A framework and API for assigning consistency/durability policies 
   to subtrees in the file system namespace; this lets users navigate
-  the tradeoffs of different metadata protocols.
+  the trade-offs of different metadata protocols.
 
   \item This framework lets subtrees with different semantics co-exist in a
   global namespace. We show how this scales further and performs better than
