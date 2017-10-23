@@ -8,7 +8,7 @@
 
   - name: make a base journal with a bunch of directories
     shell: docker exec cephfs  mkdir {{ mount_point }}/mydir{{ item }}
-    with_sequence: start=0 end=30
+    with_sequence: start=0 end=39
 
   - name: create the base journal
     shell: docker exec cephfs cephfs-journal-tool journal export /etc/ceph/myjournal.bin
@@ -19,8 +19,8 @@
   - name: add events to the in memory journal and save to a file
     shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --persist true --file /etc/ceph/events-{{ item.0 }}.bin --decoupled_dir mydir{{ item.0 }} --start_ino {{ item.1 }} 
     with_together:
-    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
-    - [1099511727780, 1099611727780, 1099711727780, 1099811727780, 1099911727780, 1100011727780, 1100111727780, 1100211727780, 1100311727780, 1100411727780, 1100511727780, 1100611727780, 1100711727780, 1100811727780, 1100911727780, 1101011727780, 1101111727780, 1101211727780, 1101311727780, 1101411727780, 1101511727780, 1101611727780, 1101711727780, 1101811727780, 1101911727780, 1102011727780, 1102111727780, 1102211727780, 1102311727780, 1102411727780]
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+    - [1099511727780, 1099611727780, 1099711727780, 1099811727780, 1099911727780, 1100011727780, 1100111727780, 1100211727780, 1100311727780, 1100411727780, 1100511727780, 1100611727780, 1100711727780, 1100811727780, 1100911727780, 1101011727780, 1101111727780, 1101211727780, 1101311727780, 1101411727780, 1101511727780, 1101611727780, 1101711727780, 1101811727780, 1101911727780, 1102011727780, 1102111727780, 1102211727780, 1102311727780, 1102411727780, 1102511727780, 1102611727780, 1102711727780, 1102811727780, 1102911727780, 1103011727780, 1103111727780, 1103211727780, 1103311727780, 1103411727780]
 
     register: r
   - local_action: lineinfile dest="{{ output }}" line="v.apply,{{ nfiles }},{{ ansible_date_time.time }},{{ item.delta }}" create="yes"
@@ -28,7 +28,7 @@
 
   - name: move that file to the control server
     fetch: src="/etc/ceph/events-{{ item }}.bin" dest="{{ workload_fetch }}/events-{{ item }}.bin" flat=yes
-    with_sequence: start=0 end=29
+    with_sequence: start=0 end=39
 
 - hosts: mdss[0]
   become: True
@@ -36,12 +36,5 @@
   - set_fact: output="/popper/results/summary.txt"
 
   - name: move that file to the metadata server
-    copy: dest="/etc/ceph/events-{{ item }}.bin" src="{{ workload_fetch }}/events-{{ item }}.bin"
-    with_sequence: start=0 end=29
-
-  - name: move the secret sauce merger
-    copy: dest="/etc/ceph/parallel_merge.sh" src="/workloads/parallel_merge.sh" mode=750
-
-  - shell: docker exec ceph-{{ ansible_hostname }}-mds /etc/ceph/parallel_merge.sh {{ ansible_hostname }} 29
-    register: r
-  - local_action: lineinfile dest="{{ output }}" line="merge,{{ nfiles }},{{ ansible_date_time.time }},{{ r.delta }}" create="yes"
+    copy: dest="/mnt/disk/events-{{ item }}.bin" src="{{ workload_fetch }}/events-{{ item }}.bin"
+    with_sequence: start=0 end=39
