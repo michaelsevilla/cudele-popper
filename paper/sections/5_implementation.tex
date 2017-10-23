@@ -26,9 +26,9 @@ store data structure is structured as a tree of directory fragments making it
 easier to read and traverse.
 
 % how i used it
-\textbf{Cudele}: the ``RPCs" mechanism uses the metadata store to
-service requests. Using code designed for recovery, ``Nonvolatile Apply" and
-``Volatile Apply" replay updates onto the metadata store in memory and in the
+\textbf{Cudele}: the RPCs mechanism uses the metadata store to
+service requests. Using code designed for recovery, Nonvolatile Apply and
+Volatile Apply replay updates onto the metadata store in memory and in the
 object store, respectively.  When the clients are ready to merge their updates
 back into the global namespace, they pass a binary file of  metadata updates to
 the metadata server. 
@@ -45,8 +45,8 @@ writes are fast but reads are slow because state must be reconstructed.
 Specifically, reads are slow because there is more state to read, it is
 unorganized, and many of the updates may be redundant.
 
-\textbf{Cudele}: the journal format is used by ``Stream", ``Append Client Journal",
-``Local Persist", and ``Global Persist".  ``Stream" is the default
+\textbf{Cudele}: the journal format is used by Stream, Append Client Journal,
+Local Persist, and Global Persist.  Stream is the default
 implementation for achieving global durability in CephFS but the rest of the
 mechanisms are implemented by writing with the journal format.  By writing with
 the same format, the metadata servers can read and use the recovery code to
@@ -71,7 +71,7 @@ store.
 \textbf{Cudele}: the external library the clients link into is based
 on the journal tool. It already had functions for importing, exporting, and
 modifying the updates in the journal so we re-purposed that code to implement
-``Append Client Journal", ``Volatile Apply", and ``Nonvolatile Apply".  
+Append Client Journal, Volatile Apply, and Nonvolatile Apply.  
 
 % Journal import
 %The journal tool imports journals from binary files stored on disk.  First the
@@ -135,7 +135,7 @@ bytes\footnote{http://docs.ceph.com/docs/jewel/dev/mds\_internals/data-structure
 The inode cache has code for manipulating inode numbers, such as pre-allocating
 inodes to clients.
 
-\textbf{Cudele}: ``Nonvolatile Apply" uses the internal inode cache
+\textbf{Cudele}: Nonvolatile Apply uses the internal inode cache
 code to allocate inodes to clients that decouple parts of the namespace and to
 skip inodes used by the client at merge time.
 

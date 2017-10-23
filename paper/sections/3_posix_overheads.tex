@@ -19,18 +19,17 @@ file system is an implementation of one set of design decisions and our goal
 here is to highlight the effect that those decisions have on performance.
 
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
-the Linux kernel.  The \texttt{untar} phase, which is characterized by many
-creates, has the highest resource usage (combined CPU, network, and disk)
-because of the number of RPCs needed for consistency and durability. The RPCs
-are also serialized because the metadata server is single threaded; although
-na\"{\i}ve, this design is common because of the complexity of multi-threaded
-metadata servers~\cite{konstantinos:pdsw2014-lustre-metadata}.  Traditional
-file system techniques for improving performance, such as caching inodes, do
-not help for create-heavy workloads.  In this section, we quantify the costs of
-consistency and durability in CephFS.  At the end of each subsection we compare
-the approach to ``decoupled namespaces", the technique in related work that
-detaches subtrees from the global namespace to relax consistency/durability
-guarantees. 
+the Linux kernel in a CephFS mount.  The \texttt{untar} phase, which is
+characterized by many creates, has the highest resource usage (combined CPU,
+network, and disk) because of the number of RPCs needed for consistency and
+durability. The RPCs are also serialized because the metadata server is single
+threaded; although na\"{\i}ve, this design is common because of the complexity
+of multi-threaded metadata
+servers~\cite{konstantinos:pdsw2014-lustre-metadata}.  In this section, we
+quantify the costs of consistency and durability in CephFS.  At the end of each
+subsection we compare the approach to ``decoupled namespaces", the technique in
+related work that detaches subtrees from the global namespace to relax
+consistency/durability guarantees. 
 
 \subsection{Durability}
 \label{sec:durability}
@@ -70,7 +69,7 @@ i.e.} striped or replicated across a cluster). Local durability means that
 metadata can be lost if the client or server stays down after a failure. None
 means that metadata is volatile and that the system provides no guarantees when
 clients or servers fail.  None is different than local durability because
-regardless of the type failure, metadata will be lost when components die in a
+regardless of the type of failure, metadata will be lost when components die in a
 None configuration.
 
 % - sequential IO, trim redundant operations
@@ -102,28 +101,24 @@ write-optimized.
 %\end{figure}
 
 % Effects on performance
-Figure~\ref{fig:overhead-a} shows the
-effect of journaling of different journal segment sizes; the larger the segment
-size the bigger that the writes into the object store are. The trade-off for
-better performance is memory consumption because larger segments take up
-more space for buffering. When journaling is on, 
-the metadata server periodically stops serving requests to flush ({\it i.e.}
-apply journal updates) to the metadata store.  The journal overhead is
+Figure~\ref{fig:overhead-a} shows the effect of journaling of with different
+segment sizes; the larger the segment size the bigger that the writes into the
+object store are. The trade-off for better performance is memory consumption
+because larger segments take up more space for buffering. When journaling is
+on, the metadata server periodically stops serving requests to flush ({\it
+i.e.} apply journal updates) to the metadata store.  The journal overhead is
 sufficient enough to slow down metadata throughput but not so much as to
-overwhelm the bandwidth of the object store. We measured our peak bandwidth to
-be 100MB/s, which is the speed of our network link.
+overwhelm the bandwidth of the object store. 
 
-\textbf{Comparison to decoupled namespaces}: In BatchFS and DeltaFS, to the
-best of our knowledge, when a client or server fails there is no recovery
-scheme. For BatchFS, if a client fails when it is writing to the local
-log-structured merged tree (implemented as an
-SSTable~\cite{ren:atc2013-tablefs}) then those batched metadata operations are
+\textbf{Comparison to decoupled namespaces}: For BatchFS, if a client fails
+when it is writing to the local log-structured merge tree (implemented as an
+SSTable~\cite{ren:atc2013-tablefs}) then unwritten metadata operations are
 lost. For DeltaFS, if the client fails then, on restart, the computation does
 the work again -- since the snapshots of the namespace are never globally
 consistent and there is no ground truth.  On the server side, BatchFS and
-DeltaFS use IndexFS. IndexFS writes metadata to SSTables, which initially
-reside in memory but are later flushed to the underlying distributed file
-system.
+DeltaFS use IndexFS~\cite{ren:sc2014-indexfs}. IndexFS writes metadata to
+SSTables, which initially reside in memory but are later flushed to the
+underlying distributed file system.
 
 \subsection{Strong Consistency}
 \label{sec:strong-consistency}
@@ -135,7 +130,7 @@ see the same state has high overhead.
 
 \textbf{CephFS Design}: Capabilities keep metadata strongly
 consistent. To reduce the number of RPCs needed for consistency, clients can
-obtain capabilities for reading, creating and updating inodes, as well as caching reads,
+obtain capabilities for reading and writing inodes, as well as caching reads,
 buffering writes, changing the file size, and performing lazy IO.
 
 % inode cache - reduces RPCs (lookups for create, readdirs for stats)
@@ -153,20 +148,20 @@ Figure~\ref{fig:overhead-b}. The colors show the behavior of the client for two
 different runs.  If only one client is creating files in a directory
 (``isolated" curve on \(y1\) axis) then that client can lookup the existence of
 new files locally before issuing a create request to the metadata server. If
-another client starts creating files in the same directory (``interfere" curve
-on \(y1\) axis) then the directory inode transitions out of read caching and
-the first client must send \texttt{lookup()}s to the metadata server
-(``interfere" curve on \(y2\) axis). These extra requests increase the
-throughput of the ``interfere" curve because the metadata server can handle the
-extra load but performance suffers.  This degradation is shown in
-Figure~\ref{fig:overhead-c}, where we scale the number of clients and show the
-slowdown of the slowest client.  The results are normalized to a single
-isolated client without a metadata server journal.  For the ``interfere" bars,
-each client creates files in private directories and at 30 seconds we launch
-another process that creates files in those directories. 18 clients is the
-maximum number the metadata server could handle for this metadata-intensive
-workload; at higher client load, the metadata server started complaining about
-laggy and unresponsive requests.
+another client starts creating files in the same directory then the directory
+inode transitions out of read caching and the first client must send
+\texttt{lookup()}s to the metadata server (``interfere" curve on \(y2\) axis).
+These extra requests increase the throughput of the ``interfere" curve on the
+\(y1\) axis because the metadata server can handle the extra load but
+performance suffers.  This degradation is shown in Figure~\ref{fig:overhead-c},
+where we scale the number of clients and show the slowdown of the slowest
+client.  The results are normalized to a single isolated client without a
+metadata server journal and the error bars are the standard deviations of all
+client runtimes.  For the ``interfere" bars, each client creates files in
+private directories and at 30 seconds we launch another process that creates
+files in those directories. 18 is the maximum number of clients the metadata
+server can handle for this metadata-intensive workload; at higher client load,
+the metadata server complains about laggy and unresponsive requests.
 
 % TODO: what is the cost of trimming the cache?
 % TODO: does CephFS still cache inodes when I turn off caching? Why is still keeping inodes in memory? Gah!
@@ -174,7 +169,7 @@ laggy and unresponsive requests.
 \textbf{Comparison to decoupled namespaces}: Decoupled namespaces
 merge batches of metadata operations into the global namespaces when the job
 completes.  In BatchFS the merge is delayed by the application using an API to
-switch between asynchronous to synchronous mode. The merge itself is explicitly
+switch between asynchronous and synchronous mode. The merge itself is explicitly
 managed by the application but future work looks at more automated
 methodologies. In DeltaFS snapshots of the metadata subtrees stays on the client
 machines; there is no ground truth and consistent namespaces are constructed

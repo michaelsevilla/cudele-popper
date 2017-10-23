@@ -24,7 +24,7 @@ Section~\S\ref{sec:the-cudelesfs-mechanisms}.}\label{fig:decouple}
 \caption{Descriptions of the mechanisms. Example compositions are shown in Table~\ref{table:spectrum}.\label{table:mechanisms}} 
 \end{table}
 
-In this section we describe Cudele, our API and framework that lets users
+In this section we describe our API and framework that lets users
 assign consistency and durability semantics to subtrees in the global
 namespace. A \textbf{mechanism} is an abstraction and basic building block for
 constructing consistency and durability guarantees. Cudele exposes these
@@ -42,32 +42,31 @@ Figure~\ref{fig:decouple} shows the mechanisms (labeled arrows) in Cudele and
 which daemon(s) they are performed by.  Table~\ref{table:mechanisms} has a
 description of what each mechanism does.  Decoupled clients use the
 \underline{Append Client Journal} mechanism to append metadata updates to a
-local, in-memory journal. This is fast because clients do not need to check for
+local, in-memory journal. Clients do not need to check for
 consistency when writing events and the metadata server blindly applies the
 updates because it assumes the events were already checked for consistency. The
-trade-off here is performance; it is a dangerous approach but could be
+trade-off here is fast performance; it is a dangerous approach but could be
 implemented safely if the clients or metadata server are configured to check
 the validity of events before writing them.  Once the job is complete, the
-system calls Cudele mechanisms to achieve the desired consistency/durability
+system calls mechanisms to achieve the desired consistency/durability
 semantics.  Cudele provides a library for clients to link into and all
 operations are performed by the client.  
 
-\subsubsection{Mechanisms Used for Consistency} \underline{RPCs} send remote procedure
-calls for every metadata operation from the client to the metadata server,
-assuming the request cannot be satisfied by the inode cache. This mechanism is
-part of the default CephFS implementation and is the strongest form of
-consistency because clients see metadata updates right away.  \underline{Nonvolatile
-Apply} replays the client's journal onto the metadata cluster's metadata store.
-The client's in-memory journal is written into the object store and the
-metadata servers are restarted. When the metadata servers re-initialize, they
-notice new journal updates in the object store and replay the events onto their
-in-memory metadata stores.  \underline{Volatile Apply} takes the client's in-memory journal on the
-client and applies the updates directly to the in-memory metadata store maintained
-by the metadata servers. We say volatile because -- in exchange for peak
-performance -- Cudele makes no consistency or durability guarantees while
-Volatile Apply is executing.  If a concurrent update from a client occurs
-there is no rule for resolving conflicts and if the client or metadata server
-crashes there may be no way to recover.
+\subsubsection{Mechanisms Used for Consistency} \underline{RPCs} send remote
+procedure calls for every metadata operation from the client to the metadata
+server, assuming the request cannot be satisfied by the inode cache. This
+mechanism is part of the default CephFS implementation and is the strongest
+form of consistency because clients see metadata updates right away.
+\underline{Nonvolatile Apply} replays the client's in-memory journal into the
+object store and restarts the metadata servers. When the metadata servers
+re-initialize, they notice new journal updates in the object store and replay
+the events onto their in-memory metadata stores.  \underline{Volatile Apply}
+takes the client's in-memory journal on the client and applies the updates
+directly to the in-memory metadata store maintained by the metadata servers. We
+say volatile because -- in exchange for peak performance -- Cudele makes no
+consistency or durability guarantees while Volatile Apply is executing.  If a
+concurrent update from a client occurs there is no rule for resolving conflicts
+and if the client or metadata server crashes there may be no way to recover.
 
 % difference between apply and volatile apply
 The biggest difference between Volatile Apply and Nonvolatile Apply is
@@ -96,7 +95,7 @@ mechanisms used by default in CephFS.  Using existing configuration settings in
 Ceph we can turn Stream on and off.  If it is off, then the metadata servers
 will not save journals in the object store. For \underline{Local Persist}, clients write
 serialized log events to a file on local disk and for \underline{Global Persist},
-clients push the journal into the objects store. The overheads for both Local
+clients push the journal into the object store. The overheads for both Local
 Persist and Global Persist is the write bandwidth of the local disk and
 object store, respectively.  These persist mechanisms are part of the library that
 links into the client.
@@ -193,31 +192,24 @@ following parameters (default values are in parenthesis):
   decoupled namespace (100)
 
   \item \texttt{interfere\_policy}: how to handle a request from another
-  client targeted at this subtree (\texttt{allow}))
+  client targeted at this subtree (\texttt{allow})
 
 \end{itemize}
 
-The ``Consistency" and ``Durability" parameters are set to the Cudele
-mechanisms; they can be composed (\(+\)) or run in parallel (\(|\|\)).
-``Allocated Inodes" is a way for the application to specify how many files it
-intends to create. It is a contract so that the file system can provision
-enough resources for the incumbent merge and so it can give valid inodes to
-other clients. The inodes can be used anywhere within the decoupled namespace
-({i.e.} at any depth in the subtree).
-
-% description
-``Interfere Policy" has two settings: \texttt{block} and \texttt{allow}.
-For \texttt{block}, any requests to this part of the namespace returns with
-``Device is busy", which will spare the metadata server from wasting resources
-for updates that may get overwritten. If the application does not mind losing
-updates, for example it wants approximations for results that take too long to
-compute, it can select \texttt{allow}. In this case, metadata from the interfering client will be
-written and the computation from the decoupled namespace will take priority at
-merge time because the results are more accurate.
-
-% examples
-Given these default values decoupling the namespace with an empty policies file
-would give the application 100 inodes but the subtree would behave like the
-existing CephFS implementation.  BatchFS merges updates into the global
-namespace after the job is complete.  This can be achieved with by composing
-two mechanisms: 
+The ``Consistency" and ``Durability" parameters are compositions of mechanisms;
+they can be serialized (\(+\)) or run in parallel (\(|\|\)).  ``Allocated
+Inodes" is a way for the application to specify how many files it intends to
+create. It is a contract so that the file system can provision enough resources
+for the incumbent merge and so it can give valid inodes to other clients. The
+inodes can be used anywhere within the decoupled namespace ({i.e.} at any depth
+in the subtree).  ``Interfere Policy" has two settings: \texttt{block} and
+\texttt{allow}.  For \texttt{block}, any requests to this part of the namespace
+returns with ``Device is busy", which will spare the metadata server from
+wasting resources for updates that may get overwritten. If the application does
+not mind losing updates, for example it wants approximations for results that
+take too long to compute, it can select \texttt{allow}. In this case, metadata
+from the interfering client will be written and the computation from the
+decoupled namespace will take priority at merge time because the results are
+more accurate.  Given these default values decoupling the namespace with an
+empty policies file would give the application 100 inodes but the subtree would
+behave like the existing CephFS implementation.  

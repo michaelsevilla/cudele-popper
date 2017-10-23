@@ -1,20 +1,21 @@
 \begin{abstract}
 
-HPC and data center scale developers are abandoning POSIX IO because the file
-system metadata synchronization and serialization overheads of providing strong
-consistency and durability are too costly -- and often unnecessary -- for their
-applications.  Unfortunately, designing file systems with weaker consistency or
-durability excludes applications that rely on stronger guarantees, forcing
-developers to re-write their applications or deploy them on a different system.
-Mounting multiple systems in the global namespace forces users to (1) provision
-separate storage clusters and (2) manually move data across systems.  We
-present a framework and API that lets clients specify their
-consistency/durability requirements and dynamically assign them to subtrees in
-the same namespace, allowing users to optimize subtrees over time and space for
-different workloads.  We confirm the performance benefits of techniques
-presented in related work but also explore new consistency/durability metadata
-designs, all integrated the same storage system.  By custom fitting a subtree
-to a create-heavy application, we show 8\(\times\) speedup and 2\(\times\)
-scale when compared to our baseline system.
+HPC and data center scale application developers are abandoning POSIX IO
+because the file system metadata synchronization and serialization overheads of
+providing strong consistency and durability are too costly -- and often
+unnecessary -- for their applications.  Unfortunately, designing file systems
+with weaker consistency or durability excludes applications that rely on
+stronger guarantees, forcing developers to re-write their applications or
+deploy them on a different system.  Users can mount multiple systems in the
+global namespace but this means (1) provisioning separate storage clusters and
+(2) manually moving data across system boundaries.  We present a framework and
+API that lets clients specify their consistency/durability requirements and
+dynamically assign them to subtrees in the same namespace, allowing users to
+optimize subtrees over time and space for different workloads.  We confirm the
+performance benefits of techniques presented in related work but also explore
+new consistency/durability metadata designs, all integrated over the same
+storage system.  By custom fitting a subtree to a create-heavy application, we
+show 8\(\times\) speedup and 2\(\times\) scale when compared to our baseline
+system.
 
 \end{abstract}
