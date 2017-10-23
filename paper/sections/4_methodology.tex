@@ -143,7 +143,7 @@ where all updates are always recoverable.
 Existing, state-of-the-art systems in HPC can be represented by the cells in
 Table~\ref{table:spectrum} (we construct the semantics for these systems later
 in Section~\S\ref{sec:microbenchmarks}).  POSIX IO-compliant systems like
-CephFS and IndexFS have global consistency and durability~\footnote{This is the
+CephFS and IndexFS have global consistency and durability\footnote{This is the
 normal case.  IndexFS also has bulk merge which would transition the system
 into ``weak consistency"}; DeltaFS uses ``invisible" consistency and ``local"
 durability and BatchFS uses ``weak" consistency and ``local" durability. These
