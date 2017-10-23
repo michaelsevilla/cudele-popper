@@ -127,10 +127,10 @@ metadata creates and suggests that updates for a million files would be 2.5KB
 \(*\) 1 million files \(=\) 2.38GB. Transfer times for payloads of this size in
 most HPC/data center networks are reasonable.
 
-\textbf{Takeaway}: measuring the mechanisms individually shows that
-their overheads and costs can differ {\it by orders of magnitude}. Cudele gives
-users the ability to quantify the performance impact of different
-consistency/durability guarantees.\\
+\textbf{Takeaway}: measuring the mechanisms individually shows that their
+overheads and costs can differ {\it by orders of magnitude}. We also show that
+some mechanisms, like Nonvolatile Apply, are not worthwhile as currently
+implemented.
 
 \subsection{Use Case 1: Creates in the Same Directory}
 \label{sec:use-case-1}
@@ -345,8 +345,8 @@ return \texttt{-EBUSY}, and (3) merging updates from the decoupled client has a
 negligible effect on performance.
 
 \textbf{Takeaway}: the API lets users isolate directories when applications
-need better and more reliable performance. This is a way of controlling
-consistency.
+need better and more reliable performance. Blocking updates is an effective way of
+controlling consistency.
 
 \subsection{Use Case 3: Read while Writing}
 

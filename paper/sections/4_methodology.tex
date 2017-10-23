@@ -142,21 +142,23 @@ where all updates are always recoverable.
 
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
-Table~\ref{table:spectrum}.  POSIX IO-compliant systems like CephFS and IndexFS
-have global consistency and durability~\footnote{This is the normal case.
-IndexFS also has bulk merge which would transition the system into ``weak
-consistency"}; DeltaFS uses ``invisible" consistency and ``local" durability
-and BatchFS uses ``weak" consistency and ``local" durability. These systems
-have other features that could push them into different semantics but we assign
-labels here based on the points emphasized in the papers.  To compose the
-mechanisms users inject which mechanisms to run and which to use in parallel
-using a domain specific language.  Although we can achieve all permutations of
-the different guarantees in Table~\ref{table:spectrum}, not all of them make
-sense. For example, it makes little sense to do \texttt{append client
-journal+RPCs} since both mechanisms do the same thing or \texttt{stream+save}
-since ``global" durability is stronger and has more overhead than ``local"
-durability. The cost of each mechanism and the semantics described above are
-quantified in Sections~\S\ref{sec:microbenchmarks} and~\S\ref{sec:use-case-1}.
+Table~\ref{table:spectrum} (we construct the semantics for these systems later
+in Section~\S\ref{sec:microbenchmarks}).  POSIX IO-compliant systems like
+CephFS and IndexFS have global consistency and durability~\footnote{This is the
+normal case.  IndexFS also has bulk merge which would transition the system
+into ``weak consistency"}; DeltaFS uses ``invisible" consistency and ``local"
+durability and BatchFS uses ``weak" consistency and ``local" durability. These
+systems have other features that could push them into different semantics but
+we assign labels here based on the points emphasized in the papers.  To compose
+the mechanisms users inject which mechanisms to run and which to use in
+parallel using a domain specific language.  Although we can achieve all
+permutations of the different guarantees in Table~\ref{table:spectrum}, not all
+of them make sense. For example, it makes little sense to do \texttt{append
+client journal+RPCs} since both mechanisms do the same thing or
+\texttt{stream+save} since ``global" durability is stronger and has more
+overhead than ``local" durability. The cost of each mechanism and the semantics
+described above are quantified in Sections~\S\ref{sec:microbenchmarks}
+and~\S\ref{sec:use-case-1}.
 
 % talk of eventual consistency
 The consistency and durability properties in Table~\ref{table:spectrum} are not

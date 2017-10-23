@@ -25,19 +25,15 @@ here is to highlight the effect that those decisions have on performance.
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
 the Linux kernel.  The \texttt{untar} phase, which is characterized by many
 creates, has the highest resource usage (combined CPU, network, and disk)
-because of the number of RPCs needed for consistency and durability. The RPCs are
-also serialized because the metadata server is single threaded; although naive,
-this design is common because of the complexity of multi-threaded metadata
-servers.  Traditional file system techniques for improving performance, such as
-caching inodes, do not help for create-heavy workloads.
-
-In this section, we quantify the costs of strong consistency and global
-durability in CephFS. At the end of each subsection we compare the approach to
-``decoupled namespaces", the technique in related work that detaches subtrees
-from the global namespace to relax consistency/durability guarantees.  We use
-the kernel client so that we can find the true create speed of the server; our
-experiments show a low CPU utilization for the clients which indicates that we
-are stressing the servers more.
+because of the number of RPCs needed for consistency and durability. The RPCs
+are also serialized because the metadata server is single threaded; although
+naive, this design is common because of the complexity of multi-threaded
+metadata servers.  Traditional file system techniques for improving
+performance, such as caching inodes, do not help for create-heavy workloads.
+In this section, we quantify the costs of consistency and durability in CephFS.
+At the end of each subsection we compare the approach to ``decoupled
+namespaces", the technique in related work that detaches subtrees from the
+global namespace to relax consistency/durability guarantees. 
 
 \subsection{Durability}
 \label{sec:durability}
@@ -83,7 +79,7 @@ None configuration.
 % - sequential IO, trim redundant operations
 \textbf{CephFS Design}: a journal of metadata updates that streams into the
 resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
-WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to grow large
+WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to be large
 (on the order of MBs) which ensures (1) sequential writes into the object store
 and (2) the ability for daemons to trim redundant or irrelevant journal
 entries.  The journal is striped over objects where multiple journal updates
