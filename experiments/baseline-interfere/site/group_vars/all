@@ -1,0 +1,67 @@
+---
+nclients: 1
+
+################
+# ceph ansible #
+################
+monitor_interface: eth1
+ceph_mon_docker_interface: eth1
+ceph_mon_docker_subnet: 192.168.140.0/24
+fsid: "e9570dd8-03ad-45f0-8a74-ec9b3bb7095f"
+docker: true
+install_docker: false
+
+#############
+# ceph.conf #
+#############
+ceph_conf_overrides:
+   global:
+     osd pool default size: 1
+     osd pool default pg num: 512
+     osd pool default pgp num: 512
+   mon:
+     debug mon: 1
+   osd:
+     debug osd: 0
+     osd mkfs type: ext4
+     osd max object name len: 256
+     osd max object namespace len: 64
+     osd journal size: 10000
+   mds: 
+     debug ms: 0
+     debug mds: 0
+     max mds: 5
+     mds log: false
+     mds bal max until: -1
+     mds bal mode: 2
+     mds log max expiring: -1
+     mds log max segments: -1
+     mds cache size: 2000000
+     mds bal fragment size max: 200000
+   client:
+     debug client: 0
+     client cache size: 2000000
+
+################
+# docker stuff #
+################
+ceph_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_docker_imagename: daemon
+ceph_docker_image_tag: ec12610
+ceph_mon_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_mon_docker_imagename: daemon
+ceph_mon_docker_image_tag: ec12610
+ceph_osd_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_osd_docker_imagename: daemon
+ceph_osd_docker_image_tag: ec12610
+ceph_mds_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_mds_docker_imagename: daemon
+ceph_mds_docker_image_tag: ec12610
+ceph_client_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_client_docker_imagename: daemon
+ceph_client_docker_image_tag: ec12610
+
+####################
+# experiment stuff #
+repetitions: 3
+####################

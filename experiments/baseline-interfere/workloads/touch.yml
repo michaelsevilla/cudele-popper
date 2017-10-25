@@ -1,0 +1,42 @@
+- hosts: clients
+  become: True
+  tasks:
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - fail: msg="Uh oh. Please define drop_delay"
+    when: drop_delay is not defined
+  - include: mdtest.yml
+
+- name: force MDS to drop lease by recursively creating a file in dir
+  hosts: interfere
+  become: True
+  tasks: 
+  - pause: seconds={{ drop_delay }}
+  - shell: docker exec cephfs-{{ item.1 }} /bin/bash -c "touch /cephfs/testdir/nfiles-{{ nfiles }}-{{ item.0 }}/#test-dir.0/mdtest_tree.0/poke"
+    register: results
+    ignore_errors: True
+    with_items:
+    - "{{ groups['clients'] }}"
+  - local_action: >
+      copy content={{ item }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/touch-interference-{{ nfiles }}-drop_delay-{{ drop_delay }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"
+
+- name: wait for mdtest to finish and get the output
+  hosts: clients
+  become: True
+  tasks:
+  - shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client-{{ item }}"
+    register: result
+    until:    result.stdout.find("false") != -1
+    retries:  600
+    with_sequence: start=1 end={{ nclients }}
+  - shell: docker logs client-{{ item }}
+    register: results
+    with_sequence: start=1 end={{ nclients }}
+  - local_action: >
+      copy content={{ item }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/mdtest-touch-{{ nfiles }}-drop_delay-{{ drop_delay }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"

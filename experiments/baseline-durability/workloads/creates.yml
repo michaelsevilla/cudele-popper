@@ -1,0 +1,44 @@
+- hosts: clients
+  become: True
+  tasks:
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+
+  - name: warm up the metrics
+    shell: docker exec cephfs-1 touch /cephfs/blah-{{ ansible_hostname }}
+  - pause: minutes=5
+
+  - include: mdtest.yml
+  - name: wait for the job to finish
+    shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client-{{ item }}"
+    register: result
+    until:    result.stdout.find("false") != -1
+    retries:  600
+    with_sequence: start=1 end={{ nclients }}
+  - debug:    var=result.stdout_lines
+
+  - name: get the output for mdtest
+    shell: docker logs client-{{ item }}
+    register: results
+    with_sequence: start=1 end={{ nclients }}
+  - local_action: >
+      copy content={{ item }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/mdtest-{{ nfiles }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"
+
+#- name: get baseline for isolated stat/create
+#  hosts: interfere
+#  become: True
+#  tasks:
+#  - shell: "docker exec cephfs ls -alhR /cephfs/testdir | wc -l"
+#    register: results
+#  - local_action: >
+#      copy content={{ results }} 
+#      dest="{{ playbook_dir|dirname }}/results/{{ site }}/stat-iso-{{ nfiles }}-{{ ansible_hostname }}-{{ results.start | replace(' ', '_') }}.txt"
+#
+#  - shell: docker exec cephfs /bin/bash -c "find /cephfs/testdir/ -type d -exec touch {}/file-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}-{{ ansible_hostname }} \;"
+#    register: results
+#  - local_action: >
+#      copy content={{ results }} 
+#      dest="{{ playbook_dir|dirname }}/results/{{ site }}/touch-iso-{{ nfiles }}-{{ ansible_hostname }}-{{ results.start | replace(' ', '_') }}.txt"

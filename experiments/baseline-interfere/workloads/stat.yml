@@ -1,0 +1,35 @@
+# test with inteference local
+- hosts: clients
+  become: True
+  tasks:
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - fail: msg="Uh oh. Please define drop_delay"
+    when: drop_delay is not defined
+  - include: mdtest.yml
+
+- name: force the MDS to drop the lease
+  hosts: interfere
+  become: True
+  tasks:
+  - pause: seconds={{ drop_delay }}
+  - shell: "docker exec cephfs ls -alhR /cephfs/testdir/ | wc -l"
+    register: results
+  - local_action: >
+      copy content={{ results }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/stat-interference-{{ nfiles }}-drop_delay-{{ drop_delay }}-{{ ansible_hostname }}-{{ results.start | replace(' ', '_') }}.txt"
+
+- name: wait for mdtest to finish and get the output
+  hosts: clients
+  become: True
+  tasks:
+  - shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
+    register: result
+    until:    result.stdout.find("false") != -1
+    retries:  600
+  - shell: docker logs client
+    register: results
+  - local_action: >
+      copy content={{ results }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/mdtest-stat-{{ nfiles }}-drop_delay-{{ drop_delay }}-{{ ansible_hostname }}-{{ results.start | replace(' ', '_') }}.txt"
+

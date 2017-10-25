@@ -1,0 +1,82 @@
+---
+# Adapted from ceph-ansible's purge_docker_cluster.yml
+# This playbook purges a containerized Ceph cluster
+# It removes: packages, configuration files and ALL THE DATA
+
+- hosts: clients, interfere
+  become: True
+  tasks:
+  - shell: docker rm -f client
+    ignore_errors: True
+
+  - shell: docker rm -f client-{{ item }}
+    ignore_errors: True
+    with_sequence: start=0 end=32
+
+  - shell: docker exec cephfs sudo umount /cephfs
+    ignore_errors: True
+
+  - shell: docker exec cephfs-{{ item }} sudo umount /cephfs
+    ignore_errors: True
+    with_sequence: start=0 end=32
+
+- hosts: localhost
+  become: True
+  tasks:
+  - name: delete the config directory on the ansible server
+    file: path="{{ playbook_dir }}/roles/ceph-ansible/fetch" state=absent
+
+  - name: delete old logs
+    shell: ls -d {{ playbook_dir|dirname }}/logs/* | grep -v gitkeep
+    register: logs
+    ignore_errors: True
+  - file: path={{ item }} state=absent
+    with_items: 
+    - "{{ logs.stdout_lines }}"
+
+  - name: delete old utilizations
+    shell: ls -d {{ playbook_dir|dirname }}/utilizations/* | grep -v gitkeep
+    register: utilizations
+    ignore_errors: True
+  - file: path={{ item }} state=absent
+    with_items: 
+    - "{{ utilizations.stdout_lines }}"
+
+  #- name: delete old results
+  #  shell: ls -d {{ playbook_dir|dirname }}/results/* | grep -v gitkeep | grep -v visualize
+  #  register: results
+  #  ignore_errors: True
+  #- file: path={{ item }} state=absent
+  #  with_items: 
+  #  - "{{ results.stdout_lines }}"
+
+- hosts:  mons, osds, mdss, clients, interfere
+  become: True
+  tasks:
+  - name: decimate all containers
+    shell: docker ps -aq | xargs docker rm -f
+    ignore_errors: True
+
+- hosts: graphite
+  tasks:
+  - shell: docker rm -f graphite
+    ignore_errors: True
+
+- hosts: all
+  become: True
+  roles:
+  - role: cleanup
+    delete:
+    - /etc/ceph/
+    - /var/lib/ceph
+    - /tmp/graphite
+
+- hosts: osds
+  become: True
+  tasks:
+  - name: disk zap
+    command: sgdisk --zap-all --clear --mbrtogpt -g -- {{ item }}
+    with_items: ceph_osd_docker_devices
+  - name: disk zap again
+    command: sgdisk --zap-all --clear --mbrtogpt -g -- {{ item }}
+    with_items: ceph_osd_docker_devices

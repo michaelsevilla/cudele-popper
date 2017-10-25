@@ -1,0 +1,9 @@
+---
+dummy:
+
+mds_containerized_deployment: true
+
+collectl_args: "-scCnm -i 1"
+ceph_perf_dump: "group_vars/ceph-stats_conf/ceph_perf_dump.py"
+ceph_stats_daemon: "ceph-{{ ansible_hostname }}-mds"
+ceph_stats_interval: 10
