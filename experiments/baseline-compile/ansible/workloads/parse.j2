@@ -1,0 +1,4 @@
+delta,cmd
+{% for x in results.results %}
+"{{ x.delta }}","{{ x.item.1 }}"
+{% endfor %}

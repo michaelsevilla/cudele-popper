@@ -1,0 +1,10 @@
+---
+- hosts: graphite
+  become: True
+  roles: 
+    - monitor/graphite
+
+- hosts: mdss
+  become: true
+  roles:
+    - ceph/ceph-stats

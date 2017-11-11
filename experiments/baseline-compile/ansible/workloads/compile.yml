@@ -1,0 +1,7 @@
+---
+
+- hosts: clients[0]
+  become: True
+  tasks:
+  - include: make.yml
+

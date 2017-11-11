@@ -1,0 +1,53 @@
+- name: setup dir
+  set_fact: dir="{{ mount_point }}/{{ ansible_hostname }}-{{ threads }}"
+
+- name: drop the os file cache
+  shell: sudo sh -c "$(which echo) 3 > /proc/sys/vm/drop_caches"
+
+- name: remove old containers
+  shell: docker rm -f client
+  ignore_errors: True
+
+- pause: minutes=5
+
+- name: create some bogus files to trigger metrics
+  shell: docker exec cephfs touch {{ mount_point }}/bogus{{ item }}
+  with_sequence:  start=0 end=10
+  
+- pause: minutes=5
+
+- name: start the job
+  shell: >
+         docker run -d -it \
+           --name=client \
+           --net=host \
+           --volumes-from cephfs \
+           --entrypoint=/bin/bash \
+           {{ compile_container }}
+
+- name: create a directory
+  shell: mkdir {{ dir }}
+  ignore_errors: True
+
+- name: define the job
+  set_fact:
+    job:
+      - "wget https://cdn.kernel.org/pub/linux/kernel/v4.x/testing/linux-4.9-rc6.tar.xz"
+      - "tar xf linux-4.9-rc6.tar.xz"
+      - "cd linux-4.9-rc6; make allnoconfig"
+      - "cd linux-4.9-rc6; make -j{{ threads }}"
+      - "ls -alh linux-4.9-rc6"
+      - "rm -r linux-4.9-rc6"
+
+- name: run the job
+  shell: "docker exec client /bin/bash -c \"cd {{ dir }}; {{ item.1 }}\""
+  register: results
+  with_nested:
+  - [0]
+  - "{{ job }}"
+
+- name: spit results to a file
+  connection: local
+  template: src=parse.j2 dest="/popper/results/compile-threads-{{ threads }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+  with_items:
+  - "{{ results.results }}"
