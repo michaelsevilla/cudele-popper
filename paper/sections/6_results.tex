@@ -28,20 +28,31 @@ explored with something like Mantle~\cite{sevilla:sc15-mantle}.
 %daemons.\label{table:clusters}} 
 %\end{table}
 
-%We run experiments on the same cluster and normalize results to control for
-%hardware differences and to make our results more generally applicable and
-%reproducible\footnote{ This paper adheres to The Popper
-%Convention~\cite{jimenez_popper_2016}, so experiments presented here are
-%available in the repository for this article.  Experiments can be examined in
-%more detail, or even re-run, by visiting the \texttt{[source]} link next to
-%each figure. That link points to a Jupyter notebook that shows the analysis and
-%source code for that graph, which points to an experiment and its artifacts.}.
-%We use a CloudLab cluster of 34 nodes, each with 16 2.4 GHz CPUs, 128GB RAM,
-%and SSDs.  Each node uses Ubuntu 14.04 and We develop on Ceph's Jewel release,
-%version 10.2.1, which was released in May 2016. All daemons run as a single
-%process (the default setting for Ceph) and the Ceph
-%components\footnote{http://docs.ceph.com/docs/jewel/rados/} are: 1 monitor, 3
-%object storage daemons, 1 metadata server, and 29 clients.
+\newcomment{We run experiments on the same cluster and normalize results to
+control for hardware differences and to make our results more generally
+applicable. We use a CloudLab cluster of 34 nodes connected with 10Gbit
+ethernet, each with 16 2.4 GHz CPUs, 128GB RAM, and SSDs.  Each node uses
+Ubuntu 14.04 and we develop on Ceph's Jewel release, version 10.2.1, which was
+released in May 2016. All daemons run as a single process (the default setting
+for Ceph) and the Ceph
+components\footnote{http://docs.ceph.com/docs/jewel/rados/} are: 1 monitor, 3
+object storage daemons, 1 metadata server, and 29 clients.}
+
+\newcomment{We understand concerns about cluster size and network, especially
+for systems aimed at HPC but our evaluation focuses on verifying the behavior of
+different techniques in the same global namespace. These techniques have
+already proven to be effective and scalable in systems that specialize an
+entire namespace according to a single optimization strategy (e.g., Lustre,
+BatchFS, DeltaFS), so our evaluation explores the behavior of the
+consistency/durability mechanisms and their effect with/without isolation.}
+
+\newcomment{To make our results reproducible, this paper adheres to The Popper
+Convention~\cite{jimenez_popper_2016}, so experiments presented here are
+available in the repository for this article.  Experiments can be examined in
+more detail, or even re-run, by visiting the \texttt{[source]} link next to
+each figure. That link points to a Jupyter notebook that shows the analysis and
+source code for that graph, which points to an experiment and its artifacts.}
+\addressesissue{1}
 
 \subsection{Microbenchmarks}
 \label{sec:microbenchmarks}
