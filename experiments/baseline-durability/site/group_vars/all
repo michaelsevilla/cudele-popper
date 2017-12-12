@@ -45,21 +45,21 @@ ceph_conf_overrides:
 ################
 # docker stuff #
 ################
-ceph_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_docker_username: ceph
 ceph_docker_imagename: daemon
-ceph_docker_image_tag: f628bac
-ceph_mon_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_docker_image_tag: tag-stable-3.0-jewel-ubuntu-14.04
+ceph_mon_docker_username: ceph
 ceph_mon_docker_imagename: daemon
-ceph_mon_docker_image_tag: f628bac
-ceph_osd_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_mon_docker_image_tag: tag-stable-3.0-jewel-ubuntu-14.04
+ceph_osd_docker_username: ceph
 ceph_osd_docker_imagename: daemon
-ceph_osd_docker_image_tag: f628bac
-ceph_mds_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_osd_docker_image_tag: tag-stable-3.0-jewel-ubuntu-14.04
+ceph_mds_docker_username: ceph
 ceph_mds_docker_imagename: daemon
-ceph_mds_docker_image_tag: f628bac
-ceph_client_docker_username: piha.soe.ucsc.edu:5000/ceph
+ceph_mds_docker_image_tag: tag-stable-3.0-jewel-ubuntu-14.04
+ceph_client_docker_username: ceph
 ceph_client_docker_imagename: daemon
-ceph_client_docker_image_tag: f628bac
+ceph_client_docker_image_tag: tag-stable-3.0-jewel-ubuntu-14.04
 
 ####################
 # experiment stuff #
