@@ -3,18 +3,18 @@
 set -ex
 
 # setup the docker command
+ROOT=`dirname $PWD | xargs dirname`
 RUN="docker run -it --rm --net host -v $HOME/.ssh:/root/.ssh -w /root"
 ANSIBLE="michaelsevilla/ansible --forks 50 --skip-tags package-install,with_pkg"
-CEPH_ANSIBLE="$RUN -v `pwd`/site/roles/ceph-ansible:/root $ANSIBLE"
+CEPH_ANSIBLE="$RUN -v $ROOT/ansible/ceph:/root $ANSIBLE"
 SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
 
-#for site in "nojournal-cache" "nojournal-nocache" "journal-cache" "journal-nocache"; do
-for site in "journal120-cache" "journal150-cache" "journal180-cache" "journal30-cache" "journal60-cache" "journal90-cache"; do
+for site in "nojournal-cache" "journal120-cache" "journal150-cache" "journal180-cache" "journal30-cache" "journal60-cache" "journal90-cache"; do
   nclients=3
 
   # configure ceph and setup results directory
   mkdir -p results/$site/logs || true
-  cp site/* site/roles/ceph-ansible || true
+  cp site/* $ROOT/ansible/ceph || true
   cp site_confs/${site}.yml site/group_vars/all
   cp -r site/group_vars site/roles/ceph-ansible/
   cp inventory/${nclients}client site/hosts
@@ -30,9 +30,5 @@ for site in "journal120-cache" "journal150-cache" "journal180-cache" "journal30-
     ./ansible-playbook.sh -e site=$site -e nfiles=100000 ../workloads/creates.yml
   done
   
-  ## baseline the drop delays
-  #./ansible-playbook.sh -e site=$site -e nfiles=50000 -e drop_delay=15 ../workloads/stat.yml
-  #./ansible-playbook.sh -e site=$site -e nfiles=50000 -e drop_delay=15 ../workloads/touch.yml
-
   ./ansible-playbook.sh -e site=$site collect.yml
 done
