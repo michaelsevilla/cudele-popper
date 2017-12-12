@@ -20,9 +20,10 @@ ERR=$?
 if [ $ERR != "0" ] ; then
   echo "ERROR: $ERR"
   cat build.log
+  exit 1
 fi
 
-set +e
+set +x
 rm -r _minted-paper paper.aux paper.bbl paper.blg paper.log paper.out paper.synctex.gz build.log >> /dev/null 2>&1
 
 echo "SUCCESS"
