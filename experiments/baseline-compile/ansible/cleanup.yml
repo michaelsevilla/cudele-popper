@@ -88,9 +88,9 @@
     - /var/lib/ceph
     - /tmp/graphite
   tasks:
-    - shell: docker stop iperf-server iperf-client
+    - shell: docker stop iperf-server iperf-client collectl
       ignore_errors: True
-    - shell: docker rm iperf-server iperf-client
+    - shell: docker rm iperf-server iperf-client collectl
       ignore_errors: True
 
 - hosts: osds

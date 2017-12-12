@@ -34,9 +34,10 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-./teardown.sh
 sudo rm -rf results; mkdir results
 cp configs_$SITE/all ansible/group_vars/all 
+cp configs_$SITE/clients1 hosts
+./teardown.sh
 $DOCKER ceph.yml monitor.yml \
         /workloads/compile.yml \
         /popper/ansible/collect.yml
