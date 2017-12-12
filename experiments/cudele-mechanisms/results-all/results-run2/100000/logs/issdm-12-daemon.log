@@ -1,0 +1,82 @@
+2017-02-22 01:09:33  /entrypoint.sh: static: does not generate config
+HEALTH_WARN too few PGs per OSD (10 < min 30)
+2017-02-22 01:09:33  /entrypoint.sh: static: does not generate admin key
+pool 'cephfs_data' created
+pool 'cephfs_metadata' created
+new fs with metadata pool 2 and data pool 1
+2017-02-22 01:09:37  /entrypoint.sh: SUCCESS
+2017-02-22 01:09:37.970520 7fd5ae22b300  0 set uid:gid to 64045:64045 (ceph:ceph)
+2017-02-22 01:09:37.970567 7fd5ae22b300  0 ceph version 9.0.0-18996-gf4d39ca (f4d39ca86e29555a45a4cff3f03862081bcc1f84), process ceph-mds, pid 198
+starting mds.issdm-12 at -
+2017-02-22 01:09:37.972635 7fd5ae22b300  0 pidfile_write: ignore empty --pid-file
+2017-02-22 01:09:42.288450 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:1
+2017-02-22 01:09:42.288732 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:100
+2017-02-22 01:09:42.288752 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:600
+2017-02-22 01:09:42.288934 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:601
+2017-02-22 01:09:42.289028 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:602
+2017-02-22 01:09:42.289300 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:603
+2017-02-22 01:09:42.289417 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:604
+2017-02-22 01:09:42.289547 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:605
+2017-02-22 01:09:42.289640 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:606
+2017-02-22 01:09:42.289734 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:607
+2017-02-22 01:09:42.289824 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:608
+2017-02-22 01:09:42.289947 7fd5a6c2f700  0 mds.0.cache creating system inode with ino:609
+2017-02-22 01:09:47.618386 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7476000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:10:02.622235 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:10:17.623581 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7477800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:10:32.634286 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:10:47.638801 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7480800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:11:02.654791 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:11:17.670739 7fd5a9bb1700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:11:32.679208 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:11:47.683884 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:12:02.699866 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:12:17.715034 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:12:32.723448 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:12:47.727934 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:13:02.743797 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:13:17.759589 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:13:32.767586 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:13:47.771566 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:14:02.787188 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:14:17.803920 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:14:32.812416 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:14:47.816905 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:15:02.832476 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:15:17.848465 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:15:32.856896 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:15:47.857304 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:16:02.872922 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:16:17.884868 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:16:32.897440 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:16:47.898837 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:17:02.914420 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:17:17.929504 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:17:32.938088 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:17:47.942659 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:18:02.958610 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:18:17.974111 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:18:32.982664 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:18:47.987062 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:19:02.989499 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:19:18.006621 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:19:33.015044 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b747a800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:19:48.023703 7fd5a8baf700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:20:03.039454 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:20:18.055212 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:20:33.063543 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:20:48.067358 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b750e000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:21:03.083237 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:21:18.087165 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:21:33.094592 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:21:48.098921 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b750e000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:22:03.103660 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7505800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:22:18.119612 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:22:33.128686 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:22:48.130743 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b750e000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:23:03.134378 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7507000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:23:18.150378 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7479000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:23:33.015239 7fd5a442a700 -1 log_channel(cluster) log [ERR] : unmatched rstat on 1, inode has n(v1), dirfrags have n(v0 1=0+1)
+2017-02-22 01:23:33.160948 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7512800 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:23:48.165357 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b7511000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed
+2017-02-22 01:24:03.170645 7fd5a93b0700  0 -- 192.168.140.188:6800/2070894099 >> - conn(0x7fd5b750e000 :6800 s=STATE_ACCEPTING_WAIT_BANNER_ADDR pgs=0 cs=0 l=0).fault with nothing to send and in the half  accept state just closed

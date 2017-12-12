@@ -4,9 +4,12 @@
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1\linewidth]{./graphs/overhead-creates.png}
-\caption{Create-heavy workloads (such as \texttt{untar}) incur the highest disk, network, and
-CPU utilization because of the consistency and durability demands of
-CephFS.}\label{fig:overhead-creates}
+
+\caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-compile/visualize/viz.ipynb}{source}]
+Create-heavy workloads (such as \texttt{untar}) incur the highest disk,
+network, and CPU utilization because of the consistency and durability demands
+of CephFS.}\label{fig:overhead-creates}
+
 \end{figure}
 
 In our examination of the overheads of POSIX IO we benchmark and analyze
@@ -38,26 +41,30 @@ consistency/durability guarantees.
   \centering
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=1.0\linewidth]{graphs/slowdown-journal.png}
-      \caption{Runtime normalized to no journal} \label{fig:overhead-a}
+      \includegraphics[width=0.95\linewidth]{graphs/slowdown-journal.png}
+      \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-durability/visualize/viz.ipynb}{source}]
+      Effect of Journal} \label{fig:overhead-a}
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=1.2\linewidth]{graphs/behavior-interfere.png}
-      \caption{Interference forces \texttt{lookup()}s}
+      \includegraphics[width=1.1\linewidth]{graphs/behavior-interfere.png}
+      \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-interfere/visualize/viz.ipynb}{source}]
+      Interference increases RPCs}
       \label{fig:overhead-b}
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=1.1\linewidth]{graphs/slowdown-interfere-scale.png}
-      \caption{Interference hurts variability}
+      \includegraphics[width=1\linewidth]{graphs/slowdown-interfere-scale.png}
+      \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-creates/visualize/viz.ipynb}{source}]
+      Interference hurts variability}
       \label{fig:overhead-c}
   \end{subfigure}
-  \caption{The overhead of durability and strong consistency in CephFS.
-  (a) shows the effect of different journal segment sizes, which are streamed
-  into the object store for fault tolerance. (b) and (c) show that when a second
-  client ``interferes", capabilities are revoked and metadata servers do more
-  work.  \label{fig:overhead}}
+  \caption{ The overhead of durability and strong consistency in CephFS.  (a)
+  shows the effect of different journal segment sizes, normalized to a setup
+  without a journal (``No Journal").  The journal is streamed into the object
+  store for fault tolerance. (b) and (c) show that when a second client
+  ``interferes", capabilities are revoked and metadata servers do more work.
+  \label{fig:overhead}}
 \end{figure*}
 
 % what is durability
