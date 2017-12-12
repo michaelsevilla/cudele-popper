@@ -1,27 +1,27 @@
-2017-12-11 18:03:46  /entrypoint.sh: static: does not generate config
+2017-12-11 20:08:45  /entrypoint.sh: static: does not generate config
 HEALTH_WARN too few PGs per OSD (21 < min 30)
-2017-12-11 18:03:46  /entrypoint.sh: static: does not generate the admin key, so we can not get it.
-2017-12-11 18:03:46  /entrypoint.sh: static: make it available with the help of your configuration management system.
-2017-12-11 18:03:46  /entrypoint.sh: static: ceph-ansible is a good candidate to deploy a containerized version of Ceph.
-2017-12-11 18:03:46  /entrypoint.sh: static: ceph-ansible will help you fetching the keys and push them on the right nodes.
-2017-12-11 18:03:46  /entrypoint.sh: static: if you're interested, please visit: https://github.com/ceph/ceph-ansible
+2017-12-11 20:08:45  /entrypoint.sh: static: does not generate the admin key, so we can not get it.
+2017-12-11 20:08:45  /entrypoint.sh: static: make it available with the help of your configuration management system.
+2017-12-11 20:08:45  /entrypoint.sh: static: ceph-ansible is a good candidate to deploy a containerized version of Ceph.
+2017-12-11 20:08:45  /entrypoint.sh: static: ceph-ansible will help you fetching the keys and push them on the right nodes.
+2017-12-11 20:08:45  /entrypoint.sh: static: if you're interested, please visit: https://github.com/ceph/ceph-ansible
 pool 'cephfs_data' created
 pool 'cephfs_metadata' created
 new fs with metadata pool 2 and data pool 1
-2017-12-11 18:03:48  /entrypoint.sh: SUCCESS
-2017-12-11 18:03:48.932694 7fcc6a303300  0 set uid:gid to 64045:64045 (ceph:ceph)
-2017-12-11 18:03:48.932714 7fcc6a303300  0 ceph version 9.0.0-19001-ga241c6f (a241c6fda16253476dbd9ed44e3cc180b7425955), process ceph-mds, pid 236
+2017-12-11 20:08:47  /entrypoint.sh: SUCCESS
+2017-12-11 20:08:48.008395 7fac3a48d300  0 set uid:gid to 64045:64045 (ceph:ceph)
+2017-12-11 20:08:48.008418 7fac3a48d300  0 ceph version 9.0.0-19001-ga241c6f (a241c6fda16253476dbd9ed44e3cc180b7425955), process ceph-mds, pid 236
 starting mds.node-4 at -
-2017-12-11 18:03:48.933825 7fcc6a303300  0 pidfile_write: ignore empty --pid-file
-2017-12-11 18:03:53.198518 7fcc62cff700  0 mds.0.cache creating system inode with ino:1
-2017-12-11 18:03:53.198803 7fcc62cff700  0 mds.0.cache creating system inode with ino:100
-2017-12-11 18:03:53.198817 7fcc62cff700  0 mds.0.cache creating system inode with ino:600
-2017-12-11 18:03:53.198999 7fcc62cff700  0 mds.0.cache creating system inode with ino:601
-2017-12-11 18:03:53.199162 7fcc62cff700  0 mds.0.cache creating system inode with ino:602
-2017-12-11 18:03:53.199459 7fcc62cff700  0 mds.0.cache creating system inode with ino:603
-2017-12-11 18:03:53.199581 7fcc62cff700  0 mds.0.cache creating system inode with ino:604
-2017-12-11 18:03:53.199720 7fcc62cff700  0 mds.0.cache creating system inode with ino:605
-2017-12-11 18:03:53.199819 7fcc62cff700  0 mds.0.cache creating system inode with ino:606
-2017-12-11 18:03:53.199900 7fcc62cff700  0 mds.0.cache creating system inode with ino:607
-2017-12-11 18:03:53.200046 7fcc62cff700  0 mds.0.cache creating system inode with ino:608
-2017-12-11 18:03:53.200186 7fcc62cff700  0 mds.0.cache creating system inode with ino:609
+2017-12-11 20:08:48.009560 7fac3a48d300  0 pidfile_write: ignore empty --pid-file
+2017-12-11 20:08:52.625638 7fac32e89700  0 mds.0.cache creating system inode with ino:1
+2017-12-11 20:08:52.625943 7fac32e89700  0 mds.0.cache creating system inode with ino:100
+2017-12-11 20:08:52.625957 7fac32e89700  0 mds.0.cache creating system inode with ino:600
+2017-12-11 20:08:52.626143 7fac32e89700  0 mds.0.cache creating system inode with ino:601
+2017-12-11 20:08:52.626247 7fac32e89700  0 mds.0.cache creating system inode with ino:602
+2017-12-11 20:08:52.626550 7fac32e89700  0 mds.0.cache creating system inode with ino:603
+2017-12-11 20:08:52.626702 7fac32e89700  0 mds.0.cache creating system inode with ino:604
+2017-12-11 20:08:52.626831 7fac32e89700  0 mds.0.cache creating system inode with ino:605
+2017-12-11 20:08:52.626968 7fac32e89700  0 mds.0.cache creating system inode with ino:606
+2017-12-11 20:08:52.627073 7fac32e89700  0 mds.0.cache creating system inode with ino:607
+2017-12-11 20:08:52.627170 7fac32e89700  0 mds.0.cache creating system inode with ino:608
+2017-12-11 20:08:52.627335 7fac32e89700  0 mds.0.cache creating system inode with ino:609
