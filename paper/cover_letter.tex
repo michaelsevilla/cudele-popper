@@ -22,26 +22,28 @@ We thank the reviewers for their hard work and genuinely helpful suggestions.
 In addition to this cover letter, we have posted a PDF online explicitly
 showing additions in \textcolor{red}{\textbf{red}} and deletions in
 \textcolor{blue}{\textbf{blue}}. Three issues were common across reviewer
-feedback:
+feedback; Reviewer 1 and 3's comments are addressed in issues I and II,
+Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
+comments are addressed in issues II and III. 
 
 %Experimental Setup (R1, R2, R3)
 %- code R1
 %- servers, network, storage R1, R3
-\section{No Experimental Setup (Reviewers 1, 2, and 3)}
+\section*{Issue I: No Experimental Setup (Reviewers 1, 2, and 3)}
 
-We apologize for the omission of experimental setup and source code details.
-For the experimental setup, we have added details about the cluster we ran on
-(addresses Reviewers 1 and 3). For the source code, we have added code snippets
-to the Evaluation to concretize what was actually done (addresses Reviewer 1).  
-
-Additionally, we have added paper artifacts online.  For the experimental
-setup, we have made the infrastructure code available and added links after
-each figure to show exactly how experiments are run.  This infrastructure code
+We apologize for the omission of experimental setup and source code details. To
+provide a more comprehensive view of our experiments, we added text to the
+paper and made paper artifacts available online. For the experimental setup, we
+describe the cluster setup (hardware, software, etc.) in Section~{\S}V.  We
+have also made the infrastructure code available and added links after each
+figure to show exactly how experiments are run.  This infrastructure code
 contains scripts to deploy the system, run experiments, and gather results.
 This process follows the Popper
 Convention\footnote{http://falsifiable.us/}~\cite{jimenez_popper_2016}, which
-aims to make research reproducible.  We also make the source code available and
-linked in the paper.
+aims to make research reproducible.  For the source code, we have added code
+snippets to the evaluation to concretize what was actually done and made the
+source code available online. A link is provided in a footnote in
+Section~{\S}V.
 
 %Mixing contributions and future work (R1)
 %Statements in Introduction do not align with Evaluation (R1, R2, R3)
@@ -50,54 +52,62 @@ linked in the paper.
 %- remove major takeaways and cross refercnes
 %Will not address:
 %- cost of dynamically changing consistency/durability not presented R1
-\section{Structure and Layout of Evaluation (All Reviewers)}
+\section*{Issue II: Structure and Layout of Evaluation (All Reviewers)}
 
-One pervasive issue across reviews is that the results and contributions we
-cite in the introduction are not validated, explained, or even mentioned in the
-Evaluation.  To fix this, we separate out future work to make the contributions
-of this paper more explicit (addresses Reviewer 1) and we connect all numbers
-we cite in the introduction to the evaluation (addresses all reviewers).  To
-further clarify the Evaluation, we:
+All reviewers note that the results and contributions we cite in the
+introduction are not validated, explained, or even mentioned in the evaluation.
+One confusing component of this issue is that we mixed future work with the
+contributions of this paper; to make the contributions more explicit we remove
+future work from the introduction and add it to the future work section in
+Section~{\S}VI. We also connect all numbers we cite in the introduction to the
+evaluation. To further clarify the evaluation, we:
 
 \begin{itemize}
 
-  \item added Table IV which includes raw baseline, Cudele, and hardware limit
-numbers. This adds raw numbers and helps us make comparisons to hardware
-speeds. Ultimately, we hope this adds insight into the results (addresses
-Reviewers 2 nad 3).
+  \item added raw numbers (as annotations) to the baselines in each figure.
+This helps the reader calculate the raw numbers instead of just relying on
+overhead and speedup numbers. 
 
-  \item re-organized the section to make experiments more independent
-and removed cross-references (addresses Reviewer 2). Experiments are now
-self-contained so the reader can see the effects of different API
-configurations (addresses Reviewer 2) and we do a better job of explaining how
-results are derived (addresses Reviewer 3). 
+  \item re-organized the section to make experiments more independent and
+removed cross-references. Experiments are now self-contained so the reader can
+see the effects of different API configurations and we do a better job of
+explaining how results are derived. 
 
   \item removed the ``major takeaways". We deleted the headings but left the
-conclusions we make as transitions (Reviewer 2). We also add insights into the
-results by analyzing the raw numbers we observe.
+conclusions we make as transitions. We also add insights into the results by
+analyzing the raw numbers we observe in comparison to hardware capabilities.
 
 \end{itemize}
 
 %Use Cases R2, R4
 %- Spark discussion R2
 %- more emphasis on parallel and distributed computing themes R4
-\section{Synthetic and/or Irrelevant Use Cases (Reviewers 2 and 4)}
+\section*{Issue III: Synthetic and/or Irrelevant Use Cases (Reviewers 2 and 4)}
 
 We add a section to the introduction that scopes the importance of storage for
-large scale runtimes and workflows. Parallel and distributed jobs (whether that
-be MPI-based or more structured runtimes like Hadoop) need parallel and
-distributed storage systems that keep up with the computation. Furthermore, we
-highlight the parallel and distributed computing themes (addresses Reviewer 4)
-and cast light on them from the context of our prototype. We also add the Spark
-discussion proposed by Reviewer 2 to the Evaluation. The goal is to show how a
-system such as Cudele would benefit more general runtimes. We also move the
-discussion about the potential for HDFS and CephFS subtrees in the same
-namespace and the cost of dynamically changing consistency and durability
-semantics on a subtree. 
+large scale runtimes and workflows. Parallel and distributed jobs (whether they
+are MPI-based, MapReduce-based, etc.) need parallel and distributed storage
+systems that keep up with the computation. Furthermore, we highlight the
+parallel and distributed computing themes and cast light on them from the
+context of our prototype. We also add the Spark discussion proposed by to the
+evaluation. The goal is to show how a system such as Cudele would benefit from
+more general runtimes. We also move the discussion about the potential for HDFS
+and CephFS subtrees in the same namespace and the cost of dynamically changing
+consistency and durability semantics on a subtree. 
 
 \section*{Cosmetic Fixes}
 %Terminology
 %- users vs. clients R2
+\begin{itemize}
+  \item Reviewer 1: fixed user vs. client terminology in Section~{\S}III
+  \item Reviewer 1: clarified that the cost of dynamically changing semantics is future work Sections~{\S}III and ~{\S}V.E
+  \item Reviewer 1: added source code pointer in Section~{\S}IV
+  \item Reviewer 2: remove major takeways in Section~{\S}V
+  \item Reviewer 2: remove major cross-references in Section~{\S}V
+  \item Reviewer 3: quantified speedups with figure annotations in Section~{\S}V
+  \item Reviewers 1 and 3: add servers, network, and storage setups in Section~{\S}V
+  \item Reviewer 4: add new section ({\S}V.F) describing how Cudele would work with a system like Spark
+\end{itemize}
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,paper}

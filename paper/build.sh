@@ -18,6 +18,7 @@ docker run --rm \
 
 ERR=$?
 if [ $ERR != "0" ] ; then
+  set +x
   echo "ERROR: $ERR"
   cat build.log
   exit 1

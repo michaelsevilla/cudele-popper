@@ -110,8 +110,8 @@ write-optimized.
 % Effects on performance
 Figure~\ref{fig:overhead-a} shows the effect of journaling of with different
 segment sizes; the larger the segment size the bigger that the writes into the
-object store are. The trade-off for better performance is memory consumption
-because larger segments take up more space for buffering. When journaling is
+object store are.  The trade-off for better performance is memory consumption
+because larger segments take up more space for buffering.  When journaling is
 on, the metadata server periodically stops serving requests to flush ({\it
 i.e.} apply journal updates) to the metadata store.  The journal overhead is
 sufficient enough to slow down metadata throughput but not so much as to

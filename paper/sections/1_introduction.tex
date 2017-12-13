@@ -93,17 +93,18 @@ that can be custom fit to an application. We make the following contributions:
 
 \end{enumerate}
 
-The last contribution lays the groundwork for future work on our prototype. It
-is more scalable than the current practice of mounting different storage systems in a global
-namespace because there is no need to provision dedicated storage clusters to
-applications or move data between these systems.  For example, the results of a
-Hadoop job do not need to be migrated into a Ceph file system (CephFS) for other processing; instead
-the user can change the semantics of the HDFS subtree into a CephFS subtree.
-This may cause metadata/data movement to make things strongly consistent again
-but this is superior to moving all data across file system boundaries. Our prototype
+\oldcomment{The last contribution lays the groundwork for future work on our
+prototype. It is more scalable than the current practice of mounting different
+storage systems in a global namespace because there is no need to provision
+dedicated storage clusters to applications or move data between these systems.
+For example, the results of a Hadoop job do not need to be migrated into a Ceph
+file system (CephFS) for other processing; instead the user can change the
+semantics of the HDFS subtree into a CephFS subtree.  This may cause
+metadata/data movement to make things strongly consistent again but this is
+superior to moving all data across file system boundaries. Our prototype
 enables studies that adjust these semantics over {\it time and space}, where
 subtrees can change their semantics and migrate around the cluster without ever
-moving the data they reference.
+moving the data they reference.}
 
 % Results
 The results in this paper pave the way for such a system and confirm the
