@@ -1,16 +1,16 @@
 [osds]
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+node-1 ansible_ssh_user=msevilla
+node-2 ansible_ssh_user=msevilla
+node-3 ansible_ssh_user=msevilla
 
 [mons]
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+node-0 ansible_ssh_user=msevilla
 
 [mdss]
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+node-4 ansible_ssh_user=msevilla
 
 [clients]
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+node-5 ansible_ssh_user=msevilla
 
 [graphite]
-<CHANGE ME> ansible_ssh_user=<CHANGE ME>
+node-0 ansible_ssh_user=msevilla
