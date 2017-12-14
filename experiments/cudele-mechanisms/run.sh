@@ -34,14 +34,19 @@ if [ ! -z $1 ]; then
   exit
 fi
 
+cp configs_$SITE/hosts hosts
 for run in 0 1 2; do
   for nfiles in 100000; do
-    mkdir results || true
-    ./teardown.sh
-    cp configs_$SITE/hosts hosts
-    $DOCKER -e nfiles=$nfiles ceph.yml monitor.yml /workloads/vapply.yml
+    for stream in "stream" "nostream"; do
+      mkdir -p results/${nfiles}/logs || true
+      cp configs_cloudlab/${stream}.yml ansible/group_vars/all
+      ./teardown.sh
+      $DOCKER -e nfiles=$nfiles -e stream=$stream ceph.yml /workloads/journal-rpcs.yml
+      ./teardown.sh
+      $DOCKER -e nfiles=$nfiles -e stream=$stream ceph.yml /workloads/journal-vapply.yml
+    done
   done
-  mv results results-$SITE-clients$clients-run$run-parmsweep
+  mv results results-$SITE-$stream-run$run
 done
 
 exit 0

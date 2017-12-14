@@ -1,0 +1,23 @@
+---
+# Defines deployment design and assigns role to server groups
+
+- hosts: mons
+  become: True
+  roles:
+  - ceph-mon
+
+- hosts: osds
+  become: True
+  roles:
+  - ceph-osd
+
+- hosts: mdss
+  become: True
+  roles:
+  - ceph-mds
+  serial: 1 # Please make the MDSs come in a specific order
+
+- hosts: clients, interfere
+  become: True
+  roles:
+  - ceph-client

@@ -1,0 +1,18 @@
+---
+- hosts: mons[0]
+  become: True
+  tasks:
+    - name: setup mon convenience functions
+      set_fact:
+        ceph: "docker run --rm --entrypoint=ceph -v /etc/ceph:/etc/ceph {{ ceph_mon_docker_username }}/{{ ceph_mon_docker_imagename }}:{{ ceph_mon_docker_image_tag }}"
+
+    - name: allow multiple active MDSs
+      command: "{{ ceph }} mds set allow_multimds true --yes-i-really-mean-it"
+
+    - name: activate the standby MDSs
+      command: "{{ ceph }} mds set max_mds 5"
+
+- hosts: mdss
+  tasks:
+    - name: turn off metadata load balancing
+      shell: "docker exec ceph-{{ ansible_hostname }}-mds ceph daemon mds.{{ ansible_hostname }} config set mds_bal_interval -1"

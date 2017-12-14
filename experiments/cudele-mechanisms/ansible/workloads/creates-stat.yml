@@ -1,0 +1,34 @@
+- hosts: clients
+  become: True
+  tasks:
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - include: mdtest.yml
+
+- hosts: interfere
+  become: True
+  tasks:
+  - pause: seconds={{ drop_delay }}
+  - shell: "docker exec cephfs ls -alhR {{ mount_point }}/testdir/ | wc -l"
+    register: results
+  - local_action: >
+      copy content={{ results }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/stat-interference-{{ nfiles }}-drop_delay-{{ drop_delay }}-{{ ansible_hostname }}-{{ results.start | replace(' ', '_') }}.txt"
+
+- hosts: clients
+  become: True
+  tasks:
+  - name: wait for the job to finish
+    shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
+    register: result
+    until: result.stdout.find("false") != -1
+    retries: 6000
+
+  - name: get the output for mdtest
+    shell: docker logs client
+    register: results
+  - local_action: >
+      copy content={{ item }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/mdtest-stat-{{ nfiles }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"

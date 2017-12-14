@@ -1,0 +1,21 @@
+- hosts: clients[0]
+  become: True
+  tasks:
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+
+  - name: create files in the same directory
+    include: mdtest.yml
+  - pause: minutes=1
+
+  - name: wait for job to finish
+    shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
+    register: result
+    until: result.stdout.find("false") != -1
+    retries: 6000
+
+  - name: get the results
+    shell: docker logs client
+    register: results
+  - local_action: copy content="{{ results }}" dest="/popper/results/{{ nfiles }}/summary-rpcs-{{ stream }}.txt"

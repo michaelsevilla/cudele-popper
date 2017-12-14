@@ -6,10 +6,13 @@ nclients: 1
 ################
 monitor_interface: eth1
 ceph_mon_docker_interface: eth1
-ceph_mon_docker_subnet: 192.168.140.0/24
+ceph_mon_docker_subnet: 10.10.1.1/24
 fsid: "e9570dd8-03ad-45f0-8a74-ec9b3bb7095f"
 docker: true
 install_docker: false
+cluster_network: "10.10.1.1/24"
+private_network: "10.10.1.1/24"
+public_network: "10.10.1.1/24"
 
 #############
 # ceph.conf #
@@ -19,6 +22,9 @@ ceph_conf_overrides:
      osd pool default size: 1
      osd pool default pg num: 512
      osd pool default pgp num: 512
+     cluster network: "10.10.1.1/24"
+     private network: "10.10.1.1/24"
+     public network: "10.10.1.1/24"
    mon:
      debug mon: 1
    osd:
@@ -36,30 +42,31 @@ ceph_conf_overrides:
      mds bal mode: 2
      mds log max expiring: 40
      mds log max segments: 30
-     mds cache size: 1000000
      mds bal fragment size max: 200000
    client:
      debug client: 0
-     client cache size: 1000000
 
 ################
 # docker stuff #
 ################
-ceph_docker_username: piha.soe.ucsc.edu:5000/ceph
-ceph_docker_imagename: daemon
-ceph_docker_image_tag: f628bac
-ceph_mon_docker_username: piha.soe.ucsc.edu:5000/ceph
-ceph_mon_docker_imagename: daemon
-ceph_mon_docker_image_tag: f628bac
-ceph_osd_docker_username: piha.soe.ucsc.edu:5000/ceph
-ceph_osd_docker_imagename: daemon
-ceph_osd_docker_image_tag: f628bac
-ceph_mds_docker_username: piha.soe.ucsc.edu:5000/ceph
-ceph_mds_docker_imagename: daemon
-ceph_mds_docker_image_tag: f628bac
-ceph_client_docker_username: piha.soe.ucsc.edu:5000/ceph
-ceph_client_docker_imagename: daemon
-ceph_client_docker_image_tag: f628bac
+ceph_docker_username: michaelsevilla
+ceph_docker_imagename: ceph
+ceph_docker_image_tag: 8adf01b
+ceph_mon_docker_username: michaelsevilla
+ceph_mon_docker_imagename: ceph
+ceph_mon_docker_image_tag: 8adf01b
+ceph_osd_docker_username: michaelsevilla
+ceph_osd_docker_imagename: ceph
+ceph_osd_docker_image_tag: 8adf01b
+ceph_mds_docker_username: michaelsevilla
+ceph_mds_docker_imagename: ceph
+ceph_mds_docker_image_tag: 8adf01b
+ceph_client_docker_username: michaelsevilla
+ceph_client_docker_imagename: ceph
+ceph_client_docker_image_tag: 8adf01b
+ceph_wait_status: "HEALTH_OK"
+site: cloudlab
+kraken: false
 
 ####################
 # experiment stuff #

@@ -5,7 +5,6 @@
   tasks:
   - command:  docker exec {{ ansible_hostname }} ceph -s
     register: result
-    until:    result.stdout.find("HEALTH_WARN") != -1
+    until:    result.stdout.find("{{ ceph_wait_status }}") != -1
     retries:  120
   - debug:    var=result.stdout_lines
-  - pause:    minutes=5

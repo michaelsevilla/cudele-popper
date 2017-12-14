@@ -6,6 +6,7 @@
 # SRC          #
 ################
 ceph_repository: https://github.com/michaelsevilla/ceph.git
+#ceph_docker_version: a241c6f
 ceph_docker_version: 8adf01b
 ceph_docker_username: michaelsevilla
 ceph_docker_imagename: ceph

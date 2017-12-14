@@ -1,0 +1,28 @@
+---
+- name: drop the os file cache
+  shell: sudo sh -c "$(which echo) 3 > /proc/sys/vm/drop_caches"
+
+- name: remove old containers
+  shell: docker rm -f client
+  ignore_errors: True
+
+- name: remove old testdir
+  shell: docker exec cephfs mv {{ mount_point }}/testdir {{ mount_point }}/testdir-nfiles-{{ nfiles }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}-{{ ansible_hostname }}
+  ignore_errors: True
+
+- name: create the test directory
+  shell: docker exec cephfs mkdir {{ mount_point }}/testdir
+  ignore_errors: True
+    
+- name: sleep 
+  pause: minutes=1
+
+- name: run the metadata benchmark
+  shell: >
+         docker run -d \
+           --name=client \
+           --volumes-from cephfs \
+           michaelsevilla/mdtest \
+           -F -C -n {{ nfiles }} -d {{ mount_point }}/testdir/nfiles-{{ nfiles }}-{{ ansible_hostname }}
+
+#-F -C -n {{ nfiles }} -d {{ mount_point }}/testdir/nfiles-{{ nfiles }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}-{{ ansible_hostname }}-client{{ item }}
