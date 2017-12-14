@@ -1,0 +1,33 @@
+- hosts: clients
+  become: True
+  tasks:
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - name: benchmark creates with an interferring create stream (do touches because mpirun is pain)
+    include: mdtest.yml
+
+- hosts: interfere
+  become: True
+  tasks:
+  - pause: seconds={{ drop_delay }}
+  - shell: for i in `seq 0 1000`; do docker exec cephfs touch {{ mount_point }}/testdir/nfiles-{{ nfiles }}-{{ item }}/#test-dir.0/mdtest_tree.0/file-$i.txt; done
+    with_items:
+    - "{{ groups['clients'] }}"
+
+- hosts: clients
+  become: True
+  tasks:
+  - name: wait for the job to finish
+    shell: "docker inspect -f {% raw %}'{{ .State.Running }}' {% endraw %} client"
+    register: result
+    until: result.stdout.find("false") != -1
+    retries: 6000
+
+  - name: get the output for mdtest
+    shell: docker logs client
+    register: results
+  - local_action: >
+      copy content={{ item }} 
+      dest="{{ playbook_dir|dirname }}/results/{{ site }}/mdtest-interfere-{{ nfiles }}-{{ ansible_hostname }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    with_items:
+    - "{{ results }}"

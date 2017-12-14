@@ -1,0 +1,29 @@
+# broken: issdm-3
+
+[osds]
+issdm-0 ansible_ssh_user=issdm
+issdm-1 ansible_ssh_user=issdm
+#issdm-6 ansible_ssh_user=issdm
+issdm-14 ansible_ssh_user=issdm
+issdm-24 ansible_ssh_user=issdm
+issdm-27 ansible_ssh_user=issdm
+issdm-29 ansible_ssh_user=issdm
+issdm-34 ansible_ssh_user=issdm
+issdm-40 ansible_ssh_user=issdm
+
+[mons]
+issdm-11 ansible_ssh_user=issdm
+
+[mdss]
+issdm-12 ansible_ssh_user=issdm
+issdm-15 ansible_ssh_user=issdm
+issdm-18 ansible_ssh_user=issdm
+
+[clients]
+issdm-0 ansible_ssh_user=issdm
+
+[interfere]
+issdm-45 ansible_ssh_user=issdm
+
+[graphite]
+192.168.140.2 ansible_ssh_user=issdm

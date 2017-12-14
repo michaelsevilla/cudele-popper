@@ -1,0 +1,46 @@
+- hosts: clients[0]
+  become: True
+  tasks:
+
+  - fail: msg="Uh oh. Please define nfiles"
+    when: nfiles is not defined
+  - set_fact: output="{{ playbook_dir|dirname }}/results/{{ nfiles }}/summary.txt"
+
+  - name: decouple subtree and copy the journal of events to the client (setup)
+    copy: src="{{ playbook_dir|dirname }}/site/basejournal.bin" dest="/etc/ceph/basejournal.bin"
+
+  - name: materialize the snapshot in client memory
+    shell: docker exec cephfs cephfs-journal-tool journal import /etc/ceph/basejournal.bin
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="snapshot,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: add events to the in memory journal and apply them to the metadata store
+    shell: docker exec cephfs cephfs-journal-tool event create summary --nfiles {{ nfiles }} --memapply true
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="apply,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: apply the events again (required for correctness -- it is a bug)
+    shell: docker exec cephfs cephfs-journal-tool event apply summary
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="apply1,{{ ansible_date_time.time }},{{ results.delta }}" create="yes"
+
+  - name: replay by clearing the journal
+    shell: docker exec cephfs cephfs-journal-tool journal reset
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="replay,{{ ansible_date_time.time }},{{ results.delta }}" create="yes" 
+
+  - name: mark when we start the replay process
+    shell: date +"%T"
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="replay1-start,{{ ansible_date_time.time }},{{ results.stdout }}" create="yes" 
+  - name: replay by restarting the metadata servers
+    shell: docker exec cephfs ceph mds fail {{ item }}
+    with_items: groups['mdss']
+  - command:  docker exec cephfs ceph -s
+    register: result
+    until:    result.stdout.find("up:active") != -1
+    retries:  120
+  - name: mark when we stop process
+    shell: date +"%T"
+    register: results
+  - local_action: lineinfile dest="{{ output }}" line="replay1-stop,{{ ansible_date_time.time }},{{ results.stdout }}" create="yes" 
