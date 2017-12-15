@@ -9,27 +9,28 @@ ANSIBLE="michaelsevilla/ansible --forks 50 --skip-tags package-install,with_pkg"
 CEPH_ANSIBLE="$RUN -v $ROOT/ansible/ceph:/root $ANSIBLE"
 SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
 
-for site in "nojournal-cache" "journal120-cache" "journal150-cache" "journal180-cache" "journal30-cache" "journal60-cache" "journal90-cache" "nojournal-cache"; do
-  #nclients=3
+for nclients in 1 5 10 15 18 20; do
+    cp inventory_cloudlab/${nclients}client site/hosts
+    cp site/hosts $ROOT/ansible/ceph/hosts
+  for site in "nojournal-cache" "journal210-cache" "journal120-cache" "journal30-cache"; do
 
-  # configure ceph and setup results directory
-  mkdir -p results/$site/logs || true
-  cp site/* $ROOT/ansible/ceph || true
-  cp site_confs/${site}.yml site/group_vars/all
-  cp -r site/group_vars $ROOT/ansible/ceph/
-  #cp inventory/${nclients}client site/hosts
-  #cp inventory/${nclients}client $ROOT/ansible/ceph//hosts
-  cp site/hosts $ROOT/ansible/ceph/hosts
+    # configure ceph and setup results directory
+    mkdir -p results/$site/logs || true
+    cp site/* $ROOT/ansible/ceph || true
+    cp site_confs/${site}.yml site/group_vars/all
+    cp -r site/group_vars $ROOT/ansible/ceph/
 
-  # cleanup and start ceph
-  $SRL_ANSIBLE cleanup.yml
-  $CEPH_ANSIBLE ceph.yml cephfs.yml
-  $SRL_ANSIBLE ceph_pgs.yml ceph_monitor.yml ceph_wait.yml
-  
-  # warmup and get baseline
-  for i in `seq 0 2`; do
-    ./ansible-playbook.sh -e site=$site -e nfiles=100000 ../workloads/creates.yml
+    # cleanup and start ceph
+    $SRL_ANSIBLE cleanup.yml
+    $CEPH_ANSIBLE ceph.yml cephfs.yml
+    $SRL_ANSIBLE ceph_pgs.yml ceph_monitor.yml ceph_wait.yml
+    
+    # warmup and get baseline
+    for i in `seq 0 2`; do
+      ./ansible-playbook.sh -e site=$site -e nfiles=100000 ../workloads/creates.yml
+    done
+    
+    ./ansible-playbook.sh -e site=$site collect.yml
   done
-  
-  ./ansible-playbook.sh -e site=$site collect.yml
+  mv results results-${nclients}clients
 done
