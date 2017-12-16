@@ -1,0 +1,31 @@
+2017-12-15 19:28:23  /entrypoint.sh: static: does not generate config
+HEALTH_WARN too few PGs per OSD (21 < min 30)
+2017-12-15 19:28:24  /entrypoint.sh: static: does not generate the admin key, so we can not get it.
+2017-12-15 19:28:24  /entrypoint.sh: static: make it available with the help of your configuration management system.
+2017-12-15 19:28:24  /entrypoint.sh: static: ceph-ansible is a good candidate to deploy a containerized version of Ceph.
+2017-12-15 19:28:24  /entrypoint.sh: static: ceph-ansible will help you fetching the keys and push them on the right nodes.
+2017-12-15 19:28:24  /entrypoint.sh: static: if you're interested, please visit: https://github.com/ceph/ceph-ansible
+pool 'cephfs_data' created
+pool 'cephfs_metadata' created
+new fs with metadata pool 2 and data pool 1
+2017-12-15 19:28:26  /entrypoint.sh: SUCCESS
+2017-12-15 19:28:26.669741 7f2cfcbbd300  0 set uid:gid to 64045:64045 (ceph:ceph)
+2017-12-15 19:28:26.669763 7f2cfcbbd300  0 ceph version 9.0.0-18997-g8adf01b (8adf01b98af39502aa7fe3d10c4b19935508eaa7), process ceph-mds, pid 236
+starting mds.node-4 at -
+2017-12-15 19:28:26.670930 7f2cfcbbd300  0 pidfile_write: ignore empty --pid-file
+2017-12-15 19:28:31.196908 7f2cf55b9700  0 mds.0.cache creating system inode with ino:1
+2017-12-15 19:28:31.197211 7f2cf55b9700  0 mds.0.cache creating system inode with ino:100
+2017-12-15 19:28:31.197230 7f2cf55b9700  0 mds.0.cache creating system inode with ino:600
+2017-12-15 19:28:31.197400 7f2cf55b9700  0 mds.0.cache creating system inode with ino:601
+2017-12-15 19:28:31.197675 7f2cf55b9700  0 mds.0.cache creating system inode with ino:602
+2017-12-15 19:28:31.197773 7f2cf55b9700  0 mds.0.cache creating system inode with ino:603
+2017-12-15 19:28:31.197863 7f2cf55b9700  0 mds.0.cache creating system inode with ino:604
+2017-12-15 19:28:31.198002 7f2cf55b9700  0 mds.0.cache creating system inode with ino:605
+2017-12-15 19:28:31.198092 7f2cf55b9700  0 mds.0.cache creating system inode with ino:606
+2017-12-15 19:28:31.198234 7f2cf55b9700  0 mds.0.cache creating system inode with ino:607
+2017-12-15 19:28:31.198342 7f2cf55b9700  0 mds.0.cache creating system inode with ino:608
+2017-12-15 19:28:31.198471 7f2cf55b9700  0 mds.0.cache creating system inode with ino:609
+tcmalloc: large alloc 1593843712 bytes == 0x7f2f77e50000 @  0x7f2cfbbc0c4c 0x7f2cfbbe144e 0x7f2cfc3338c3 0x7f2cfc3040c1 0x7f2cfc3088a0 0x7f2cfc324dc3 0x7f2cfc3253c4 0x7f2cfc32959b 0x7f2cfc2ab16c 0x7f2cfc2b4951 0x7f2cfc2b5aa5 0x7f2cfc2a3593 0x7f2cfc7ca7a3 0x7f2cfc6761dd 0x7f2cfb998184 0x7f2cfa0e9ffd (nil)
+tcmalloc: large alloc 3187679232 bytes == 0x7f31e87b4000 @  0x7f2cfbbc0c4c 0x7f2cfbbe144e 0x7f2cfc3338c3 0x7f2cfc3040c1 0x7f2cfc3088a0 0x7f2cfc324dc3 0x7f2cfc3253c4 0x7f2cfc32959b 0x7f2cfc2ab16c 0x7f2cfc2b4951 0x7f2cfc2b5aa5 0x7f2cfc2a3593 0x7f2cfc7ca7a3 0x7f2cfc6761dd 0x7f2cfb998184 0x7f2cfa0e9ffd (nil)
+tcmalloc: large alloc 1677729792 bytes == 0x7f3665984000 @  0x7f2cfbbc0c4c 0x7f2cfbbe144e 0x7f2cfc3338c3 0x7f2cfc4736bc 0x7f2cfc386830 0x7f2cfc2efd4c 0x7f2cfc2f085d 0x7f2cfc324ec3 0x7f2cfc3253c4 0x7f2cfc32959b 0x7f2cfc2ab16c 0x7f2cfc2b4951 0x7f2cfc2b5aa5 0x7f2cfc2a3593 0x7f2cfc7ca7a3 0x7f2cfc6761dd 0x7f2cfb998184 0x7f2cfa0e9ffd (nil)
+tcmalloc: large alloc 6375350272 bytes == 0x7f36ca1aa000 @  0x7f2cfbbc0c4c 0x7f2cfbbe144e 0x7f2cfc3338c3 0x7f2cfc3040c1 0x7f2cfc3088a0 0x7f2cfc324dc3 0x7f2cfc3253c4 0x7f2cfc32959b 0x7f2cfc2ab16c 0x7f2cfc2b4951 0x7f2cfc2b5aa5 0x7f2cfc2a3593 0x7f2cfc7ca7a3 0x7f2cfc6761dd 0x7f2cfb998184 0x7f2cfa0e9ffd (nil)
