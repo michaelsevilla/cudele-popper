@@ -11,7 +11,7 @@ SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
 
 #for nclients in 1 5 10 15 18 20; do
 #for nclients in 15 18 20; do
-for nclients in 15; do
+for nclients in 1; do
     cp inventory_cloudlab/${nclients}client site/hosts
     cp site/hosts $ROOT/ansible/ceph/hosts
   for site in "nojournal-cache"; do #"journal210-cache" "journal120-cache" "journal30-cache"; do

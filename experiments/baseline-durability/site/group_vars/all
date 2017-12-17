@@ -10,6 +10,9 @@ ceph_mon_docker_subnet: 10.10.1.1/24
 fsid: "e9570dd8-03ad-45f0-8a74-ec9b3bb7095f"
 docker: true
 install_docker: false
+cluster_network: "10.10.1.1/24"
+private_network: "10.10.1.1/24"
+public_network: "10.10.1.1/24"
 
 #############
 # ceph.conf #
@@ -19,7 +22,9 @@ ceph_conf_overrides:
      osd pool default size: 1
      osd pool default pg num: 512
      osd pool default pgp num: 512
-     cluster network: 10.10.1.0/24
+     cluster network: "10.10.1.1/24"
+     private network: "10.10.1.1/24"
+     public network: "10.10.1.1/24"
    mon:
      debug mon: 1
    osd:
