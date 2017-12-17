@@ -9,12 +9,10 @@ ANSIBLE="michaelsevilla/ansible --forks 50 --skip-tags package-install,with_pkg"
 CEPH_ANSIBLE="$RUN -v $ROOT/ansible/ceph:/root $ANSIBLE"
 SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
 
-#for nclients in 1 5 10 15 18 20; do
-#for nclients in 15 18 20; do
-for nclients in 1; do
+for nclients in 1 5 10 15 18 20; do
     cp inventory_cloudlab/${nclients}client site/hosts
     cp site/hosts $ROOT/ansible/ceph/hosts
-  for site in "nojournal-cache"; do #"journal210-cache" "journal120-cache" "journal30-cache"; do
+  for site in "nojournal-cache" "journal210-cache" "journal120-cache" "journal30-cache"; do
 
     # configure ceph and setup results directory
     mkdir -p results/$site/logs || true
@@ -34,5 +32,5 @@ for nclients in 1; do
     
     ./ansible-playbook.sh -e site=$site collect.yml
   done
-  mv results results-${nclients}clients-g1-test
+  mv results results-${nclients}clients-g1-10G
 done

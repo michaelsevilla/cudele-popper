@@ -6,7 +6,7 @@
 
   - name: warm up the metrics
     shell: docker exec cephfs touch /cephfs/blah-{{ ansible_hostname }}
-  - pause: minutes=5
+  - pause: minutes=1
 
   - include: mdtest.yml
   - name: wait for the job to finish

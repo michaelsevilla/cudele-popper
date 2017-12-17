@@ -14,9 +14,6 @@
   shell: docker exec cephfs mkdir /cephfs/testdir
   ignore_errors: True
     
-- name: sleep 
-  pause: minutes=1
-
 - name: run the metadata benchmark
   shell: >
          docker run -d \

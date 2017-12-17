@@ -1,7 +1,7 @@
 [osds]
 node-1 ansible_ssh_user=msevilla
 node-2 ansible_ssh_user=msevilla
-node-24 ansible_ssh_user=msevilla
+node-3 ansible_ssh_user=msevilla
 
 [mons]
 node-0 ansible_ssh_user=msevilla
@@ -28,8 +28,6 @@ node-19 ansible_ssh_user=msevilla
 node-20 ansible_ssh_user=msevilla
 node-21 ansible_ssh_user=msevilla
 node-22 ansible_ssh_user=msevilla
-
-
 
 [graphite]
 node-0 ansible_ssh_user=msevilla
