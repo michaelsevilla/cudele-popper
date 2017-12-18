@@ -1,0 +1,4 @@
+---
+journal_size: 10000
+collectl_args: "-sDN -i 1"
+osd_containerized_deployment: true
