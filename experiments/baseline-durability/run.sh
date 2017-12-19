@@ -12,7 +12,7 @@ SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
 for nclients in 1 5 10 15 18 20; do
     cp inventory_cloudlab/${nclients}client site/hosts
     cp site/hosts $ROOT/ansible/ceph/hosts
-  for site in "nojournal-cache" "journal210-cache" "journal120-cache" "journal30-cache"; do
+  for site in "journal120-cache"; do #"nojournal-cache" "journal210-cache" "journal120-cache" "journal30-cache"; do
 
     # configure ceph and setup results directory
     mkdir -p results/$site/logs || true
@@ -22,13 +22,16 @@ for nclients in 1 5 10 15 18 20; do
 
     # cleanup and start ceph
     $SRL_ANSIBLE cleanup.yml
+    exit 1
     $CEPH_ANSIBLE ceph.yml cephfs.yml
     $SRL_ANSIBLE ceph_pgs.yml ceph_monitor.yml ceph_wait.yml
     
     # warmup and get baseline
     for i in `seq 0 2`; do
       ./ansible-playbook.sh -e site=$site -e nfiles=100000 ../workloads/creates.yml
+      sleep 60
     done
+    exit 1
     
     ./ansible-playbook.sh -e site=$site collect.yml
   done

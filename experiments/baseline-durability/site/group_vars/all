@@ -4,8 +4,8 @@ nclients: 1
 ################
 # ceph ansible #
 ################
-monitor_interface: eth1
-ceph_mon_docker_interface: eth1
+monitor_interface: eth2
+ceph_mon_docker_interface: eth2
 ceph_mon_docker_subnet: 10.10.1.1/24
 fsid: "e9570dd8-03ad-45f0-8a74-ec9b3bb7095f"
 docker: true
@@ -41,7 +41,7 @@ ceph_conf_overrides:
      mds bal max until: -1
      mds bal mode: 2
      mds log max expiring: 40
-     mds log max segments: 30
+     mds log max segments: 120
      mds bal fragment size max: 200000
    client:
      debug client: 0
@@ -67,6 +67,7 @@ ceph_client_docker_image_tag: 8adf01b
 ceph_wait_status: "HEALTH_OK"
 site: cloudlab
 kraken: false
+
 
 ####################
 # experiment stuff #

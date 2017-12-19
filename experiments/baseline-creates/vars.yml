@@ -16,8 +16,8 @@ kraken: false
 ################
 # MON          #
 ################
-monitor_interface: eth1
-ceph_mon_docker_interface: eth1
+monitor_interface: eth2
+ceph_mon_docker_interface: eth2
 ceph_mon_docker_subnet: 10.10.1.1
 
 ################

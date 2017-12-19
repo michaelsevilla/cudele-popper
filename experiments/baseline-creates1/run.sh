@@ -34,17 +34,19 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-for log in "log"; do
-  cp configs_$SITE/all-$log ansible/group_vars/all 
+mkdir results-all || true
+
+for procs in 1 5 10 15 20 25 30 35; do
   for clients in 1; do
     cp configs_$SITE/clients$clients hosts
     for job in "creates"; do
-      for procs in 1 5 10 15 20 25 30 35; do
+      for log in "nolog" "log1" "log10" "log30" "log50"; do
+        cp configs_$SITE/all-$log ansible/group_vars/all 
         sudo rm -rf results || true; mkdir results
         $DOCKER -e processes_per_client=$procs cleanup.yml
         $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
           ceph.yml monitor.yml /workloads/${job}.yml collect.yml
-        mv results results-$SITE-clients$clients-procs$procs-$log
+        mv results results-all/results-$SITE-clients$clients-procs$procs-$log
       done
     done
   done
