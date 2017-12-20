@@ -36,11 +36,13 @@ fi
 
 mkdir results-all || true
 
-for procs in 1 5 10 15 20 25 30 35; do
+#for procs in 1 5 10 15 20 25 30 35; do
+for procs in 25 30 35; do
   for clients in 1; do
     cp configs_$SITE/clients$clients hosts
     for job in "creates"; do
-      for log in "nolog" "log1" "log10" "log30" "log50"; do
+      #for log in "nolog" "log1" "log10" "log30" "log50"; do
+      for log in "nolog" "log1"; do
         cp configs_$SITE/all-$log ansible/group_vars/all 
         sudo rm -rf results || true; mkdir results
         $DOCKER -e processes_per_client=$procs cleanup.yml
