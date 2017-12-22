@@ -118,18 +118,21 @@ Figure~\ref{fig:overhead-a} shows the effect of journaling with different
 \oldcomment{segment sizes; the larger the segment size the bigger that the
 writes into the object store are}\newcomment{dispatch sizes, normalized to 1
 client that creates 100K files with journaling off (about 654 creates/sec). In
-this case a dispatch size of 10 degrades performance more because the metadata
-server is overloaded with requests and cannot spare cycles to manage concurrent
-segments.  Although the ``no journal" curve appears flat, it is actually a
-slowdown of about \(0.3\times\) per concurrent client; this slowdown is a
-result of the peak throughput of a single metadata server, which we found to be
-about 3000 operations per second}.  The trade-off for better performance is
-memory consumption because a larger \oldcomment{segment}\newcomment{dispatch}
-size uses more space for buffering.  When journaling is on, the metadata server
-periodically stops serving requests to flush ({\it i.e.} apply journal updates)
-to the metadata store.  The journal overhead is sufficient enough to slow down
-metadata throughput but not so much as to overwhelm the bandwidth of the object
-store.
+this case a dispatch size of 10 degrades performance the most because the
+metadata server is overloaded with requests and cannot spare cycles to manage
+concurrent segments.  Tuning and parameter sweeps show that a dispatch size of
+10 is the worst and that larger sizes approach a dispatch size of 1; for all
+future journal experiments we use a dispatch size of 40 which is a more
+realistic configuration.  Although the ``no journal" curve appears flat, it is
+actually a slowdown of about \(0.3\times\) per concurrent client; this slowdown
+is a result of the peak throughput of a single metadata server, which we found
+to be about 3000 operations per second}.  The trade-off for better performance
+is memory consumption because a larger
+\oldcomment{segment}\newcomment{dispatch} size uses more space for buffering.
+When journaling is on, the metadata server periodically stops serving requests
+to flush ({\it i.e.} apply journal updates) to the metadata store.  The journal
+overhead is sufficient enough to slow down metadata throughput but not so much
+as to overwhelm the bandwidth of the object store.
 
 \textbf{Comparison to decoupled namespaces}: For BatchFS, if a client fails
 when it is writing to the local log-structured merge tree (implemented as an
