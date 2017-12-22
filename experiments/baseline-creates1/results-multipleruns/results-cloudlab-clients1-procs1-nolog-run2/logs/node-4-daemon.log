@@ -1,0 +1,29 @@
+2017-12-20 11:45:11  /entrypoint.sh: static: does not generate config
+HEALTH_WARN too few PGs per OSD (21 < min 30)
+2017-12-20 11:45:11  /entrypoint.sh: static: does not generate the admin key, so we can not get it.
+2017-12-20 11:45:11  /entrypoint.sh: static: make it available with the help of your configuration management system.
+2017-12-20 11:45:11  /entrypoint.sh: static: ceph-ansible is a good candidate to deploy a containerized version of Ceph.
+2017-12-20 11:45:11  /entrypoint.sh: static: ceph-ansible will help you fetching the keys and push them on the right nodes.
+2017-12-20 11:45:11  /entrypoint.sh: static: if you're interested, please visit: https://github.com/ceph/ceph-ansible
+pool 'cephfs_data' created
+pool 'cephfs_metadata' created
+new fs with metadata pool 2 and data pool 1
+2017-12-20 11:45:14  /entrypoint.sh: SUCCESS
+warning: line 14: 'public_network' in section 'global' redefined 
+warning: line 16: 'cluster_network' in section 'global' redefined 
+2017-12-20 11:45:14.128558 7f118de1e300  0 set uid:gid to 64045:64045 (ceph:ceph)
+2017-12-20 11:45:14.128578 7f118de1e300  0 ceph version 9.0.0-18997-g8adf01b (8adf01b98af39502aa7fe3d10c4b19935508eaa7), process ceph-mds, pid 236
+starting mds.node-4 at -
+2017-12-20 11:45:14.130080 7f118de1e300  0 pidfile_write: ignore empty --pid-file
+2017-12-20 11:45:18.587906 7f118681a700  0 mds.0.cache creating system inode with ino:1
+2017-12-20 11:45:18.588205 7f118681a700  0 mds.0.cache creating system inode with ino:100
+2017-12-20 11:45:18.588217 7f118681a700  0 mds.0.cache creating system inode with ino:600
+2017-12-20 11:45:18.588412 7f118681a700  0 mds.0.cache creating system inode with ino:601
+2017-12-20 11:45:18.588576 7f118681a700  0 mds.0.cache creating system inode with ino:602
+2017-12-20 11:45:18.588835 7f118681a700  0 mds.0.cache creating system inode with ino:603
+2017-12-20 11:45:18.588977 7f118681a700  0 mds.0.cache creating system inode with ino:604
+2017-12-20 11:45:18.589134 7f118681a700  0 mds.0.cache creating system inode with ino:605
+2017-12-20 11:45:18.589291 7f118681a700  0 mds.0.cache creating system inode with ino:606
+2017-12-20 11:45:18.589407 7f118681a700  0 mds.0.cache creating system inode with ino:607
+2017-12-20 11:45:18.589549 7f118681a700  0 mds.0.cache creating system inode with ino:608
+2017-12-20 11:45:18.589668 7f118681a700  0 mds.0.cache creating system inode with ino:609

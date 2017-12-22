@@ -6,6 +6,7 @@ set -ex
 
 # if you know Ansible and Docker, the below should make sense
 # - we attach ceph-ansible to root because they expect us to be in that dir
+OUTP="results-multipleruns"
 SITE=`cat vars.yml | grep "site: " | grep -v "#" | awk '{print $2}'`
 ROOT=`dirname $PWD | xargs dirname`
 NETW="--net host -v $HOME/.ssh:/root/.ssh"
@@ -34,21 +35,38 @@ if [ ! -z $1 ]; then
   exit
 fi
 
-mkdir results-all || true
-
-#for procs in 1 5 10 15 20 25 30 35; do
-for procs in 25 30 35; do
+mkdir $OUTP || true
+for procs in 1 5 10 15; do
   for clients in 1; do
     cp configs_$SITE/clients$clients hosts
     for job in "creates"; do
-      #for log in "nolog" "log1" "log10" "log30" "log50"; do
-      for log in "nolog" "log1"; do
+      for log in "nolog" "log1" "log10" "log30" "log50"; do
         cp configs_$SITE/all-$log ansible/group_vars/all 
-        sudo rm -rf results || true; mkdir results
-        $DOCKER -e processes_per_client=$procs cleanup.yml
-        $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
-          ceph.yml monitor.yml /workloads/${job}.yml collect.yml
-        mv results results-all/results-$SITE-clients$clients-procs$procs-$log
+        for run in 0 1 2; do
+          mkdir results || true
+          $DOCKER -e processes_per_client=$procs cleanup.yml
+          $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
+            ceph.yml monitor.yml /workloads/${job}.yml collect.yml
+          mv results $OUTP/results-$SITE-clients$clients-procs$procs-$log-run$run
+        done
+      done
+    done
+  done
+done
+
+for procs in 20 25 30 35 40 45 50; do
+  for clients in 1; do
+    cp configs_$SITE/clients$clients hosts
+    for job in "creates"; do
+      for log in "nolog" "log1"; do
+      cp configs_$SITE/all-$log ansible/group_vars/all 
+        for run in 0 1 2; do
+          mkdir results || true
+          $DOCKER -e processes_per_client=$procs cleanup.yml
+          $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
+            ceph.yml monitor.yml /workloads/${job}.yml collect.yml
+          mv results $OUTP/results-$SITE-clients$clients-procs$procs-$log-run$run
+        done
       done
     done
   done
