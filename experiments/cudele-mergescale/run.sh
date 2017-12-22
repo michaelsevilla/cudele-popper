@@ -35,14 +35,14 @@ if [ ! -z $1 ]; then
 fi
 
 mkdir results || true
-#./teardown.sh
+./teardown.sh
 #$DOCKER -e nfiles=100000 -e nclients=$nclients ceph.yml /workloads/generate_journals.yml
-for run in 3 4 5; do
-  for nclients in 40 30 20 10 1; do
+for run in 0 1 2; do
+  for nclients in 1 5 10 15 20; do
     ./teardown.sh
     cp configs_$SITE/hosts hosts
     $DOCKER -e nfiles=100000 -e nclients=$nclients ceph.yml /workloads/merge.yml #/workloads/clients${nclients}.yml
   done
-  mv results results-run$run
+  mv results results-rerun-run$run-blah
 done
 exit 0
