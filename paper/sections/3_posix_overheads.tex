@@ -4,12 +4,10 @@
 \begin{figure}[tb]
 \centering
 \includegraphics[width=1\linewidth]{./graphs/overhead-creates.png}
-
 \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-compile/visualize/viz.ipynb}{source}]
 Create-heavy workloads (such as \texttt{untar}) incur the highest disk,
 network, and CPU utilization because of the consistency and durability demands
 of CephFS.}\label{fig:overhead-creates}
-
 \end{figure}
 
 In our examination of the overheads of POSIX IO we benchmark and analyze
@@ -41,30 +39,37 @@ consistency/durability guarantees.
   \centering
   \begin{subfigure}[b]{.3\linewidth}
       \centering
-      \includegraphics[width=0.95\linewidth]{graphs/slowdown-journal.png}
+      \includegraphics[width=1\linewidth]{graphs/slowdown-journal.png}
       \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-durability/visualize/viz.ipynb}{source}]
-      Effect of Journal} \label{fig:overhead-a}
+      effect of journal} \label{fig:overhead-a}
+  \end{subfigure}
+  \begin{subfigure}[b]{.3\linewidth}
+      \centering
+      \includegraphics[width=0.98\linewidth]{graphs/slowdown-interfere-scale.png}
+      \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-creates/visualize/viz.ipynb}{source}]
+      interference hurts variability}
+      \label{fig:overhead-b}
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
       \includegraphics[width=1.1\linewidth]{graphs/behavior-interfere.png}
       \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-interfere/visualize/viz.ipynb}{source}]
-      Interference increases RPCs}
-      \label{fig:overhead-b}
-  \end{subfigure}
-  \begin{subfigure}[b]{.3\linewidth}
-      \centering
-      \includegraphics[width=1\linewidth]{graphs/slowdown-interfere-scale.png}
-      \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-creates/visualize/viz.ipynb}{source}]
-      Interference hurts variability}
+      interference increases RPCs}
       \label{fig:overhead-c}
   \end{subfigure}
-  \caption{ The overhead of durability and strong consistency in CephFS.  (a)
-  shows the effect of different journal segment sizes, normalized to a setup
-  without a journal (``No Journal").  The journal is streamed into the object
-  store for fault tolerance. (b) and (c) show that when a second client
-  ``interferes", capabilities are revoked and metadata servers do more work.
-  \label{fig:overhead}}
+
+  \caption{\newcomment{The durability and strong consistency slowdown of the
+existing CephFS implementation increases as the number of clients scales.
+Results are normalized to 1 client that creates 100K files in isolation.  (a)
+shows the effect of journaling metadata updates; ``segment(s)" is the number
+of journal segments dispatched to disk at once. (b) shows the slowdown when
+another client interferes by creating files in all directories and (c)
+highlights the cause: }\oldcomment{The overhead of durability and strong
+consistency in CephFS. (a) shows the effect of different journal segment sizes,
+which are streamed into the object store for fault tolerance. (b) and (c) show
+that} when another client ``interferes", capabilities are revoked and metadata
+servers do more work.} \label{fig:overhead}
+
 \end{figure*}
 
 % what is durability
@@ -82,13 +87,14 @@ None configuration.
 % - sequential IO, trim redundant operations
 \textbf{CephFS Design}: A journal of metadata updates that streams into the
 resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
-WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to be large
-(on the order of MBs) which ensures (1) sequential writes into the object store
-and (2) the ability for daemons to trim redundant or irrelevant journal
-entries.  The journal is striped over objects where multiple journal updates
-can reside on the same object. There are two tunables for controlling the
-journal: the segment size and the number of segments that can be written in
-parallel. Unless the journal saturates memory or CPU resources, larger values
+WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to be large (on
+the order of MBs) which ensures (1) sequential writes into the object store and
+(2) the ability for daemons to trim redundant or irrelevant journal entries.
+The journal is striped over objects where multiple journal updates can reside
+on the same object. There are two tunables\newcomment{, related to groups of
+journal events called segments,} for controlling the journal: the segment size
+and the dispatch size ({\it i.e.} the number of segments that can be dispatched
+at once).  Unless the journal saturates memory or CPU resources, larger values
 for these tunables results in better performance.
 
 % purpose of the journal
@@ -108,14 +114,22 @@ write-optimized.
 %\end{figure}
 
 % Effects on performance
-Figure~\ref{fig:overhead-a} shows the effect of journaling of with different
-segment sizes; the larger the segment size the bigger that the writes into the
-object store are.  The trade-off for better performance is memory consumption
-because larger segments take up more space for buffering.  When journaling is
-on, the metadata server periodically stops serving requests to flush ({\it
-i.e.} apply journal updates) to the metadata store.  The journal overhead is
-sufficient enough to slow down metadata throughput but not so much as to
-overwhelm the bandwidth of the object store. 
+Figure~\ref{fig:overhead-a} shows the effect of journaling with different
+\oldcomment{segment sizes; the larger the segment size the bigger that the
+writes into the object store are}\newcomment{dispatch sizes, normalized to 1
+client that creates 100K files with journaling off (about 654 creates/sec). In
+this case a dispatch size of 10 degrades performance more because the metadata
+server is overloaded with requests and cannot spare cycles to manage concurrent
+segments.  Although the ``no journal" curve appears flat, it is actually a
+slowdown of about \(0.3\times\) per concurrent client; this slowdown is a
+result of the peak throughput of a single metadata server, which we found to be
+about 3000 operations per second}.  The trade-off for better performance is
+memory consumption because a larger \oldcomment{segment}\newcomment{dispatch}
+size uses more space for buffering.  When journaling is on, the metadata server
+periodically stops serving requests to flush ({\it i.e.} apply journal updates)
+to the metadata store.  The journal overhead is sufficient enough to slow down
+metadata throughput but not so much as to overwhelm the bandwidth of the object
+store.
 
 \textbf{Comparison to decoupled namespaces}: For BatchFS, if a client fails
 when it is writing to the local log-structured merge tree (implemented as an
@@ -150,8 +164,24 @@ client immediately reads all the inodes in the cache ({\it i.e.} \texttt{ls
 -alR}), the inode cache is less useful for create-heavy workloads.
 
 % benefits PROBLEM -- IS THIS THE METADATA PROTOCOL OR JUST THE OVERLOADEDNESS?
-The benefits of caching the directory inode when creating files is shown in
-Figure~\ref{fig:overhead-b}. The colors show the behavior of the client for two
+\oldcomment{This degradation is shown in Figure~\ref{fig:overhead-b}, where we
+scale the number of clients and show the slowdown of the slowest client.  The
+results are normalized to a single isolated client without a metadata server
+journal and the error bars are the standard deviations of all client runtimes.}
+\newcomment{Figure~\ref{fig:overhead-b} shows the slowdown of maintaining
+strong consistency when scaling the number of clients.  We plot the slowdown of
+the slowest client, normalized to 1 client that creates 100K files (about 513
+creates/sec because the journal is turned back on).} For the ``interference"
+curve, each client creates files in private directories and at 30 seconds we
+launch another process that creates files in those directories. \oldcomment{18
+is}\newcomment{20 clients has an asterisk\* because} the maximum number of
+clients the metadata server can handle for this metadata-intensive workload
+\newcomment{is actually 18}; at higher client load, the metadata server
+complains about laggy and unresponsive requests.
+
+\oldcomment{The benefits of caching the directory inode when creating
+files}\newcomment{The cause for this slowdown} is shown in
+Figure~\ref{fig:overhead-c}. The colors show the behavior of the client for two
 different runs.  If only one client is creating files in a directory
 (``isolated" curve on \(y1\) axis) then that client can lookup the existence of
 new files locally before issuing a create request to the metadata server. If
@@ -160,15 +190,9 @@ inode transitions out of read caching and the first client must send
 \texttt{lookup()}s to the metadata server (``interfere" curve on \(y2\) axis).
 These extra requests increase the throughput of the ``interfere" curve on the
 \(y1\) axis because the metadata server can handle the extra load but
-performance suffers.  This degradation is shown in Figure~\ref{fig:overhead-c},
-where we scale the number of clients and show the slowdown of the slowest
-client.  The results are normalized to a single isolated client without a
-metadata server journal and the error bars are the standard deviations of all
-client runtimes.  For the ``interfere" bars, each client creates files in
-private directories and at 30 seconds we launch another process that creates
-files in those directories. 18 is the maximum number of clients the metadata
-server can handle for this metadata-intensive workload; at higher client load,
-the metadata server complains about laggy and unresponsive requests.
+performance suffers.  
+
+
 
 % TODO: what is the cost of trimming the cache?
 % TODO: does CephFS still cache inodes when I turn off caching? Why is still keeping inodes in memory? Gah!

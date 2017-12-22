@@ -158,32 +158,40 @@ implemented.
   \begin{subfigure}[b]{.3\linewidth}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/mergescale.png}
-      \caption{\texttt{create}: done in parallel on clients}
-      \label{fig:mergescale}
+      \caption{
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-mergescale/visualize/viz.ipynb}{source}]
+      \newcomment{parallel creates on clients}
+      }\label{fig:mergescale}
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/block-allow.png}
-      \caption{Subtree semantics: block interference}
-      \label{fig:block-allow}
+      \caption{
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-blockapi/visualize/viz.ipynb}{source}]
+      \newcomment{block interference}
+      }\label{fig:block-allow}
   \end{subfigure}
   \begin{subfigure}[b]{.3\linewidth}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png}
-      \caption{Syncing to global namespace}
-      \label{fig:slowdown-sync}
+      \caption{
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-partialreads/visualize/viz.ipynb}{source}]
+      \newcomment{syncing to global namespace}
+      }\label{fig:slowdown-sync}
   \end{subfigure}
-\caption{ The performance and features of Cudele. (a)
-[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-mergescale/visualize/viz.ipynb}{source}]
-shows the cost of merging client journals at the metadata server. Shipping and
-merging journals of updates scales better than RPCs because there are less
-messages and consistency/durability code paths are bypassed. (b)
-[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-blockapi/visualize/viz.ipynb}{source}]
-the allow/block API isolates directories from interfering clients. (c)
-[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-partialreads/visualize/viz.ipynb}{source}]
-is the slowdown of a single client syncing updates to the global namespace. The
+\caption{\oldcomment{ The performance and features of Cudele}\newcomment{Cudele
+performance}. (a) \newcomment{shows the speedup of decoupled namespaces over
+RPCs; \texttt{create} is the throughput of clients creating files in-parallel
+and writing updates locally; \texttt{create+merge} includes the time to merge
+updates at the metadata server. }\oldcomment{shows the cost of merging client
+journals at the metadata server. Shipping and merging journals of
+updates}\newcomment{Decoupled namespaces} scale better than RPCs because there
+are less messages and consistency/durability code paths are bypassed. (b) shows
+how the allow/block API isolates directories from interfering clients. (c) is
+the slowdown of a single client syncing updates to the global namespace. The
 inflection point is the trade-off of frequent updates vs. larger journal
-files.} \label{fig:use-cases}
+files.}
+\label{fig:use-cases}
 \end{figure*}
 
 
