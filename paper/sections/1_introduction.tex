@@ -108,15 +108,19 @@ moving the data they reference.}
 
 % Results
 The results in this paper pave the way for such a system and confirm the
-assertions of ``clean-state" research that decouple namespaces; specifically
-that these techniques drastically improve performance (we see 104\(\times\) speed up).
-We go a step further by quantifying the costs of merging updates (7\(\times\)
-slow down) and maintaining durability (\(10\times\) slow down). In our
-prototype, we get an 8\(\times\) speedup and can scale to twice as many clients
-when we assign a more relaxed form of consistency and durability to a subtree
-with a create-heavy workload.  We use Ceph as a prototyping platform because it
-is used in cloud-based and data center systems and has a presence in
-HPC~\cite{wang:pdsw13-ceph-hpc}. 
+assertions of ``clean-state" research of decoupled namespaces; specifically
+that these techniques drastically improve performance.  We go a step further by
+quantifying the costs of merging updates (3.37\(\times\) slow down) and
+maintaining durability (\(2.4\times\) slow down).  In our prototype,
+\newcomment{we also show how to assign subtree semantics for certain
+applications such as checkpoint-restart (\(91.7\times\) speedup if consistency
+is fully relaxed), user home directories (within a 0.03 standard deviation from
+optimal), and clients checking for partial results (only a 2\% overhead).}
+\oldcomment{we get an 8\(\times\) speedup and can scale to twice as many
+clients when we assign a more relaxed form of consistency and durability to a
+subtree with a create-heavy workload.}  We use Ceph as a prototyping platform
+because it is used in cloud-based and data center systems and has a presence in
+HPC~\cite{wang:pdsw13-ceph-hpc}.
 
 %In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
 %cost of POSIX IO consistency and system-defined durability and
