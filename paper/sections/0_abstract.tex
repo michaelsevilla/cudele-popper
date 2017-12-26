@@ -15,12 +15,11 @@ optimize subtrees over time and space for different workloads.  We confirm the
 performance benefits of techniques presented in related work but also explore
 new consistency/durability metadata designs, all integrated over the same
 storage system.  By custom fitting a subtree to a create-heavy application, we
-show similar speedups to related work \newcomment{(up to \(91.7\times\)
-speedup) but more importantly, our prototype can custom fit subtrees in the
-same namespace to applications common in large data centers, such as
-checkpoint-restart (\(91.7\times\), user home directories (within a 0.03
-standard deviation from optimal), and clients checking for partial results
-(only a 2\% overhead).}  \oldcomment{ and can scale to 2\(\times\) as many
-clients when compared to our baseline system.}
+show similar speedups to related work \newcomment{but more importantly, our
+prototype can custom fit subtrees in the same namespace to applications common
+in large data centers, such as checkpoint-restart (91.7\(\times\), user home
+directories (within a 0.03 standard deviation from optimal), and clients
+checking for partial results (only a 2\% overhead).}  \oldcomment{ and can
+scale to 2\(\times\) as many clients when compared to our baseline system.}
 
 \end{abstract}

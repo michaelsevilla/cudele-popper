@@ -17,7 +17,9 @@ component and then we show how we use it in Cudele.
 %\label{sec:metadata-store}
 
 % how it works in CephFS
-\textbf{Metadata Store}: In CephFS, the metadata store is a data structure that represents the file
+\subsection{Metadata Store} 
+
+In CephFS, the metadata store is a data structure that represents the file
 system namespace. This data structure is stored in two places: in memory ({\it
 i.e.} in the collective memory of the metadata server cluster) and as objects
 in the object store. In the object store, directories and their inodes are
@@ -38,12 +40,14 @@ the metadata server.
 %\subsection{Journal}
 %\label{sec:journal}
 
-\textbf{Journal}: The journal is the second way that CephFS represents the file system namespace;
-it is a log of metadata updates that can materialize the namespace when the
-updates are replayed onto the metadata store. The journal is a ``pile system";
-writes are fast but reads are slow because state must be reconstructed.
-Specifically, reads are slow because there is more state to read, it is
-unorganized, and many of the updates may be redundant.
+\subsection{Journal} 
+
+The journal is the second way that CephFS represents the
+file system namespace; it is a log of metadata updates that can materialize the
+namespace when the updates are replayed onto the metadata store. The journal is
+a ``pile system"; writes are fast but reads are slow because state must be
+reconstructed.  Specifically, reads are slow because there is more state to
+read, it is unorganized, and many of the updates may be redundant.
 
 \textbf{Cudele}: the journal format is used by Stream, Append Client Journal,
 Local Persist, and Global Persist.  Stream is the default
@@ -61,7 +65,9 @@ for replaying events onto the internal namespace data structures.
 %\subsection{Journal Tool}
 %\label{sec:journal-tool}
 
-\textbf{Journal Tool}: The journal tool is used for disaster recovery and lets administrators view and
+\subsection{Journal Tool}
+
+The journal tool is used for disaster recovery and lets administrators view and
 modify the journal. It can read the journal, export the journal as a file,
 erase events, and apply updates to the metadata store.  To apply journal
 updates to the metadata store, the journal tool reads the journal from object
@@ -123,14 +129,16 @@ Append Client Journal, Volatile Apply, and Nonvolatile Apply.
 %\subsection{Inode Cache}
 %\label{sec:inode-cache}
 
-\textbf{Inode Cache}: In CephFS, the inode cache reduces the number of RPCs between clients and
+\subsection{Inode Cache}
+
+In CephFS, the inode cache reduces the number of RPCs between clients and
 metadata servers. Without contention clients can resolve metadata reads locally
-thus reducing the number of operations ({\it e.g.}, \texttt{lookup()}s).  For example, if a client or
-metadata server is not caching the directory inode, all creates within that
-directory will result in a lookup and a create request. If the directory inode
-is cached then only the create needs to be sent.  The size of the inode cache
-is configurable so as not to saturate the memory on the metadata server --
-inodes in CephFS are about 1400
+thus reducing the number of operations ({\it e.g.}, \texttt{lookup()}s).  For
+example, if a client or metadata server is not caching the directory inode, all
+creates within that directory will result in a lookup and a create request. If
+the directory inode is cached then only the create needs to be sent.  The size
+of the inode cache is configurable so as not to saturate the memory on the
+metadata server -- inodes in CephFS are about 1400
 bytes\footnote{http://docs.ceph.com/docs/jewel/dev/mds\_internals/data-structures/}.
 The inode cache has code for manipulating inode numbers, such as pre-allocating
 inodes to clients.
@@ -142,7 +150,9 @@ skip inodes used by the client at merge time.
 %\subsection{Large Inodes}
 %\label{sec:large-inodes}
 
-\textbf{Large Inodes}: In CephFS, inodes already store policies, like how the file is striped
+\subsection{Large Inodes}
+
+In CephFS, inodes already store policies, like how the file is striped
 across the object store or for managing subtrees for load balancing. These
 policies adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has

@@ -26,24 +26,34 @@ feedback; Reviewer 1 and 3's comments are addressed in issues I and II,
 Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
 comments are addressed in issues II and III. 
 
-%Experimental Setup (R1, R2, R3)
-%- code R1
-%- servers, network, storage R1, R3
-\section*{Issue I: No Experimental Setup (Reviewers 1, 2, and 3)}
+%Use Cases R2, R4
+%- Spark discussion R2
+%- more emphasis on parallel and distributed computing themes R4
+\section*{Issue I: Synthetic and/or Irrelevant Use Cases (Reviewers 2 and 4)}
 
-We apologize for the omission of experimental setup and source code details. To
-provide a more comprehensive view of our experiments, we added text to the
-paper and made paper artifacts available online. For the experimental setup, we
-describe the cluster setup (hardware, software, etc.) in Section~{\S}V.  We
-have also made the infrastructure code available and added links after each
-figure to show exactly how experiments are run.  This infrastructure code
-contains scripts to deploy the system, run experiments, and gather results.
-This process follows the Popper
-Convention\footnote{http://falsifiable.us/}~\cite{jimenez_popper_2016}, which
-aims to make research reproducible.  For the source code, we have added code
-snippets to the evaluation to concretize what was actually done and made the
-source code available online. A link is provided in a footnote in
-Section~{\S}V.
+To show the relevance of the use cases, we re-wrote Section~{\S}V-B to
+highlight examples from HPC and cloud workloads that would benefit from using
+Cudele. For HPC we focus on user home directories used for experiments and for
+the cloud we focus on the Hadoop and Spark runtimes (as suggested by Reviewer
+2). To connect the problematic use cases to Cudele, we added \textbf{Cudele
+setup} headers in Section~{\S}V-B to show which subtree semantics accomodate
+these workloads in the global namespace.  By showing these setups, we hope to
+demonstrate that different applications can use a file system in parallel with
+different consistency/durability semantics.  Although we do not actually run
+the workloads on our prototype, hopefully our changes show how the use cases,
+and the synthetic benchmarks we used to represent them, are indeed relevant to
+parallel and distributed computing.
+
+To align the paper to the themes of the conference, we changed Section~{\S}V-A
+and Figures 6a, 6b, and 6c to emphasize that decoupled namespaces facilitate
+client-driven parallelism. Clients detach subtrees form the global namespaces
+and do operations in-parallel to their local disk. We also hope that changes to
+the use cases above motivates the need for robust distributed storage systems
+that can handle today's applications.  So while the paper is storage-centric,
+we try to show that the workloads it supports are highly distributed and need a
+flexible solution like Cudele.  
+
+
 
 %Mixing contributions and future work (R1)
 %Statements in Introduction do not align with Evaluation (R1, R2, R3)
@@ -57,43 +67,60 @@ Section~{\S}V.
 All reviewers note that the results and contributions we cite in the
 introduction are not validated, explained, or even mentioned in the evaluation.
 One confusing component of this issue is that we mixed future work with the
-contributions of this paper; to make the contributions more explicit we remove
-future work from the introduction and add it to the future work section in
-Section~{\S}VI. We also connect all numbers we cite in the introduction to the
-evaluation. To further clarify the evaluation, we:
+contributions of the paper; to make the contributions more explicit we remove
+future work from the introduction and add it to Section~{\S}VI; we do not
+attempt to validate or prove any of the statements about the benefits of
+changing consistency and durability properties of a subtree dynamically, such
+as saving resource provisioning costs.  To further clarify the evaluation, we:
 
 \begin{itemize}
 
-  \item added raw numbers (as annotations) to the baselines in each figure.
-This helps the reader calculate the raw numbers instead of just relying on
-overhead and speedup numbers. 
+  \item explicitly state the Cudele setups and subtree configurations in bold
+in Section~{\S}V-A. Hopefully this helps the reader keep track of use cases and
+demonstrates how Cudele might be able to help in these scenarios. 
 
-  \item re-organized the section to make experiments more independent and
-removed cross-references. Experiments are now self-contained so the reader can
-see the effects of different API configurations and we do a better job of
-explaining how results are derived. 
+and include baseline values in the
+text so readers can quickly calculate raw numbers from our speedup/slowdown
+graphs. We also make sure to connect all speedups from the introduction to the
+evaluation. We hope this clarifies confusion about what we are comparing to
+when we reference speedups and slowdowns.
 
-  \item removed the ``major takeaways". We deleted the headings but left the
-conclusions we make as transitions. We also add insights into the results by
-analyzing the raw numbers we observe in comparison to hardware capabilities.
+  \item re-organized the sections and removed cross-references. Experiments are
+now self-contained so the reader can see the effects of different API
+configurations and we do a better job of explaining how results are derived. 
+
+  \item removed the ``major takeaways". We deleted the headings but moved the
+text to the beginning of each section to motivate why we are doing each
+experiment.  We also add insights into the results by analyzing the raw numbers
+we observe in comparison to hardware capabilities.
+
+  \item re-labeled all graphs with the same metric (throughput
+slowdown/speedup) and aligned Section~{\S}V with the graphs in Section~{\S}II.
+We hope this eliminates more of the confusion triggered by the
+cross-referencing we did, referenced by Reviewers 2 and 3.
 
 \end{itemize}
 
-%Use Cases R2, R4
-%- Spark discussion R2
-%- more emphasis on parallel and distributed computing themes R4
-\section*{Issue III: Synthetic and/or Irrelevant Use Cases (Reviewers 2 and 4)}
+%Experimental Setup (R1, R2, R3)
+%- code R1
+%- servers, network, storage R1, R3
+\section*{Issue III: No Experimental Setup (Reviewers 1, 2, and 3)}
 
-We add a section to the introduction that scopes the importance of storage for
-large scale runtimes and workflows. Parallel and distributed jobs (whether they
-are MPI-based, MapReduce-based, etc.) need parallel and distributed storage
-systems that keep up with the computation. Furthermore, we highlight the
-parallel and distributed computing themes and cast light on them from the
-context of our prototype. We also add the Spark discussion proposed by to the
-evaluation. The goal is to show how a system such as Cudele would benefit from
-more general runtimes. We also move the discussion about the potential for HDFS
-and CephFS subtrees in the same namespace and the cost of dynamically changing
-consistency and durability semantics on a subtree. 
+We apologize for the omission of experimental setup and source code details. To
+provide a more comprehensive view of our experiments, we added text to the
+paper and made paper artifacts available online. For the experimental setup, we
+describe the cluster setup (hardware, software, etc.) in Section~{\S}V.  We
+have also made the infrastructure code available and added links after each
+figure to show exactly how experiments are run.  This infrastructure code
+contains scripts to deploy the system, run experiments, and gather results.
+This process follows the Popper
+Convention\footnote{http://falsifiable.us/}~\cite{jimenez_popper_2016}, which
+aims to make research reproducible.  We also made the source code available
+online and a link is provided in a footnote in Section~{\S}V. Finally, we add
+details about which tools and classes we modified in Section~{\S}IV to address
+Reviewer 1's questions about the framework implementation.
+
+
 
 \section*{Cosmetic Fixes}
 %Terminology

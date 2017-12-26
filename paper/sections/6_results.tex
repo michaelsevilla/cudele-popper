@@ -6,32 +6,35 @@ well-established research techniques from other systems; so instead of
 evaluating the scalability and performance of the techniques themselves against
 other file systems, we show that (1) the mechanisms we propose are useful for
 constructing semantics used by real systems, (2) the techniques can work
-side-by-side in the same namespace, and (3) the combination of these techniques
+side-by-side in the same namespace\oldcomment{, and (3) the combination of these techniques
 can help the system scale further when subtrees are coupled to the correct type
-of application.  \newcomment{These techniques have already proven to be
+of application}. \newcomment{These techniques have already proven to be
 effective and scalable in systems that specialize an entire namespace according
-to a single optimization strategy (e.g., Lustre, BatchFS, DeltaFS), so our
+to a single optimization strategy ({\it e.g.}, Lustre, BatchFS, DeltaFS), so our
 evaluation explores the behavior of the consistency/durability mechanisms and
-their effect with/without isolation.}
+their effect with and without isolation.}
 
 \newcomment{\indent We run experiments on the same cluster and graph the
 standard deviations for three runs (sometimes error bars are too small to see).
 We also normalize results to control for hardware differences and to make our
 results more generally applicable. We use a CloudLab cluster of 34 nodes
-connected with 10Gbit ethernet, each with 16 2.4 GHz CPUs, 128GB RAM, and SSDs.
-Each node uses Ubuntu 14.04 and we develop on Ceph's Jewel release, version
-10.2.1, which was released in May 2016. All daemons run as a single process
-(the default setting for Ceph) and the Ceph
+connected with 10Gbit ethernet, each with 16 2.4 GHz CPUs, 128GB RAM, and 400GB
+SSDs.  Each node uses Ubuntu 14.04 and we develop on Ceph's Jewel release,
+version 10.2.1, which was released in May 2016. All daemons run as a single
+process (the default setting for Ceph) and the Ceph
 components\footnote{http://docs.ceph.com/docs/jewel/rados/} are: 1 monitor, 3
-object storage daemons, 1 metadata server, and 29 clients.} We scope the
-evaluation to one metadata server and scale the number of parallel
-clients\newcomment{ each doing 100K operations}\footnote{This is the maximum
+object storage daemons, 1 metadata server, and 20 clients.} We scope the
+evaluation to one metadata server and scale the number of parallel clients
+\newcomment{each doing 100K operations}\footnote{This is the maximum
 recommended size of a directory in CephFS; preliminary experiments with larger
-directory sizes show memory problems.}. This type of analysis shows the
-capacity and performance of a metadata server with superior metadata protocols,
-which should be used to inform load balancing across a metadata cluster. Load
-balancing across a cluster of metadata servers with partitioning and
-replication can be explored with something like
+directory sizes show memory problems.} \newcomment{We scale to 20 clients
+because, as shown in Section~\S\ref{sec:posix-overheads}, 20 clients is enough
+to saturate the resources of a single metadata server.} This type of analysis
+shows the capacity and performance of a metadata server with superior metadata
+protocols, which should be used to inform \oldcomment{load
+balancing}\newcomment{metadata distribution} across a \oldcomment{metadata}
+cluster. Load balancing across a cluster of metadata servers with partitioning
+and replication can be explored with something like
 Mantle~\cite{sevilla:sc15-mantle}.
 
 \newcomment{\indent To make our results reproducible, this paper adheres to The
@@ -89,27 +92,28 @@ in-memory journal.}\label{fig:composable-mechanisms}}
 
 \oldcomment{Figure~\ref{fig:composable-mechanisms} shows the runtime of the
 Cudele mechanisms for a single client creating files in the same directory, }
-\newcomment{We measure the overhead of each mechanism by having 1 client create
+\newcomment{We measure the overhead of each Cudele mechanism by having 1 client create
 100K files in a directory for various subtree configurations.
 Figure~\ref{fig:composable-mechanisms} shows the time that it takes each Cudele
 mechanism to process all metadata events.  Results are} normalized to the time
-it takes to write 100K file create updates to the client's in-memory journal
+it takes to write \oldcomment{100K file create} updates to the client's in-memory journal
 ({\it i.e.} the Append Client Journal mechanism).  \newcomment{The first graph
 groups the consistency mechanisms, the second groups the durability mechanisms,
-and the third has compositions representing real-world systems.} Stream is an
+and the third has compositions representing real-world systems.} \oldcomment{Stream is an
 approximation of the overhead and is calculated by subtracting the runtime of
 the job with the journal turned off from the runtime with the journal turned
-on.  \oldcomment{100K is the maximum recommended size of a directory in CephFS;
+on.  100K is the maximum recommended size of a directory in CephFS;
 preliminary experiments with larger directory sizes show memory problems.}
 
 {\it Poorly Scaling Data Structures:} Despite doing the same amount of work,
 mechanisms that rely on poorly scaling data structures have large
 slowdowns\oldcomment{ for the larger number of creates}. For example, RPCs has
-a \oldcomment{\(90\times\)}\newcomment{\(18\times\)} slowdown because this
-technique relies on the internal directory data structures. It is a well-known
+a \oldcomment{\(90\times\)}\newcomment{\(17.9\times\)} slowdown because this
+technique relies on internal directory data structures\newcomment{, which is a
+well-known problem~\cite{ren:sc2014-indexfs}}. \oldcomment{It is a well-known
 problem that directory data structures do not scale when creating files in the
 same directory~\cite{ren:sc2014-indexfs} and any mechanism that uses these data
-structures will experience similar slowdowns. Other mechanisms that write
+structures will experience similar slowdowns.} Other mechanisms that write
 events to a journal experience a much less drastic slowdown because the journal
 data structure does not need to be scanned for every operation.  Events are
 written to the end of the journal without even checking the validity ({\it
@@ -117,8 +121,10 @@ e.g.}, if the file already exists for a create), which is another form of
 relaxed consistency because the file system assumes the application has
 resolved conflicting updates in a different way.
 
-% RPCs vs. apply: calls to metadata server vs. RADOS
-{\it Overhead of RPCs:} RPCs is
+% RPCs vs. apply: calls to metadata server vs. RADOS TODO: why is apply so
+% slow.  apply: no CephFS changes, pulls/pushes same RADOS obj.  v_apply vs.
+% apply/persist: communicating through RADOS
+{\it Overhead of \oldcomment{RPCs}\newcomment{Consistency}:} RPCs is
 \oldcomment{\(66\times\)}\newcomment{\(19.9\times\)} slower than Volatile Apply
 because sending individual metadata updates over the network is costly.  While
 RPCs sends a request for every file create, Volatile Apply \oldcomment{writes
@@ -127,40 +133,41 @@ directly} to the in-memory data structures in the metadata server. While
 communicating the decoupled namespace directly to the metadata server
 \newcomment{with Volatile Apply} is faster, communicating through the object
 store \newcomment{with Nonvolatile Apply} is
-\oldcomment{\(10\times\)}\newcomment{\(78\times\)} slower.
-
-% TODO: why is apply so slow.  apply: no CephFS changes, pulls/pushes same
-% RADOS obj.  v_apply vs. apply/persist: communicating through RADOS
-{\it Overhead of Nonvolatile Apply:} The cost of Nonvolatile Apply is much
-larger than all the other mechanisms.  That mechanism was not implemented as
-part of Cudele -- it was a debugging and recovery tool packaged with CephFS. It
-works by iterating over the updates in the journal and pulling all objects that
-{\it may} be affected by the update.  This means that two objects are
-repeatedly pulled, updated, and pushed: the object that houses the experiment
-directory and the object that contains the root directory ({\it i.e.},
-\texttt{/}).  The cost of communicating through the object store is shown by
-comparing the runtime of Volatile Apply + Global Persist
-\newcomment{(\(1.3\times\))} to Nonvolatile Apply\newcomment{ (\(78\times\))}.
-These two operations end up with the same final metadata state but using
-Nonvolatile Apply is clearly inferior.
+\oldcomment{\(10\times\)}\newcomment{\(78\times\)} slower.  \oldcomment{{\it
+Overhead of Nonvolatile Apply:} The cost of Nonvolatile Apply is much larger
+than all the other mechanisms.  That mechanism}\newcomment{Nonvolatile Apply}
+was not implemented as part of Cudele -- it was a debugging and recovery tool
+packaged with CephFS. It works by iterating over the updates in the journal and
+pulling all objects that {\it may} be affected by the update.  This means that
+two objects are repeatedly pulled, updated, and pushed: the object that houses
+the experiment directory and the object that contains the root directory ({\it
+i.e.}, \texttt{/}).  \oldcomment{The cost of communicating through the object
+store is shown by comparing the runtime of Volatile Apply + Global Persist to
+Nonvolatile Apply.  These two operations} \newcomment{Nonvolatile Apply
+(\(78\times\)) and composing Volatile Apply + Global Persist (\(1.3\times\))}
+end up with the same final metadata state but using Nonvolatile Apply is
+clearly inferior.
 
 % persist vs. save: one disk vs. many
-{\it Parallelism of the Object Store:} \newcomment{Stream has the highest
-slowdown at \(2.4\times\) because the overhead of maintaining and streaming the
-journal is incurred by the metadata server}.  Comparing Local and Global
-Persist demonstrates the bandwidth advantages of storing the journal in a
-distributed object store. The Global Persist performance is \newcomment{only
-\(0.2\times\) slower than Local Persist because Global
-Persist}\oldcomment{\(1.5\times\) faster because the object store} is
-leveraging the collective bandwidth of the disks in the cluster. This benefit
-comes from the object store itself but should be acknowledged when making
-decisions for the application; the bandwidth of the object store can help
-mitigate the overheads of globally persisting metadata updates. The storage per
-journal update is about 2.5KB. So the storage footprint scales linearly with
-the number of metadata creates and suggests that updates for a million files
-would be \newcomment{2.38GB}\oldcomment{2.5KB \(*\) 1 million files \(=\)
-2.38GB. Transfer times for payloads of this size in most HPC/data center
-networks are reasonable.}
+{\it Parallelism of the Object Store:} \newcomment{ Stream\footnote{This
+measurement is an approximation of the overhead and is calculated by
+subtracting the runtime of the job with the journal turned off from the runtime
+with the journal turned on.} has the highest slowdown at \(2.4\times\)
+because the overhead of maintaining and streaming the journal is incurred by
+the metadata server}.  Comparing Local and Global Persist demonstrates the
+bandwidth advantages of storing the journal in a distributed object store. The
+Global Persist performance is \newcomment{only \(0.2\times\) slower than Local
+Persist because Global Persist}\oldcomment{\(1.5\times\) faster because the
+object store} is leveraging the collective bandwidth of the disks in the
+cluster. This benefit comes from the object store itself but should be
+acknowledged when making decisions for the application; the bandwidth of the
+object store can help mitigate the overheads of globally persisting metadata
+updates. The storage per journal update is about 2.5KB. So the storage
+footprint scales linearly with the number of metadata creates and suggests that
+updates for a million updates in a single journal would be
+\newcomment{2.38GB}\oldcomment{2.5KB \(*\) 1 million files \(=\) 2.38GB.
+Transfer times for payloads of this size in most HPC/data center networks are
+reasonable.}
 
 \oldcomment{\textbf{Takeaway}: measuring the mechanisms individually shows that their
 overheads and costs can differ {\it by orders of magnitude}. We also show that
@@ -212,35 +219,58 @@ files.}
 Figure~\ref{fig:composable-mechanisms} shows how applications can compose
 mechanisms together to get the consistency/durability guarantees they need in a
 global namespace.  We label the \(x\)-axis with systems that employ these
-semantics, as described in Figure~\ref{fig:subtree-policies}.  Again, the
-runtime is normalized to creating files in the client's in-memory journal.  We
-make no guarantees during execution of the mechanisms or when transitioning
-semantics -- the semantics are guaranteed {\it once the mechanism completes}.
-So if servers fail during a mechanism, metadata or data may be lost. This graph
-shows how we can build application-specific subtrees by composing mechanisms
-and that coupling well-established techniques to specific applications results
-in a more scalable global namespace.}
+semantics, as described in Figure~\ref{fig:subtree-policies}.  We make no
+guarantees during execution of the mechanisms or when transitioning semantics
+-- the semantics are guaranteed {\it once the mechanism completes}.  So if
+servers fail during a mechanism, metadata or data may be lost. This graph shows
+how we can build application-specific subtrees by composing mechanisms and that
+coupling well-established techniques to specific applications results in a more
+scalable global namespace.}
 
-\subsection{Use Case 1: Creates in the Same Directory}
+\subsection{Use Cases}
+
+\newcomment{Next we present three uses cases: creates in the same directory,
+interfering clients, and read while writing. For each use case, we provide
+motivation from HPC and cloud workloads; specifically, we look at users using
+the file system in parallel to run large-scale experiments in HPC and parallel
+runtimes that use the file system, such as Hadoop and Spark. The synthetic
+benchmarks model scenarios where these workloads co-exist in a global namespace
+and we provide insight into how the workload benefits from Cudele.}
+
+\subsubsection{Creates in the Same Directory}
 \label{sec:use-case-1}
 
-\oldcomment{Next we show how we can build application-specific subtrees by composing
-mechanisms and that \oldcomment{this approach}\newcomment{coupling
-well-established techniques to specific applications} results in a more a
-scalable global namespace.  }
-
-We start with clients creating files in private directories because this
-workload is heavily studied in HPC~\cite{weil:sc2004-dyn-metadata,
+\oldcomment{Next we show how we can build application-specific subtrees by
+composing mechanisms and that this approach of coupling well-established
+techniques to specific applications results in a more a scalable global
+namespace.} We start with clients creating files in private directories because
+this workload is heavily studied in HPC~\cite{weil:sc2004-dyn-metadata,
 ren:sc2014-indexfs, patil:fast2011-giga, zheng:pdsw2014-batchfs,
 sevilla:sc15-mantle}, mostly due to checkpoint-restart~\cite{bent_plfs_2009}.
-But the workload also appears in cloud workloads~\cite{xiao:socc15-shardfs},
-where systems like Hadoop use the file abstraction to exchange work units to
-workers or to indicate when jobs
-complete~\cite{shvachko:login2012-hdfs-scalability}. A more familiar example is
-uncompressing an archive ({\it e.g.}, \texttt{tar xzf}), where the file system
-services a flash crowd of creates across all directories as shown in
-Figure~\ref{fig:overhead-creates}. \oldcomment{ The workload is clients creating 100K files
-in private directories in the same global namespace. }
+A more familiar example is uncompressing an archive ({\it e.g.}, \texttt{tar
+xzf}), where the file system services a flash crowd of creates across all
+directories as shown in Figure~\ref{fig:overhead-creates}.  But the workload
+also appears in cloud workloads: Hadoop/Spark use the file \newcomment{system
+to assign work units to workers and the performance is proportional to the
+open/create throughput of the underlying file system~\cite{xiao:socc15-shardfs,
+shi:vldb15-spark, shvachko:login2012-hdfs-scalability}; Spark queries have an
+O(\(n\)) complexity, where \(n\) is the number of partitions.  Big Data
+Benchmark jobs examined in~\cite{chaimov:hpdc16-spark} have on the order of
+15,000 file opens or creates just to start a single Spark query and the Lustre
+system they tested on did not handle creates well, showing up to a \(24\times\)
+slowdown compared to other metadata operations. Common approaches to solve
+these types of bottlenecks is to change the application behavior or to design a
+new file system, like BatchFS or DeltaFS, that uses one set of metadata
+optimizations for the entire namespace.} \oldcomment{ abstraction to exchange
+work units to workers or to indicate when jobs complete  The workload is
+clients creating 100K files in private directories in the same global
+namespace.}
+
+\newcomment{\textbf{Cudele setup}: accommodate these workloads in the global
+namespace by configuring three subtrees with the following semantics: one with
+strong consistency and global durability (RPCs), one with invisible consistency
+and local durability (decoupled: create), and one with weak consistency and
+local durability (decoupled: create + merge).}
 
 %\begin{figure}[tb]
 %\centering
@@ -250,15 +280,15 @@ in private directories in the same global namespace. }
 %(weak consistency.)\label{fig:slowdown-strong-weak}}
 %\end{figure}
 
-\oldcomment{The graph on the right of Figure~\ref{fig:composable-mechanisms} shows how
-applications can compose mechanisms together to get the consistency/durability
-guarantees they need in a global namespace.  We label the \(x\)-axis with
-systems that employ these semantics, as described in
+\oldcomment{The graph on the right of Figure~\ref{fig:composable-mechanisms}
+shows how applications can compose mechanisms together to get the
+consistency/durability guarantees they need in a global namespace.  We label
+the \(x\)-axis with systems that employ these semantics, as described in
 Figure~\ref{fig:subtree-policies}.  Again, the runtime is normalized to
-creating files in the client's in-memory journal.  We make no guarantees
-during execution of the mechanisms or when transitioning semantics -- the
-semantics are guaranteed {\it once the mechanism completes}. So if servers fail
-during a mechanism, metadata or data may be lost.}
+creating files in the client's in-memory journal.  We make no guarantees during
+execution of the mechanisms or when transitioning semantics -- the semantics
+are guaranteed {\it once the mechanism completes}. So if servers fail during a
+mechanism, metadata or data may be lost.}
 
 \oldcomment{\textbf{Takeaway}: we confirm the performance benefits of other
 well-established research systems but, more importantly, we show that the
@@ -267,30 +297,24 @@ consistency/durability semantics.\\}
 
 \oldcomment{To show the contention at the metadata server, }In
 Figure~\ref{fig:mergescale} we scale the number of clients \newcomment{each
-doing 100K file creates in their own directories for three types of subtrees:
-one with strong consistency and global durability (RPCs), one with invisible
-consistency and local durability (decoupled: create), and one with weak
-consistency and local durability (decoupled: create + merge). Results are
-normalized to 1 client that creates 100K files using RPCs (about 549
-creates/sec). As opposed to earlier graphs in
-Section~\S\ref{sec:posix-overheads} that plotted the throughput of the slowest
-client, Figure~\ref{fig:mergescale} plots the throughput from the perspective
-of the metadata server. Plotting this way is easier to understand because of
-how we normalize but the speedups over the RPC approach are the same, whether
-we look at the slowest client or not.}
+doing 100K file creates in their own directories.  Results are normalized to 1
+client that creates 100K files using RPCs (about 549 creates/sec). As opposed
+to earlier graphs in Section~\S\ref{sec:posix-overheads} that plotted the
+throughput of the slowest client, Figure~\ref{fig:mergescale} plots the
+throughput of the total job ({\it i.e.} from the perspective of the metadata
+server). Plotting this way is easier to understand because of how we normalize
+but the speedups over the RPC approach are the same, whether we look at the
+slowest client or not.}
 
-\newcomment{When the metadata server is operating at peak efficiency between 5
-and 20 clients, ``decoupled: merge + create" outperforms ``RPCs" by
-\(3.37\times\) because ``decoupled: merge + create" uses a relaxed form of
-consistency and leverages bulk updates just liked
-DeltaFS~\cite{zheng:pdsw2015-deltafs}.  The ``RPCs" and ``decoupled: merge +
-create" curves flatten out at a slowdown of \(4.5\times\) and \(15\times\),
-respectively, because more clients increases the load at the metadata server.
-Alternatively, the ``decoupled: create" curve scales linearly with the number
-of concurrent clients because clients operate in parallel and write updates
-locally. At 20 clients, we observe a \(91.7\times\) speedup for ``decoupled:
-create" over RPCs.}\oldcomment{ for the RPC per operation strategy and the
-decoupled namespace strategy.  For RPCs, scaling the number of clients
+\newcomment{When the metadata server is operating at peak efficiency at
+20 clients, the performance of the ``RPCs" and ``decoupled: merge + create"
+subtrees is bottlenecked by the metadata server processing power, so the curves
+flatten out at a slowdown of \(4.5\times\) and \(15\times\), respectively.  On
+the other hand, the ``decoupled: create" subtree performance scales linearly
+with the number of concurrent clients because clients operate in parallel and
+write updates locally. At 20 clients, we observe a \(91.7\times\) speedup for
+``decoupled: create" over RPCs.}\oldcomment{ for the RPC per operation strategy
+and the decoupled namespace strategy.  For RPCs, scaling the number of clients
 increases the load on the metadata server and for decoupled we increase the
 number of concurrent clients operating in parallel.  Related work has pointed
 to on-disk metadata format as the primary factor for improved scalability; but
@@ -298,18 +322,23 @@ our results show that the weakened consistency and durability enables the
 scalability improvements. The on-disk metadata formats in this experiment are
 the same for all schemes.}
 
-\newcomment{Another reason that} the performance of decoupled namespaces is
-better than RPCs \newcomment{is because decoupled namespaces (1)} place no
-restrictions on the validity of metadata inserted into the journal and
-\newcomment{(2)} avoid touching poorly scaling data structures. We can scale
-linearly if we weaken our consistency by never checking for the existence of
-files before creating files ({\it i.e.} only append \texttt{open()} requests to
-the journal).  When the updates are merged by the metadata server into the
-in-memory metadata store they never scan growing data structures.  Had we
-implemented the \oldcomment{Append Client Journal mechanism}\newcomment{client}
-to include \texttt{lookup()} commands before \texttt{open()} requests, we would
-have seen the poor scaling \newcomment{behavior} that we see with the RPCs
-mechanism. 
+\newcomment{ ``Decoupled: merge + create" outperforms ``RPCs" by \(3.37\times\)
+because ``decoupled: merge + create" uses a relaxed form of consistency and
+leverages bulk updates just like DeltaFS~\cite{zheng:pdsw2015-deltafs}.
+Decoupled namespaces (1)} place no restrictions on the validity of
+metadata inserted into the journal ({\it e.g.}, never checking for the
+existence of files before creating files), \newcomment{(2)} avoid touching
+poorly scaling data structures\newcomment{, and (3) allow clients to batch
+events into bulk updates}. \oldcomment{We can scale linearly if we weaken our
+consistency by never checking for the existence of files before creating files
+({\it i.e.} only append \texttt{open()} requests to the journal).  When the
+updates are merged by the metadata server into the in-memory metadata store
+they never scan growing data structures.}  Had we implemented the
+\oldcomment{Append Client Journal mechanism}\newcomment{client to send
+updates one at a time and} to include \texttt{lookup()} commands before
+\texttt{open()} requests, we would have seen \newcomment{performance closer to
+the ``RPC" subtree}\oldcomment{the poor scaling that we see with the RPCs
+mechanism}. 
 
 \newcomment{One final point about the ``decoupled: merge + create" curve is
 that the results in the graph are pessimistic. They model a scenario in which
@@ -393,60 +422,67 @@ journal of updates improves scalability by 2\(\times\).}
 %
 %lient 0: creates, client 1 create(s)
 
-\subsection{Use Case 2: Creates with Interfering Client}
+\subsubsection{Interfering Clients}
 
 Next we show how Cudele can be programmed to block interfering
 clients\oldcomment{ using the same problematic workload from
 Figure~\ref{fig:overhead-b}. In this workload, c}\newcomment{, which lets
-applications control isolation to get better and more reliable performance.
-C}lients create 100K files in their own directories while another client interferes by
-creating \oldcomment{more}\newcomment{1000} files in each directory. This
-introduces false sharing and the metadata server revokes capabilities on
-directories touched by the interfering client. While HPC tries to avoid these
-situations with workflows~\cite{zheng:pdsw2014-batchfs,
-zheng:pdsw2015-deltafs}, it still happens in distributed file systems when
-users unintentionally access directories in a shared file system.
+applications control isolation to get better and more reliable performance.}
+Clients create 100K files in their own directories while another client
+interferes by creating \oldcomment{more}\newcomment{1000} files in each
+directory. \oldcomment{This}\newcomment{The workload} introduces false sharing
+and the metadata server revokes capabilities on directories touched by the
+interfering client. While HPC tries to avoid these situations with
+workflows~\cite{zheng:pdsw2014-batchfs, zheng:pdsw2015-deltafs}, it still
+happens in distributed file systems when users unintentionally access
+directories in a shared file system.  \newcomment{ In the cloud, Spark and
+Hadoop stacks use HDFS, which lets users ignore this type of consistency completely
+by letting interfering clients read files opened for
+writing~\cite{hakimzadeh:dais14-hdfs-consistency}.}
+
+\newcomment{\textbf{Cudele setup}: enable global durability with Stream and
+strong consistency with RPCs to mirror the setup from the problem presented in
+Figure~\ref{fig:overhead-b}. We configure one subtree with an interfere policy
+of ``allow" and another with subtree with ``block" so \texttt{-EBUSY} is
+returned to interfering clients.  The former is the default behavior in file
+systems and the latter isolates performance from malicious clients.}
+
 \oldcomment{We only scale to 15 clients because the performance variability of
 a nearly overloaded metadata server, in our case 18 clients, is too high.}
-
-\newcomment{We switch back to clients doing RPCs per operation with journaling
-enabled, to mirror the setup from the problem presented in
-Figure~\ref{fig:overhead-b}.} Figure~\ref{fig:block-allow} plots the overhead
-of the slowest client \oldcomment{and the error bars are the standard deviation
-of 3 runs.  ``Interfere (Fig 3c)" is the result from
-Figure~\ref{fig:overhead-b}; ``Interfere" uses the allow/block API to return
-\texttt{-EBUSY} to interfering clients; and ``Isolated" is the baseline
-performance without an interfering.  Each subtree has RPCs and Stream enabled.
-Results are normalized to the runtime of a single client creating files in a
-directory.  Note that IndexFS has a similar behavior to ``interfere" with
-leases, except clients block.  }\newcomment{normalized to 1 client that creates
-100K files in isolation (about 513 creates/sec). ``Interference" and ``no
-interference" is the performance with and without an interfering client
-touching files in every directory, respectively. The goal is to explicitly
-isolate clients so that performance is similar to the ``no interfere" curve,
-which has lower slowdowns (on average, \(1.42\times\) per client compared to
-\(1.67\times\) per client for ``interfere") and less variability (on average, a
-standard deviation of 0.06 compared to 0.44 for ``interfere").  ``Block
-interference" uses the Cudele API to block interfering clients with
-\texttt{-EBUSY}. That curve shows slowdowns similar to ``interfere" for smaller
-clusters because the overhead to reject requests is more evident when the
-metadata server is underloaded; but the slowdown (\(1.34\times\) per client)
+Figure~\ref{fig:block-allow} plots the overhead of the slowest
+client\oldcomment{and the error bars are the standard deviation of 3 runs.
+``Interfere (Fig 3c)" is the result from Figure~\ref{fig:overhead-b};
+``Interfere" uses the allow/block API to return \texttt{-EBUSY} to interfering
+clients; and ``Isolated" is the baseline performance without an interfering.
+Each subtree has RPCs and Stream enabled.  Results are normalized to the
+runtime of a single client creating files in a directory.  Note that IndexFS
+has a similar behavior to ``interfere" with leases, except clients block.
+}\newcomment{, normalized to 1 client that creates 100K files in isolation
+(about 513 creates/sec). ``Interference" and ``no interference" is the
+performance with and without an interfering client touching files in every
+directory, respectively. The goal is to explicitly isolate clients so that
+performance is similar to the ``no interfere" curve, which has lower slowdowns
+(on average, \(1.42\times\) per client compared to \(1.67\times\) per client
+for ``interfere") and less variability (on average, a standard deviation of
+0.06 compared to 0.44 for ``interfere").  ``Block interference" uses the Cudele
+API to block interfering clients and the slowdown (\(1.34\times\) per client)
 and variability (0.09) look very similar to ``no interfere" for larger
-clusters. Clients can block interfering clients to get the same performance as
-isolated clients but there is a non-negligible overhead for rejecting requests
-when the metadata server is not operating at peak efficiency.}
+clusters. For smaller clusters the overhead to reject requests is more evident
+when the metadata server is underloaded so the slowdowns are similar to
+``interfere".  Clients can block interfering clients to get the same
+performance as isolated clients but there is a non-negligible overhead for
+rejecting requests when the metadata server is not operating at peak
+efficiency.}
 
-\oldcomment{We draw three conclusions: (1) clients that use the API to block interfering
-clients  get the same performance as isolated clients, (2) there is a
-negligible effect on performance for the extra work the metadata server does to
-return \texttt{-EBUSY}, and (3) merging updates from the decoupled client has a
-negligible effect on performance.}
+\oldcomment{We draw three conclusions: (1) clients that use the API to block
+interfering clients  get the same performance as isolated clients, (2) there is
+a negligible effect on performance for the extra work the metadata server does
+to return \texttt{-EBUSY}, and (3) merging updates from the decoupled client
+has a negligible effect on performance.  \textbf{Takeaway}: the API lets users
+isolate directories when applications need better and more reliable
+performance. Blocking updates is an effective way of controlling consistency.}
 
-\oldcomment{\textbf{Takeaway}: the API lets users isolate directories when applications
-need better and more reliable performance. Blocking updates is an effective way of
-controlling consistency.}
-
-\subsection{Use Case 3: Read while Writing}
+\subsubsection{Read while Writing}
 
 The final use case shows how the API gives users fine-grained control of the
 consistency semantics \newcomment{to support current practices and experimental
@@ -455,17 +491,22 @@ leverage the file system to check the progress of jobs using \texttt{ls} even
 though this operation is notoriously heavy-weight~\cite{carns:ipdps09-pvfs,
 eshel:fast10-panache}. The number of files or size of the files is indicative
 of the progress. This practice is not too different from systems that use the
-file system to manage the progress of jobs; Hadoop writes to temporary files,
-renames them when complete, and creates a ``DONE" file to indicate to the
-runtime that the task did not fail and should not be re-scheduled on another
-node. In this scenario, Cudele users will not see the progress of decoupled
-namespaces since their updates are not globally visible.  To help users judge
-the progress of their jobs, Cudele clients have a ``namespace sync" that sends
-batches of updates back to the global namespace at regular intervals.
+file system to manage the progress of jobs; Spark and Hadoop write to temporary
+files, renames them when complete, and creates a ``DONE" file to indicate to
+the runtime that the task did not fail and should not be re-scheduled on
+another node. \newcomment{Also, the browser interface lets users check the
+progress by querying the file system and returning a \% of job complete
+metric.} 
 
 % Does this implementation need to be described in the implementation?
-\newcomment{We configure a subtree as a decoupled namespace with invisible
-consistency, local durability, and partial updates enabled.}
+\newcomment{\textbf{Cudele setup}: in this scenario, Cudele users will not see
+the progress of decoupled namespaces since their updates are not globally
+visible.  To provide the performance of decoupled namespaces and to help users
+judge the progress of their jobs, Cudele clients have a ``namespace sync" that
+sends batches of updates back to the global namespace at regular intervals.
+We configure a subtree as a decoupled namespace with invisible consistency, local
+durability, and partial updates enabled.}
+
 Figure~\ref{fig:slowdown-sync} shows the performance degradation of a single
 client writing \newcomment{1 million} updates to the decoupled namespace and
 pausing to send updates to the metadata server. \oldcomment{The error bars are
@@ -482,7 +523,7 @@ As expected, syncing namespace updates too frequently has the highest overhead
 performance is 10 seconds, which only incurs 2\% overhead), because larger
 intervals must write more updates to disk and network. For the 25 second
 interval, the client only pauses 3-4 times but each sync writes about 278
-thousand updates at once, which is a 678MB journal.
+thousand updates at once, which is a journal of size 678MB.
 
 \oldcomment{\textbf{Takeaway}: Syncing namespace updates has up to a 9\%
 overhead and can be tuned depending on the users preference but, more
