@@ -35,12 +35,12 @@ Relaxing consistency/durability semantics in the file system is a double-edged
 sword. While it performs and scales better, it alienates applications that rely
 on strong consistency and durability. Mounting other systems to the global
 namespace is convenient but wastes resources and incurs data movement.  Cudele
-lets users assign consistency/durability guarantees to subtrees in the global
-namespace, which can be custom fit to the application. Using Cudele, we show
-how applications can co-exist and perform well in a global namespace and lay
-the groundwork for new systems that dynamically change consistency/durability
-guarantees to avoid provisioning dedicated storage clusters and moving large
-amounts of data.
+lets \oldcomment{users}\newcomment{administrators} assign
+consistency/durability guarantees to subtrees in the global namespace, which
+can be custom fit to the application. Using Cudele, we show how applications
+can co-exist and perform well in a global namespace and lay the groundwork for
+new systems that dynamically change consistency/durability guarantees to avoid
+provisioning dedicated storage clusters and moving large amounts of data.
 
 % Implied Namespaces
 

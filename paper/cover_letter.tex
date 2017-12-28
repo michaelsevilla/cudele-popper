@@ -36,7 +36,7 @@ highlight examples from HPC and cloud workloads that would benefit from using
 Cudele. For HPC we focus on user home directories used for experiments and for
 the cloud we focus on the Hadoop and Spark runtimes (as suggested by Reviewer
 2). To connect the problematic use cases to Cudele, we added \textbf{Cudele
-setup} headers in Section~{\S}V-B to show which subtree semantics accomodate
+setup} headers in Section~{\S}V-B to show which subtree semantics accommodate
 these workloads in the global namespace.  By showing these setups, we hope to
 demonstrate that different applications can use a file system in parallel with
 different consistency/durability semantics.  Although we do not actually run
@@ -53,7 +53,12 @@ that can handle today's applications.  So while the paper is storage-centric,
 we try to show that the workloads it supports are highly distributed and need a
 flexible solution like Cudele.  
 
-
+We also clarified confusing terminology in a footnote in Section~{\S}I: we use
+the term administrator to refer to a person that configures subtrees and client
+to refer to a storage client or application that interacts with the metadata
+server. We avoid using the term ``user" except when referring to end-users that
+interact with home directories in a file system or the Hadoop/Spark runtime
+itself.
 
 %Mixing contributions and future work (R1)
 %Statements in Introduction do not align with Evaluation (R1, R2, R3)
