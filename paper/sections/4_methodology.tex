@@ -3,26 +3,27 @@
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=90mm]{figures/fig-decouple.png}
+%\includegraphics[width=50mm]{figures/fig-decouple.png}
+\includegraphics[width=1.0\linewidth]{figures/fig-decouple.png}
 \caption{Illustration of the \textbf{mechanisms} used by applications to build
-consistency/durability semantics. Descriptions are provided in
-Table~\ref{table:mechanisms} and the underlined words in
-Section~\S\ref{sec:the-cudelesfs-mechanisms}.}\label{fig:decouple}
+consistency/durability semantics. Descriptions are provided in by the
+underlined words in Section~\S\ref{sec:the-cudelesfs-mechanisms}.
+}\label{fig:decouple}
 \end{figure}
 
-\begin{table}
-\begin{tabular}{ r | l }
-  Mechanism         & Description \\\hline
-  RPCs              & round trip remote procedure calls \\
-  Stream            & stream journal into object store \\
-  Append Client Journal & events appended to in-memory journal \\
-  Volatile Apply & apply to metadata store in memory \\
-  Nonvolatile Apply    & apply to metadata store in obj store \\
-  Local Persist     & journal saved to client's disk \\
-  Global Persist    & journal saved in object store \\
-\end{tabular}
-\caption{Descriptions of the mechanisms. Example compositions are shown in Table~\ref{table:spectrum}.\label{table:mechanisms}} 
-\end{table}
+%\begin{table}
+%\begin{tabular}{ r | l }
+%  Mechanism         & Description \\\hline
+%  RPCs              & round trip remote procedure calls \\
+%  Stream            & stream journal into object store \\
+%  Append Client Journal & events appended to in-memory journal \\
+%  Volatile Apply & apply to metadata store in memory \\
+%  Nonvolatile Apply    & apply to metadata store in obj store \\
+%  Local Persist     & journal saved to client's disk \\
+%  Global Persist    & journal saved in object store \\
+%\end{tabular}
+%\caption{Descriptions of the mechanisms. Example compositions are shown in Table~\ref{table:spectrum}.\label{table:mechanisms}} 
+%\end{table}
 
 In this section we describe our API and framework that lets
 \oldcomment{users}\newcomment{administrators} assign consistency and durability
@@ -40,8 +41,8 @@ policies, and the API for assigning policies to subtrees.
 
 % describe the figure
 Figure~\ref{fig:decouple} shows the mechanisms (labeled arrows) in Cudele and
-which daemon(s) they are performed by.  Table~\ref{table:mechanisms} has a
-description of what each mechanism does.  Decoupled clients use the
+which daemon(s) they are performed by. \oldcomment{Table~\ref{table:mechanisms} has a
+description of what each mechanism does.}  Decoupled clients use the
 \underline{Append Client Journal} mechanism to append metadata updates to a
 local, in-memory journal. Clients do not need to check for
 consistency when writing events and the metadata server blindly applies the
@@ -145,20 +146,20 @@ updates are always recoverable.
 Existing, state-of-the-art systems in HPC can be represented by the cells in
 Table~\ref{table:spectrum} (we construct the semantics for these systems later
 in Section~\S\ref{sec:microbenchmarks}).  POSIX IO-compliant systems like
-CephFS and IndexFS have global consistency and durability\footnote{This is the
-normal case.  IndexFS also has bulk merge which would transition the system
-into ``weak consistency"}; DeltaFS uses ``invisible" consistency and ``local"
-durability and BatchFS uses ``weak" consistency and ``local" durability. These
-systems have other features that could push them into different semantics but
-we assign labels here based on the points emphasized in the papers.  To compose
-the mechanisms \oldcomment{users}\newcomment{administrators} inject which
-mechanisms to run and which to use in parallel using a domain specific
-language.  Although we can achieve all permutations of the different guarantees
-in Table~\ref{table:spectrum}, not all of them make sense. For example, it
-makes little sense to do \texttt{append client journal+RPCs} since both
-mechanisms do the same thing or \texttt{stream+local persist} since ``global"
-durability is stronger and has more overhead than ``local" durability. The cost
-of each mechanism and the semantics described above are quantified in
+CephFS and IndexFS have global consistency and durability\footnote{ IndexFS
+also has bulk merge which is a form of ``weak consistency"}; DeltaFS uses
+``invisible" consistency and ``local" durability and BatchFS uses ``weak"
+consistency and ``local" durability. These systems have other features that
+could push them into different semantics but we assign labels here based on the
+points emphasized in the papers.  To compose the mechanisms
+\oldcomment{users}\newcomment{administrators} inject which mechanisms to run
+and which to use in parallel using a domain specific language.  Although we can
+achieve all permutations of the different guarantees in
+Table~\ref{table:spectrum}, not all of them make sense. For example, it makes
+little sense to do \texttt{append client journal+RPCs} since both mechanisms do
+the same thing or \texttt{stream+local persist} since ``global" durability is
+stronger and has more overhead than ``local" durability. The cost of each
+mechanism and the semantics described above are quantified in
 Sections~\S\ref{sec:microbenchmarks} and~\S\ref{sec:use-case-1}.
 
 % talk of eventual consistency
@@ -182,36 +183,25 @@ present a directory path and a policies configuration that gets distributed and
 versioned by the monitor to all daemons in the system. For example,
 (msevilla/mydir, policies.yml) would decouple the path ``msevilla/mydir" and
 would apply the policies in ``policies.yml".  The policies file supports the
-following parameters (default values are in parenthesis):
-
-\begin{itemize}
-
-  \item \texttt{consistency}: which consistency model to use (\texttt{RPCs})
-
-  \item \texttt{durability}: which durability model to use (\texttt{stream})
-
-  \item \texttt{allocated\_inodes}: the number of inodes to provision to the
-  decoupled namespace (100)
-
-  \item \texttt{interfere\_policy}: how to handle a request from another
-  client targeted at this subtree (\texttt{allow})
-
-\end{itemize}
-
-The ``Consistency" and ``Durability" parameters are compositions of mechanisms;
-they can be serialized (\(+\)) or run in parallel (\(|\|\)).  ``Allocated
-Inodes" is a way for the application to specify how many files it intends to
-create. It is a contract so that the file system can provision enough resources
-for the incumbent merge and so it can give valid inodes to other clients. The
-inodes can be used anywhere within the decoupled namespace ({i.e.} at any depth
-in the subtree).  ``Interfere Policy" has two settings: \texttt{block} and
-\texttt{allow}.  For \texttt{block}, any requests to this part of the namespace
-returns with ``Device is busy", which will spare the metadata server from
-wasting resources for updates that may get overwritten. If the application does
-not mind losing updates, for example it wants approximations for results that
-take too long to compute, it can select \texttt{allow}. In this case, metadata
-from the interfering client will be written and the computation from the
-decoupled namespace will take priority at merge time because the results are
-more accurate.  Given these default values decoupling the namespace with an
-empty policies file would give the application 100 inodes but the subtree would
-behave like the existing CephFS implementation.  
+following parameters (default values are in parenthesis): which consistency
+model to use (\texttt{RPCs}), which durability model to use (\texttt{stream})
+number of inodes to provision to the decoupled namespace (100), which interfere
+policy to use, {\it i.e.} how to handle a request from another client
+targeted at this subtree (\texttt{allow}). The ``Consistency" and ``Durability"
+parameters are compositions of mechanisms; they can be serialized (\(+\)) or
+run in parallel (\(|\|\)).  ``Allocated Inodes" is a way for the application to
+specify how many files it intends to create. It is a contract so that the file
+system can provision enough resources for the incumbent merge and so it can
+give valid inodes to other clients. The inodes can be used anywhere within the
+decoupled namespace ({i.e.} at any depth in the subtree).  ``Interfere Policy"
+has two settings: \texttt{block} and \texttt{allow}.  For \texttt{block}, any
+requests to this part of the namespace returns with ``Device is busy", which
+will spare the metadata server from wasting resources for updates that may get
+overwritten. If the application does not mind losing updates, for example it
+wants approximations for results that take too long to compute, it can select
+\texttt{allow}. In this case, metadata from the interfering client will be
+written and the computation from the decoupled namespace will take priority at
+merge time because the results are more accurate.  Given these default values
+decoupling the namespace with an empty policies file would give the application
+100 inodes but the subtree would behave like the existing CephFS
+implementation.  

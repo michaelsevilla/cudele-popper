@@ -25,56 +25,48 @@ i.e.} in the collective memory of the metadata server cluster) and as objects
 in the object store. In the object store, directories and their inodes are
 stored together in objects to improve the performance of scans.  The metadata
 store data structure is structured as a tree of directory fragments making it
-easier to read and traverse.
-
-% how i used it
-\textbf{Cudele}: the RPCs mechanism uses the metadata store to
-service requests. Using code designed for recovery, Nonvolatile Apply and
-Volatile Apply replay updates onto the metadata store in memory and in the
-object store, respectively.  When the clients are ready to merge their updates
-back into the global namespace, they pass a binary file of  metadata updates to
-the metadata server. 
+easier to read and traverse. \textbf{In Cudele} the RPCs mechanism uses the
+metadata store to service requests. Using code designed for recovery,
+Nonvolatile Apply and Volatile Apply replay updates onto the metadata store in
+memory and in the object store, respectively.  When the clients are ready to
+merge their updates back into the global namespace, they pass a binary file of
+metadata updates to the metadata server. 
 
 %\noindent\textbf{Used to Implement}: RPCs, Stream, Volatile Apply
 
 %\subsection{Journal}
 %\label{sec:journal}
 
-\subsection{Journal} 
+\subsection{Journal Format and Journal Tool} 
 
-The journal is the second way that CephFS represents the
-file system namespace; it is a log of metadata updates that can materialize the
-namespace when the updates are replayed onto the metadata store. The journal is
-a ``pile system"; writes are fast but reads are slow because state must be
-reconstructed.  Specifically, reads are slow because there is more state to
-read, it is unorganized, and many of the updates may be redundant.
-
-\textbf{Cudele}: the journal format is used by Stream, Append Client Journal,
-Local Persist, and Global Persist.  Stream is the default
-implementation for achieving global durability in CephFS but the rest of the
-mechanisms are implemented by writing with the journal format.  By writing with
-the same format, the metadata servers can read and use the recovery code to
-materialize the updates from a client's decoupled namespace ({\it i.e.} merge).
-These implementations required no changes to CephFS because the metadata
-servers know how to read the events the library is writing.  By re-using the
-journal subsystem to implement the namespace decoupling, Cudele leverages the
-write/read optimized data structures, the formats for persisting events
-(similar to TableFS's SSTables~\cite{ren:atc2013-tablefs}), and the functions
-for replaying events onto the internal namespace data structures.
+The journal is the second way that CephFS represents the file system namespace;
+it is a log of metadata updates that can materialize the namespace when the
+updates are replayed onto the metadata store. The journal is a ``pile system";
+writes are fast but reads are slow because state must be reconstructed.
+Specifically, reads are slow because there is more state to read, it is
+unorganized, and many of the updates may be redundant.  \textbf{In Cudele} the
+journal format is used by Stream, Append Client Journal, Local Persist, and
+Global Persist.  Stream is the default implementation for achieving global
+durability in CephFS but the rest of the mechanisms are implemented by writing
+with the journal format.  By writing with the same format, the metadata servers
+can read and use the recovery code to materialize the updates from a client's
+decoupled namespace ({\it i.e.} merge).  These implementations required no
+changes to CephFS because the metadata servers know how to read the events the
+library is writing.  By re-using the journal subsystem to implement the
+namespace decoupling, Cudele leverages the write/read optimized data
+structures, the formats for persisting events (similar to TableFS's
+SSTables~\cite{ren:atc2013-tablefs}), and the functions for replaying events
+onto the internal namespace data structures.
 
 %\subsection{Journal Tool}
 %\label{sec:journal-tool}
-
-\subsection{Journal Tool}
 
 The journal tool is used for disaster recovery and lets administrators view and
 modify the journal. It can read the journal, export the journal as a file,
 erase events, and apply updates to the metadata store.  To apply journal
 updates to the metadata store, the journal tool reads the journal from object
 store objects and replays the updates on the metadata store in the object
-store.
-
-\textbf{Cudele}: the external library the clients link into is based
+store.  \textbf{In Cudele} the external library the clients link into is based
 on the journal tool. It already had functions for importing, exporting, and
 modifying the updates in the journal so we re-purposed that code to implement
 Append Client Journal, Volatile Apply, and Nonvolatile Apply.  
@@ -129,7 +121,7 @@ Append Client Journal, Volatile Apply, and Nonvolatile Apply.
 %\subsection{Inode Cache}
 %\label{sec:inode-cache}
 
-\subsection{Inode Cache}
+\subsection{Inode Cache and Large Inodes}
 
 In CephFS, the inode cache reduces the number of RPCs between clients and
 metadata servers. Without contention clients can resolve metadata reads locally
@@ -139,27 +131,21 @@ creates within that directory will result in a lookup and a create request. If
 the directory inode is cached then only the create needs to be sent.  The size
 of the inode cache is configurable so as not to saturate the memory on the
 metadata server -- inodes in CephFS are about 1400
-bytes\footnote{http://docs.ceph.com/docs/jewel/dev/mds\_internals/data-structures/}.
-The inode cache has code for manipulating inode numbers, such as pre-allocating
-inodes to clients.
-
-\textbf{Cudele}: Nonvolatile Apply uses the internal inode cache
-code to allocate inodes to clients that decouple parts of the namespace and to
-skip inodes used by the client at merge time.
+bytes~\cite{docs:cephinternalds}.  The inode cache has code for manipulating
+inode numbers, such as pre-allocating inodes to clients. \textbf{In
+Cudele},Nonvolatile Apply uses the internal inode cache code to allocate inodes
+to clients that decouple parts of the namespace and to skip inodes used by the
+client at merge time.
 
 %\subsection{Large Inodes}
 %\label{sec:large-inodes}
 
-\subsection{Large Inodes}
-
-In CephFS, inodes already store policies, like how the file is striped
-across the object store or for managing subtrees for load balancing. These
-policies adhere to logical partitionings of metadata or data, like Ceph pools and file
+In CephFS, inodes already store policies, like how the file is striped across
+the object store or for managing subtrees for load balancing. These policies
+adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has
 the ability to recursively apply policies to subtrees and to isolate subtrees
-from each other.
-
-\textbf{Cudele}: uses the large inodes to store consistency and
+from each other. \textbf{In Cudele} the large inodes store consistency and
 durability policies in the directory inode. This approach uses the File Type
 interface from the Malacology programmable store
 system~\cite{sevilla:eurosys17} and it tells clients how to access the

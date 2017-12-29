@@ -6,17 +6,21 @@
 \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/baseline-compile/visualize/viz.ipynb}{source}]
 For the CephFS metadata server, create-heavy workloads ({\it e.g.},
 \texttt{untar}) incur the highest disk, network, and CPU utilization because of
-the consistency and durability demands of CephFS.}\label{fig:overhead-creates}
+consistency/durabiliy demands.}\label{fig:overhead-creates}
 \end{figure}
 
 In our examination of the overheads of POSIX IO we benchmark and analyze
 CephFS, the file system that uses Ceph's object store ({\it i.e.} RADOS) to
-store its data and metadata. To show how the file system behaves under high
-metadata load we use a create-heavy workload.  During this process we
-discovered, based on the analysis and breakdown of costs, that durability and
-consistency have high overhead but we urge the reader to keep in mind that this
-file system is an implementation of one set of design decisions and our goal
-here is to highlight the effect that those decisions have on performance.
+store its data and metadata. \newcomment{In this paper, ``client" is a storage
+client or application that interacts with the metadata server, ``administrator"
+is a system administrator that configures the storage, and ``end-users"
+interact with the file system, via home directories or runtimes.} To show how
+the file system behaves under high metadata load we use a create-heavy
+workload.  During this process we discovered, based on the analysis and
+breakdown of costs, that durability and consistency have high overhead but we
+urge the reader to keep in mind that this file system is an implementation of
+one set of design decisions and our goal here is to highlight the effect that
+those decisions have on performance.
 
 Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
 the Linux kernel in a CephFS mount.  The \texttt{untar} phase, which is

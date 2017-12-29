@@ -15,50 +15,43 @@
 }
 
 \begin{document}
-\title{Cover Letter}
+\title{Cover Letter: Cudele}
 \maketitle
 
 We thank the reviewers for their hard work and genuinely helpful suggestions.
 In addition to this cover letter, we have posted a PDF online explicitly
 showing additions in \textcolor{red}{\textbf{red}} and deletions in
 \textcolor{blue}{\textbf{blue}}. Three issues were common across reviewer
-feedback; Reviewer 1 and 3's comments are addressed in issues I and II,
+feedback; Reviewer 1 and 3's comments are addressed in issues II and III,
 Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
-comments are addressed in issues II and III. 
+comments are addressed in issues I and II. 
 
 %Use Cases R2, R4
 %- Spark discussion R2
 %- more emphasis on parallel and distributed computing themes R4
-\section*{Issue I: Synthetic and/or Irrelevant Use Cases (Reviewers 2 and 4)}
+\section*{Issue I: Irrelevant and/or Synthetic Use Cases (Reviewers 2 and 4)}
 
-To show the relevance of the use cases, we re-wrote Section~{\S}V-B to
-highlight examples from HPC and cloud workloads that would benefit from using
-Cudele. For HPC we focus on user home directories used for experiments and for
-the cloud we focus on the Hadoop and Spark runtimes (as suggested by Reviewer
-2). To connect the problematic use cases to Cudele, we added \textbf{Cudele
-setup} headers in Section~{\S}V-B to show which subtree semantics accommodate
-these workloads in the global namespace.  By showing these setups, we hope to
-demonstrate that different applications can use a file system in parallel with
-different consistency/durability semantics.  Although we do not actually run
-the workloads on our prototype, hopefully our changes show how the use cases,
-and the synthetic benchmarks we used to represent them, are indeed relevant to
+We re-wrote Section~{\S}V-B to highlight examples from HPC and cloud workloads
+that would benefit from using Cudele. For HPC we focus on user home directories
+used for experiments and for the cloud we focus on the Hadoop and Spark
+runtimes (as suggested by Reviewer 2).  We also added \textbf{In Cudele}
+headers in Section~{\S}V-B to show which subtree semantics accommodate each
+workload and to demonstrate how Cudele might be able to help in these
+scenarios.  By showing these setups, we hope to demonstrate that different
+applications can use a file system in parallel with different
+consistency/durability semantics.  Although we do not actually run the
+workloads on our prototype, hopefully our changes show how the use cases, and
+the synthetic benchmarks we used to represent them, are indeed relevant to
 parallel and distributed computing.
 
 To align the paper to the themes of the conference, we changed Section~{\S}V-A
 and Figures 6a, 6b, and 6c to emphasize that decoupled namespaces facilitate
-client-driven parallelism. Clients detach subtrees form the global namespaces
+client-driven parallelism, where clients detach subtrees form the global namespaces
 and do operations in-parallel to their local disk. We also hope that changes to
 the use cases above motivates the need for robust distributed storage systems
 that can handle today's applications.  So while the paper is storage-centric,
 we try to show that the workloads it supports are highly distributed and need a
 flexible solution like Cudele.  
-
-We also clarified confusing terminology in a footnote in Section~{\S}I: we use
-the term administrator to refer to a person that configures subtrees and client
-to refer to a storage client or application that interacts with the metadata
-server. We avoid using the term ``user" except when referring to end-users that
-interact with home directories in a file system or the Hadoop/Spark runtime
-itself.
 
 %Mixing contributions and future work (R1)
 %Statements in Introduction do not align with Evaluation (R1, R2, R3)
@@ -69,40 +62,38 @@ itself.
 %- cost of dynamically changing consistency/durability not presented R1
 \section*{Issue II: Structure and Layout of Evaluation (All Reviewers)}
 
-All reviewers note that the results and contributions we cite in the
-introduction are not validated, explained, or even mentioned in the evaluation.
-One confusing component of this issue is that we mixed future work with the
-contributions of the paper; to make the contributions more explicit we remove
-future work from the introduction and add it to Section~{\S}VI; we do not
-attempt to validate or prove any of the statements about the benefits of
-changing consistency and durability properties of a subtree dynamically, such
-as saving resource provisioning costs.  To further clarify the evaluation, we:
+To clarify the evaluation and eliminate some of the confusion due to our
+cross-referencing, we:
 
 \begin{itemize}
 
-  \item explicitly state the Cudele setups and subtree configurations in bold
-in Section~{\S}V-A. Hopefully this helps the reader keep track of use cases and
-demonstrates how Cudele might be able to help in these scenarios. 
-
-and include baseline values in the
-text so readers can quickly calculate raw numbers from our speedup/slowdown
-graphs. We also make sure to connect all speedups from the introduction to the
-evaluation. We hope this clarifies confusion about what we are comparing to
-when we reference speedups and slowdowns.
-
-  \item re-organized the sections and removed cross-references. Experiments are
-now self-contained so the reader can see the effects of different API
-configurations and we do a better job of explaining how results are derived. 
-
-  \item removed the ``major takeaways". We deleted the headings but moved the
-text to the beginning of each section to motivate why we are doing each
-experiment.  We also add insights into the results by analyzing the raw numbers
-we observe in comparison to hardware capabilities.
-
-  \item re-labeled all graphs with the same metric (throughput
+  \item connected performance gains from the abstract and Section~{\S}I to
+Section~{\S}V to clarify speedup/slowdown comparisons and to show how results
+are derived; we also re-labeled all graphs with the same metric (throughput
 slowdown/speedup) and aligned Section~{\S}V with the graphs in Section~{\S}II.
-We hope this eliminates more of the confusion triggered by the
-cross-referencing we did, referenced by Reviewers 2 and 3.
+
+  \item made experiments self-contained in Sections~{\S}II and~{\S}V by
+removing cross-references and adding baseline values so readers can calculate
+raw numbers from our speedup/slowdown graphs. 
+
+  \item explicitly state Cudele setups and subtree configurations in bold in
+Section~{\S}V-B to guide the reader through use cases and the effects of
+different Cudele API configurations.
+
+  \item removed ``major takeaways" from Section~{\S}V and focused on
+insights into results by analyzing raw numbers in comparison to hardware
+speeds.
+
+  \item removed future work from Section~{\S}I to make the contributions
+explicit. We do not attempt to validate or prove any of the statements about
+the benefits of changing consistency and durability properties of a subtree
+dynamically, such as saving resource provisioning costs.  
+
+  \item clarified confusing terminology in Section~{\S}II: administrator refers
+to a person that configures subtrees and client refers to a storage client or
+application that interacts with the metadata server. We avoid using the term
+``user" except when referring to end-users that interact with home directories
+in a file system or the Hadoop/Spark runtime itself.
 
 \end{itemize}
 
@@ -111,35 +102,32 @@ cross-referencing we did, referenced by Reviewers 2 and 3.
 %- servers, network, storage R1, R3
 \section*{Issue III: No Experimental Setup (Reviewers 1, 2, and 3)}
 
-We apologize for the omission of experimental setup and source code details. To
-provide a more comprehensive view of our experiments, we added text to the
-paper and made paper artifacts available online. For the experimental setup, we
-describe the cluster setup (hardware, software, etc.) in Section~{\S}V.  We
-have also made the infrastructure code available and added links after each
-figure to show exactly how experiments are run.  This infrastructure code
-contains scripts to deploy the system, run experiments, and gather results.
-This process follows the Popper
+We apologize for the omission of experimental setup and source code details.
+We made artifacts available online for all experiments in the paper. For the
+experimental setup, we describe the cluster setup (hardware, software, etc.) in
+Section~{\S}V.  We have also made the infrastructure code available and added
+links after each figure to show exactly how experiments are run.  This
+infrastructure code contains scripts to deploy the system, run experiments, and
+gather results.  This process follows the Popper
 Convention\footnote{http://falsifiable.us/}~\cite{jimenez_popper_2016}, which
 aims to make research reproducible.  We also made the source code available
-online and a link is provided in a footnote in Section~{\S}V. Finally, we add
+online and a link is provided in a reference in Section~{\S}V. Finally, we add
 details about which tools and classes we modified in Section~{\S}IV to address
 Reviewer 1's questions about the framework implementation.
 
-
-
-\section*{Cosmetic Fixes}
-%Terminology
-%- users vs. clients R2
-\begin{itemize}
-  \item Reviewer 1: fixed user vs. client terminology in Section~{\S}III
-  \item Reviewer 1: clarified that the cost of dynamically changing semantics is future work Sections~{\S}III and ~{\S}V.E
-  \item Reviewer 1: added source code pointer in Section~{\S}IV
-  \item Reviewer 2: remove major takeways in Section~{\S}V
-  \item Reviewer 2: remove major cross-references in Section~{\S}V
-  \item Reviewer 3: quantified speedups with figure annotations in Section~{\S}V
-  \item Reviewers 1 and 3: add servers, network, and storage setups in Section~{\S}V
-  \item Reviewer 4: add new section ({\S}V.F) describing how Cudele would work with a system like Spark
-\end{itemize}
+%\section*{Cosmetic Fixes}
+%%Terminology
+%%- users vs. clients R2
+%\begin{itemize}
+%  \item Reviewer 1: fixed user vs. client terminology in Section~{\S}III
+%  \item Reviewer 1: clarified that the cost of dynamically changing semantics is future work Sections~{\S}III and ~{\S}V.E
+%  \item Reviewer 1: added source code pointer in Section~{\S}IV
+%  \item Reviewer 2: remove major takeways in Section~{\S}V
+%  \item Reviewer 2: remove major cross-references in Section~{\S}V
+%  \item Reviewer 3: quantified speedups with figure annotations in Section~{\S}V
+%  \item Reviewers 1 and 3: add servers, network, and storage setups in Section~{\S}V
+%  \item Reviewer 4: add new section ({\S}V.F) describing how Cudele would work with a system like Spark
+%\end{itemize}
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,paper}

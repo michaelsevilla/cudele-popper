@@ -7,20 +7,16 @@ checkpointing~\cite{bent_plfs_2009} or scanning the file
 system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
 inodes. Applications perform better with dedicated metadata
 servers~\cite{sevilla:sc15-mantle, ren:sc2014-indexfs} but provisioning a
-metadata server for every \newcomment{client\footnote{In this paper, ``client"
-is a storage client or application that interacts with the metadata server,
-``administrator" is a system administrator that configures the storage, and
-``end-users" interact with the file system, via home directories or runtimes.}}
-is unreasonable. This problem is exacerbated by current hardware and software
-trends: parallel runtimes like Hadoop and Spark use storage systems to
-implement important scheduling and timing semantics, and  \oldcomment{; for
-example, } HPC architectures are transitioning from complex storage stacks with
-burst buffer, file system, object store, and tape tiers to more simplified
-stacks with just a burst buffer and object
-store~\cite{bent:login16-hpc-trends}. These types of trends put pressure on
-data access because more requests from different nodes end up hitting the same
-layer in parallel and latencies cannot be hidden while data migrates across
-tiers.
+metadata server for every \newcomment{client} is unreasonable. This problem is
+exacerbated by current hardware and software trends: parallel runtimes like
+Hadoop and Spark use storage systems to implement important scheduling and
+timing semantics, and  \oldcomment{; for example, } HPC architectures are
+transitioning from complex storage stacks with burst buffer, file system,
+object store, and tape tiers to more simplified stacks with just a burst buffer
+and object store~\cite{bent:login16-hpc-trends}. These types of trends put
+pressure on data access because more requests from different nodes end up
+hitting the same layer in parallel and latencies cannot be hidden while data
+migrates across tiers.
 
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
@@ -39,9 +35,8 @@ and N:1 create patterns~\cite{bent_plfs_2009}).
 \begin{figure}[tb] \centering
 \includegraphics[width=0.35\textwidth]{figures/subtree-policies1.png}
 \caption{Illustration of subtrees with different semantics co-existing in a
-global namespace.  For performance, clients \oldcomment{can} relax consistency on their
-subtree (HDFS) or decouple the subtree and move it locally (BatchFS, RAMDisk).
-Decoupled subtrees can relax durability for even better performance.
+global namespace.  For performance, clients \oldcomment{can} relax consistency/durability on their
+subtree ({\it e.g.}, HDFS) or decouple the subtree and move it locally ({\it e.g.}, BatchFS, RAMDisk).
 }\label{fig:subtree-policies} \end{figure}
 
 % One example
@@ -62,15 +57,15 @@ entirely different system or re-written to coordinate strong
 consistency/durability themselves.
 
 % What did we do
+%\footnote{HDFS itself is not directly evaluated in this paper, although the
+%semantics and their performance is explored in~\S\ref{sec:use-case-1}.} 
 To address this problem, we present an API and framework that lets developers
 dynamically control the consistency and durability guarantees for subtrees in
 the file system namespace.  Figure~\ref{fig:subtree-policies} shows a potential
 setup in our proposed system where a single global namespace has subtrees for
 applications optimized with techniques from different state-of-the-art
-architectures.  The HDFS\footnote{HDFS itself is not directly evaluated in this
-paper, although the semantics and their performance is explored
-in~\S\ref{sec:use-case-1}.} subtree has weaker than strong consistency because
-it lets clients read files opened for
+architectures.  The HDFS subtree has weaker than strong consistency because it
+lets clients read files opened for
 writing~\cite{hakimzadeh:dais14-hdfs-consistency}, which means that not all
 updates are immediately seen by all clients; the BatchFS and RAMDisk subtrees
 are decoupled from the global namespace and have similar consistency/durability
@@ -89,14 +84,17 @@ contributions:
 
 \begin{enumerate}
 
-  \item A framework and API for assigning consistency/durability policies to
-  subtrees in the file system namespace; this lets
-  \oldcomment{users}\newcomment{administrators} navigate the trade-offs of
+  \item A framework/API for assigning consistency/durability policies to
+  subtrees in a global namespace; this lets
+  \oldcomment{users}\newcomment{administrators} navigate trade-offs of
   different metadata protocols on the same storage system.
 
-  \item This framework lets subtrees with different semantics co-exist in a
-  global namespace. We show how this scales further and performs better than
-  systems that use one strategy for the entire namespace .
+  \item
+
+  \oldcomment{This framework lets subtrees with different semantics co-exist in
+a global namespace. We show how this} \newcomment{We show how that letting
+different semantics co-exist in a global namespace scales further and performs
+better than systems that use one strategy.}
 
   \item A prototype that lets \oldcomment{users}\newcomment{administrators}
   custom fit subtrees to applications dynamically. 
