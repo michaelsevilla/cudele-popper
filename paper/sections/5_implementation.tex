@@ -131,9 +131,9 @@ creates within that directory will result in a lookup and a create request. If
 the directory inode is cached then only the create needs to be sent.  The size
 of the inode cache is configurable so as not to saturate the memory on the
 metadata server -- inodes in CephFS are about 1400
-bytes~\cite{docs:cephinternalds}.  The inode cache has code for manipulating
-inode numbers, such as pre-allocating inodes to clients. \textbf{In
-Cudele},Nonvolatile Apply uses the internal inode cache code to allocate inodes
+bytes~\cite{docs:cephinternals}.  The inode cache has code for manipulating
+inode numbers, such as pre-allocating inodes to clients. \textbf{ In
+Cudele}, Nonvolatile Apply uses the internal inode cache code to allocate inodes
 to clients that decouple parts of the namespace and to skip inodes used by the
 client at merge time.
 
