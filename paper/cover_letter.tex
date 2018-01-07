@@ -19,11 +19,12 @@
 \maketitle
 
 We thank the reviewers for their hard work and genuinely helpful suggestions.
-In addition to this cover letter, we have posted a PDF online explicitly
-showing additions in \textcolor{red}{\textbf{red}} and deletions in
-\textcolor{blue}{\textbf{blue}}. Three issues were common across reviewer
-feedback; Reviewer 1 and 3's comments are addressed in issues II and III,
-Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
+In addition to this cover letter, we have posted a
+\href{https://github.com/michaelsevilla/cudele-popper/blob/master/paper/diff.pdf}{PDF
+online} explicitly showing additions in \textcolor{blue}{\textbf{blue}} and
+deletions in \textcolor{red}{\textbf{red}}. Three issues were common across
+reviewer feedback; Reviewer 1 and 3's comments are addressed in issues II and
+III, Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
 comments are addressed in issues I and II. 
 
 %Use Cases R2, R4
@@ -34,7 +35,7 @@ comments are addressed in issues I and II.
 We re-wrote Section~{\S}V-B to highlight examples from HPC and cloud workloads
 that would benefit from using Cudele. For HPC we focus on user home directories
 used for experiments and for the cloud we focus on the Hadoop and Spark
-runtimes (as suggested by Reviewer 2).  We also added \textbf{In Cudele}
+runtimes (as suggested by Reviewer 2).  We also added \textbf{Cudele Setup}
 headers in Section~{\S}V-B to show which subtree semantics accommodate each
 workload and to demonstrate how Cudele might be able to help in these
 scenarios.  By showing these setups, we hope to demonstrate that different
@@ -48,7 +49,7 @@ To align the paper to the themes of the conference, we changed Section~{\S}V-A
 and Figures 6a, 6b, and 6c to emphasize that decoupled namespaces facilitate
 client-driven parallelism, where clients detach subtrees form the global namespaces
 and do operations in-parallel to their local disk. We also hope that changes to
-the use cases above motivates the need for robust distributed storage systems
+the use cases above motivate the need for robust distributed storage systems
 that can handle today's applications.  So while the paper is storage-centric,
 we try to show that the workloads it supports are highly distributed and need a
 flexible solution like Cudele.  
@@ -108,27 +109,23 @@ experimental setup, we describe the cluster setup (hardware, software, etc.) in
 Section~{\S}V.  We have also made the infrastructure code available and added
 links after each figure to show exactly how experiments are run.  This
 infrastructure code contains scripts to deploy the system, run experiments, and
-gather results.  This process follows the Popper
-Convention\footnote{http://falsifiable.us/}~\cite{jimenez_popper_2016}, which
-aims to make research reproducible.  We also made the source code available
-online and a link is provided in a reference in Section~{\S}V. Finally, we add
+gather results.  This process follows the \href{http://falsifiable.us/}{Popper
+Convention}, which aims to make research reproducible.  We also made the source
+code available online and a link is provided in Section~{\S}V. Finally, we add
 details about which tools and classes we modified in Section~{\S}IV to address
 Reviewer 1's questions about the framework implementation.
 
-%\section*{Cosmetic Fixes}
+\section*{Additional Cosmetic Fixes}
 %%Terminology
 %%- users vs. clients R2
-%\begin{itemize}
-%  \item Reviewer 1: fixed user vs. client terminology in Section~{\S}III
-%  \item Reviewer 1: clarified that the cost of dynamically changing semantics is future work Sections~{\S}III and ~{\S}V.E
-%  \item Reviewer 1: added source code pointer in Section~{\S}IV
-%  \item Reviewer 2: remove major takeways in Section~{\S}V
-%  \item Reviewer 2: remove major cross-references in Section~{\S}V
-%  \item Reviewer 3: quantified speedups with figure annotations in Section~{\S}V
-%  \item Reviewers 1 and 3: add servers, network, and storage setups in Section~{\S}V
-%  \item Reviewer 4: add new section ({\S}V.F) describing how Cudele would work with a system like Spark
-%\end{itemize}
 
-\bibliographystyle{IEEEtran}
-\bibliography{IEEEabrv,paper}
+For Reviewer 1, we fixed user vs. client terminology in Section~{\S}III,
+clarified that the cost of dynamically changing semantics is future work in
+Sections~{\S}I and~{\S}III, and added source code pointers in Section~{\S}V.
+For Reviewer 2, we removed the major takeways headings and cross-references in
+Section~{\S}V. For Reviewer 3, we quantified speedups with figure annotations
+in Section~{\S}V. For Reviewers 1 and 3, we added servers, network, and storage
+setups in Section~{\S}V. For Reviewer 4 we added descriptions to each use case
+in Section~{\S}V describing how Cudele would work with Spark.
+
 \end{document}

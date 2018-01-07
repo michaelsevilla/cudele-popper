@@ -20,24 +20,24 @@ error bars are too small to see) and normalize results to make our results more
 generally applicable to different hardware. We use a CloudLab cluster of 34
 nodes connected with 10Gbit ethernet, each with 16 2.4 GHz CPUs, 128GB RAM, and
 400GB SSDs.  Each node uses Ubuntu 14.04 and we develop on Ceph's Jewel
-release, version 10.2.1, which was released in May 2016. All daemons run as a
-single process (and the Ceph components~\cite{docs:cephrados} are: 1 monitor, 3
-object storage daemons, 1 metadata server, and 20 clients.} We scope the
-evaluation to one metadata server and scale the number of parallel clients
-\newcomment{each doing 100K operations because 100K is the maximum recommended
-size of a directory in CephFS. We scale to 20 clients because, as shown in
-Section~\S\ref{sec:posix-overheads}, 20 clients is enough to saturate the
-resources of a single metadata server.} This type of analysis shows the
-capacity and performance of a metadata server with superior metadata protocols,
-which should be used to inform \oldcomment{load balancing}\newcomment{metadata
-distribution} across a \oldcomment{metadata} cluster. Load balancing across a
-cluster of metadata servers with partitioning and replication can be explored
-with something like Mantle~\cite{sevilla:sc15-mantle}.  \newcomment{To make our
-results reproducible, this paper adheres to The Popper
+release, version 10.2.1, which was released in May 2016. We use 1 monitor
+daemon, 3 object storage daemons, 1 metadata server daemon, and up to 20
+clients.}  We scope the evaluation to one metadata server and scale the number
+of parallel clients \newcomment{each doing 100K operations because 100K is the
+maximum recommended size of a directory in CephFS. We scale to 20 clients
+because, as shown in Section~\S\ref{sec:posix-overheads}, 20 clients is enough
+to saturate the resources of a single metadata server.} This type of analysis
+shows the capacity and performance of a metadata server with superior metadata
+protocols, which should be used to inform \oldcomment{load
+balancing}\newcomment{metadata distribution} across a \oldcomment{metadata}
+cluster. Load balancing across a cluster of metadata servers with partitioning
+and replication can be explored with something like
+Mantle~\cite{sevilla:sc15-mantle}.  \newcomment{To make our results
+reproducible, this paper adheres to The Popper
 Convention~\cite{jimenez_popper_2016}, so experiments can be examined in more
 detail, or even re-run, by visiting the \texttt{[source]} link next to each
-figure.  The source code is available on the Cudele branch~\cite{cudele-src} of
-our Ceph fork.}
+figure.  The source code is available on the Cudele branch~\cite{docs:cudele}
+of our Ceph fork.}
 
 %\newcomment{\indent We understand concerns about cluster size and network, especially
 %for systems aimed at HPC but our evaluation focuses on verifying the behavior
@@ -63,7 +63,7 @@ our Ceph fork.}
 \centering
 \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
 \caption{
-[\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-mechanisms/visualize/viz.ipynb}{source}]
+[\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-mechanisms/visualize/viz.ipynb}{source}]
 \newcomment{Overhead of processing 100K create events for each mechanism in
 \oldcomment{Table~\ref{table:mechanisms}}\newcomment{Figure~\ref{fig:decouple}},
 normalized to the runtime of writing events to client memory. The far right
@@ -170,7 +170,7 @@ implemented.}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/mergescale.png}
       \caption{
-      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-mergescale/visualize/viz.ipynb}{source}]
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-mergescale/visualize/viz.ipynb}{source}]
       \newcomment{parallel creates on clients}
       }\label{fig:mergescale}
   \end{subfigure}
@@ -178,7 +178,7 @@ implemented.}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/block-allow.png}
       \caption{
-      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-blockapi/visualize/viz.ipynb}{source}]
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-blockapi/visualize/viz.ipynb}{source}]
       \newcomment{block interference}
       }\label{fig:block-allow}
   \end{subfigure}
@@ -186,7 +186,7 @@ implemented.}
       \centering
       \includegraphics[width=1.0\linewidth]{graphs/slowdown-sync.png}
       \caption{
-      [\href{https://github.com/michaelsevilla/cudele-popper/blob/revision/experiments/cudele-partialreads/visualize/viz.ipynb}{source}]
+      [\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-partialreads/visualize/viz.ipynb}{source}]
       \newcomment{syncing to global namespace}
       }\label{fig:slowdown-sync}
   \end{subfigure}

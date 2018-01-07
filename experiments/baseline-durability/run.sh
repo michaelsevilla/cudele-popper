@@ -1,36 +1,74 @@
 #!/bin/bash
-
+# This file should contain the series of steps that are required to execute 
+# the experiment. Any non-zero exit code will be interpreted as a failure
+# by the 'popper check' command.
 set -ex
 
-# setup the docker command
+# if you know Ansible and Docker, the below should make sense
+# - we attach ceph-ansible to root because they expect us to be in that dir
+OUTP="results-multipleruns"
+SITE=`cat vars.yml | grep "site: " | grep -v "#" | awk '{print $2}'`
 ROOT=`dirname $PWD | xargs dirname`
-RUN="docker run -it --rm --net host -v $HOME/.ssh:/root/.ssh -w /root -v $ROOT/ansible/srl:/popper/ansible/roles/srl/"
-ANSIBLE="michaelsevilla/ansible --forks 50 --skip-tags package-install,with_pkg"
-CEPH_ANSIBLE="$RUN -v $ROOT/ansible/ceph:/root $ANSIBLE"
-SRL_ANSIBLE="$RUN -v `pwd`/site:/root $ANSIBLE"
+NETW="--net host -v $HOME/.ssh:/root/.ssh"
+DIRS="-v `pwd`:/popper \
+      -v $ROOT/ansible/ceph:/root \
+      -v $ROOT/ansible/srl:/popper/ansible/roles/srl \
+      -w /root "
+ANSB="-v `pwd`/ansible/group_vars/:/root/group_vars \
+      -v `pwd`/hosts:/etc/ansible/hosts \
+      -v `pwd`/ansible/ansible.cfg:/etc/ansible/ansible.cfg \
+      -e ANSIBLE_CONFIG=/etc/ansible/ansible.cfg"
+CODE="-v `pwd`/ansible/ceph.yml:/root/ceph.yml \
+      -v `pwd`/ansible/monitor.yml:/root/monitor.yml \
+      -v `pwd`/ansible/cleanup.yml:/root/cleanup.yml \
+      -v `pwd`/ansible/collect.yml:/root/collect.yml"
+WORK="-v `pwd`/ansible/workloads:/workloads"
+ARGS="--forks 50 --skip-tags package-install,with_pkg"
+VARS="-e @/popper/vars.yml \
+      -e @/popper/ansible/vars.yml \
+      -i /etc/ansible/hosts"
+DOCKER="docker run -it --rm $NETW $DIRS $ANSB $CODE $WORK michaelsevilla/ansible $ARGS $VARS"
 
-for nclients in 1 5 10 15 18 20; do
-    cp inventory_cloudlab/${nclients}client site/hosts
-    cp site/hosts $ROOT/ansible/ceph/hosts
-  for site in "nojournal-cache" "journal210-cache" "journal120-cache" "journal30-cache"; do
+# debug mode
+if [ ! -z $1 ]; then
+  docker run -it --rm $NETW $DIRS $ANSB $CODE $WORK --entrypoint=ansible michaelsevilla/ansible $VARS $@
+  exit
+fi
 
-    # configure ceph and setup results directory
-    mkdir -p results/$site/logs || true
-    cp site/* $ROOT/ansible/ceph || true
-    cp site_confs/${site}.yml site/group_vars/all
-    cp -r site/group_vars $ROOT/ansible/ceph/
-
-    # cleanup and start ceph
-    $SRL_ANSIBLE cleanup.yml
-    $CEPH_ANSIBLE ceph.yml cephfs.yml
-    $SRL_ANSIBLE ceph_pgs.yml ceph_monitor.yml ceph_wait.yml
-    
-    # warmup and get baseline
-    for i in `seq 0 2`; do
-      ./ansible-playbook.sh -e site=$site -e nfiles=100000 ../workloads/creates.yml
+mkdir $OUTP || true
+for procs in 1 5 10 15; do
+  for clients in 1; do
+    cp configs_$SITE/clients$clients hosts
+    for job in "creates"; do
+      for log in "nolog" "log1" "log10" "log30" "log50"; do
+        cp configs_$SITE/all-$log ansible/group_vars/all 
+        for run in 0 1 2; do
+          mkdir results || true
+          $DOCKER -e processes_per_client=$procs cleanup.yml
+          $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
+            ceph.yml monitor.yml /workloads/${job}.yml collect.yml
+          mv results $OUTP/results-$SITE-clients$clients-procs$procs-$log-run$run
+        done
+      done
     done
-    
-    ./ansible-playbook.sh -e site=$site collect.yml
   done
-  mv results results-${nclients}clients-g1-10G
 done
+
+for procs in 20 25 30 35 40 45 50; do
+  for clients in 1; do
+    cp configs_$SITE/clients$clients hosts
+    for job in "creates"; do
+      for log in "nolog" "log1"; do
+      cp configs_$SITE/all-$log ansible/group_vars/all 
+        for run in 0 1 2; do
+          mkdir results || true
+          $DOCKER -e processes_per_client=$procs cleanup.yml
+          $DOCKER -e processes_per_client=$procs -e nfiles=98000 \
+            ceph.yml monitor.yml /workloads/${job}.yml collect.yml
+          mv results $OUTP/results-$SITE-clients$clients-procs$procs-$log-run$run
+        done
+      done
+    done
+  done
+done
+exit 0
