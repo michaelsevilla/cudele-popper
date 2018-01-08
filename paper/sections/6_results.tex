@@ -333,7 +333,7 @@ merge + create" curve is also pessimistic because it models a scenario in which
 all client journals arrive at the same time.} So for the 20 clients data point,
 we are measuring the operations per second for 20 client journals that land on
 the metadata server at the same time. \newcomment{Had we added infrastructure
-to overlay journal arrivals or time client sync intervales, we could have
+to overlay journal arrivals or time client sync intervals, we could have
 scaled more closely to ``decoupled: create".}\oldcomment{The ``create + merge"
 bar adds the time it takes for clients to generate the journal of events in
 parallel. ALSO DISCUSS 3.7X!!}
