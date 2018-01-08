@@ -6,7 +6,7 @@
 %\includegraphics[width=50mm]{figures/fig-decouple.png}
 \includegraphics[width=1.0\linewidth]{figures/fig-decouple.png}
 \caption{Illustration of the \textbf{mechanisms} used by applications to build
-consistency/durability semantics. Descriptions are provided in by the
+consistency/durability semantics. Descriptions are provided by the
 underlined words in Section~\S\ref{sec:the-cudelesfs-mechanisms}.
 }\label{fig:decouple}
 \end{figure}
@@ -29,8 +29,8 @@ In this section we describe our API and framework that lets
 \oldcomment{users}\newcomment{administrators} assign consistency and durability
 semantics to subtrees in the global namespace. A \textbf{mechanism} is an
 abstraction and basic building block for constructing consistency and
-durability guarantees. Cudele exposes these mechanisms and the
-\oldcomment{users}\newcomment{administrator} composes them together to
+durability guarantees.\oldcomment{Cudele exposes these mechanisms and the
+users}\newcomment{ The administrator} composes these mechanisms together to
 construct \textbf{policies}.  These policies are assigned to subtrees and they
 dictate how the file system should handle operations within that subtree.
 Below, we describe the mechanisms (which are \underline{underlined}), the
@@ -93,14 +93,14 @@ back to the object store.
 %to get different consistency and durability semantics. 
 
 \subsubsection{Mechanisms Used for Durability} \underline{Stream} is one of the
-mechanisms used by default in CephFS.  Using existing configuration settings in
-Ceph we can turn Stream on and off.  If it is off, then the metadata servers
-will not save journals in the object store. For \underline{Local Persist}, clients write
-serialized log events to a file on local disk and for \underline{Global Persist},
-clients push the journal into the object store. The overheads for both Local
-Persist and Global Persist is the write bandwidth of the local disk and
-object store, respectively.  These persist mechanisms are part of the library that
-links into the client.
+mechanisms used by default in CephFS.  Using existing configuration settings we
+can turn Stream on and off.  If it is off, then the metadata servers will not
+save journals in the object store. For \underline{Local Persist}, clients write
+serialized log events to a file on local disk and for \underline{Global
+Persist}, clients push the journal into the object store. The overheads for
+both Local Persist and Global Persist is the write bandwidth of the local disk
+and object store, respectively.  These persist mechanisms are part of the
+library that links into the client.
 
 \subsection{Defining Policies in Cudele}
 \label{sec:setting-policies-with-cudele}
@@ -144,14 +144,13 @@ updates are always recoverable.
 
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
-Table~\ref{table:spectrum} (we construct the semantics for these systems later
-in Section~\S\ref{sec:microbenchmarks}).  POSIX IO-compliant systems like
-CephFS and IndexFS have global consistency and durability\footnote{ IndexFS
-also has bulk merge which is a form of ``weak consistency"}; DeltaFS uses
-``invisible" consistency and ``local" durability and BatchFS uses ``weak"
-consistency and ``local" durability. These systems have other features that
-could push them into different semantics but we assign labels here based on the
-points emphasized in the papers.  To compose the mechanisms
+Table~\ref{table:spectrum} POSIX IO-compliant systems like CephFS and IndexFS
+have global consistency and durability\footnote{ IndexFS also has bulk merge
+which is a form of ``weak consistency"}; DeltaFS uses ``invisible" consistency
+and ``local" durability and BatchFS uses ``weak" consistency and ``local"
+durability. These systems have other features that could push them into
+different semantics but we assign labels here based on the points emphasized in
+the papers.  To compose the mechanisms
 \oldcomment{users}\newcomment{administrators} inject which mechanisms to run
 and which to use in parallel using a domain specific language.  Although we can
 achieve all permutations of the different guarantees in
@@ -163,15 +162,17 @@ mechanism and the semantics described above are quantified in
 Sections~\S\ref{sec:microbenchmarks}.
 
 % talk of eventual consistency
-The consistency and durability properties in Table~\ref{table:spectrum} are not
-guaranteed until all mechanisms in the cell are complete. The compositions
-should be considered atomic and there are no guarantees while transitioning
-between policies. For example, updates are not deemed to have ``global"
-durability until they are safely saved in the object store. If a failure occurs
-during Global Persist or if we inject a new policy that changes a subtree from
-Local Persist to Global Persist, Cudele makes no guarantee until the mechanisms
-are complete. Despite this, production systems that use Cudele should state
-up-front what the transition guarantees are for subtrees.
+In our prototype, the consistency and durability properties in
+Table~\ref{table:spectrum} are not guaranteed until all mechanisms in the cell
+are complete. The compositions should be considered atomic and there are no
+guarantees while transitioning between policies. For example, updates are not
+deemed to have ``global" durability until they are safely saved in the object
+store. If a failure occurs during Global Persist or if we inject a new policy
+that changes a subtree from Local Persist to Global Persist, Cudele makes no
+guarantee until the mechanisms are complete. Despite this, production systems
+that use Cudele should state up-front what the transition guarantees are for
+subtrees. This is not a limitation of our approach; it just lead to the
+simplest implementation.
 
 \subsection{Cudele Namespace API}
 \label{sec:cudelefs-namespace-api}
@@ -184,8 +185,8 @@ versioned by the monitor to all daemons in the system. For example,
 (msevilla/mydir, policies.yml) would decouple the path ``msevilla/mydir" and
 would apply the policies in ``policies.yml".  The policies file supports the
 following parameters (default values are in parenthesis): which consistency
-model to use (\texttt{RPCs}), which durability model to use (\texttt{stream})
-number of inodes to provision to the decoupled namespace (100), which interfere
+model to use (\texttt{RPCs}), which durability model to use (\texttt{stream}), 
+number of inodes to provision to the decoupled namespace (100), and which interfere
 policy to use, {\it i.e.} how to handle a request from another client
 targeted at this subtree (\texttt{allow}). The ``Consistency" and ``Durability"
 parameters are compositions of mechanisms; they can be serialized (\(+\)) or
@@ -193,7 +194,7 @@ run in parallel (\(|\|\)).  ``Allocated Inodes" is a way for the application to
 specify how many files it intends to create. It is a contract so that the file
 system can provision enough resources for the incumbent merge and so it can
 give valid inodes to other clients. The inodes can be used anywhere within the
-decoupled namespace ({i.e.} at any depth in the subtree).  ``Interfere Policy"
+decoupled namespace ({\it i.e.} at any depth in the subtree).  ``Interfere Policy"
 has two settings: \texttt{block} and \texttt{allow}.  For \texttt{block}, any
 requests to this part of the namespace returns with ``Device is busy", which
 will spare the metadata server from wasting resources for updates that may get

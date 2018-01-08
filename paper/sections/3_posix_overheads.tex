@@ -14,7 +14,7 @@ CephFS, the file system that uses Ceph's object store ({\it i.e.} RADOS) to
 store its data and metadata. \newcomment{In this paper, ``client" is a storage
 client or application that interacts with the metadata server, ``administrator"
 is a system administrator that configures the storage, and ``end-users"
-interact with the file system, via home directories or runtimes.} To show how
+interact with the file system via home directories or runtimes.} To show how
 the file system behaves under high metadata load we use a create-heavy
 workload.  During this process we discovered, based on the analysis and
 breakdown of costs, that durability and consistency have high overhead but we
@@ -22,18 +22,20 @@ urge the reader to keep in mind that this file system is an implementation of
 one set of design decisions and our goal here is to highlight the effect that
 those decisions have on performance.
 
-Figure~\ref{fig:overhead-creates} shows the resource utilization of compiling
-the Linux kernel in a CephFS mount.  The \texttt{untar} phase, which is
+%The RPCs are also serialized because the
+%metadata server is single threaded; although na\"{\i}ve, this design is common
+%because of the complexity of multi-threaded metadata
+%servers~\cite{konstantinos:pdsw2014-lustre-metadata}.  
+In this section we quantify the costs of consistency and durability in CephFS.
+At the end of each subsection we compare the approach to ``decoupled
+namespaces", the technique in related work that detaches subtrees from the
+global namespace to relax consistency/durability guarantees. We use a
+create-heavy workload for this study because it has high resource utilization,
+as shown by the trace of compiling the Linux kernel in a CephFS mount in
+Figure~\ref{fig:overhead-creates}.  The \texttt{untar} phase, which is
 characterized by many creates, has the highest resource usage (combined CPU,
-network, and disk) because of the number of RPCs needed for consistency and
-durability. The RPCs are also serialized because the metadata server is single
-threaded; although na\"{\i}ve, this design is common because of the complexity
-of multi-threaded metadata
-servers~\cite{konstantinos:pdsw2014-lustre-metadata}.  In this section, we
-quantify the costs of consistency and durability in CephFS.  At the end of each
-subsection we compare the approach to ``decoupled namespaces", the technique in
-related work that detaches subtrees from the global namespace to relax
-consistency/durability guarantees. 
+network, and disk) on the metadata server because of the number of RPCs needed
+for consistency and durability.  
 
 \subsection{Durability}
 \label{sec:durability}
@@ -69,7 +71,7 @@ slowdown when another client interferes by creating files in all directories
 and (c) highlights the cause: }\oldcomment{The overhead of durability and
 strong consistency in CephFS. (a) shows the effect of different journal segment
 sizes, which are streamed into the object store for fault tolerance. (b) and
-(c) show that} when another client ``interferes", capabilities are revoked and
+(c) show that} when another client interferes, capabilities are revoked and
 metadata servers do more work.} \label{fig:overhead}
 \end{figure*}
 
@@ -96,7 +98,7 @@ on the same object. There are two tunables\newcomment{, related to groups of
 journal events called segments,} for controlling the journal: the segment size
 and the dispatch size ({\it i.e.} the number of segments that can be dispatched
 at once).  Unless the journal saturates memory or CPU resources, larger values
-for these tunables results in better performance.
+for these tunables result in better performance.
 
 % purpose of the journal
 In addition to the metadata journal, CephFS also represents metadata in RADOS
@@ -130,10 +132,10 @@ is a result of the peak throughput of a single metadata server, which we found
 to be about 3000 operations per second}.  The trade-off for better performance
 is memory consumption because a larger
 \oldcomment{segment}\newcomment{dispatch} size uses more space for buffering.
-When journaling is on, the metadata server periodically stops serving requests
+\oldcomment{When journaling is on, the metadata server periodically stops serving requests
 to flush ({\it i.e.} apply journal updates) to the metadata store.  The journal
 overhead is sufficient enough to slow down metadata throughput but not so much
-as to overwhelm the bandwidth of the object store.
+as to overwhelm the bandwidth of the object store.}
 
 \textbf{Comparison to decoupled namespaces}: For BatchFS, if a client fails
 when it is writing to the local log-structured merge tree (implemented as an
@@ -153,15 +155,15 @@ reads and writes to the same inode or directory are globally ordered.  The
 synchronization and serialization machinery needed to ensure that all clients
 see the same state has high overhead.
 
-\textbf{CephFS Design}: Capabilities keep metadata strongly
-consistent. To reduce the number of RPCs needed for consistency, clients can
-obtain capabilities for reading and writing inodes, as well as caching reads,
-buffering writes, changing the file size, and performing lazy IO.
-
 % inode cache - reduces RPCs (lookups for create, readdirs for stats)
-To keep track of the read caching and write buffering capabilities, the clients
-and metadata servers agree on the state of each inode using an inode cache.  If
-a client has the directory inode cached it can do metadata writes ({\it e.g.},
+
+\textbf{CephFS Design}: Capabilities keep metadata strongly consistent. To
+reduce the number of RPCs needed for consistency, clients can obtain
+capabilities for reading and writing inodes, as well as caching reads,
+buffering writes, changing the file size, and performing lazy IO.  To keep
+track of the read caching and write buffering capabilities, the clients and
+metadata servers agree on the state of each inode using an inode cache.  If a
+client has the directory inode cached it can do metadata writes ({\it e.g.},
 create) with a single RPC. If the client is not caching the directory inode
 then it must do an extra RPC to determine if the file exists.  Unless the
 client immediately reads all the inodes in the cache ({\it i.e.} \texttt{ls
@@ -187,12 +189,12 @@ complains about laggy and unresponsive requests.
 files}\newcomment{The cause for this slowdown} is shown in
 Figure~\ref{fig:overhead-c}. The colors show the behavior of the client for two
 different runs.  If only one client is creating files in a directory
-(``isolated" curve on \(y1\) axis) then that client can lookup the existence of
+(``no interference" curve on \(y1\) axis) then that client can lookup the existence of
 new files locally before issuing a create request to the metadata server. If
 another client starts creating files in the same directory then the directory
 inode transitions out of read caching and the first client must send
-\texttt{lookup()}s to the metadata server (``interfere" curve on \(y2\) axis).
-These extra requests increase the throughput of the ``interfere" curve on the
+\texttt{lookup()}s to the metadata server (``interference" curve on \(y2\) axis).
+These extra requests increase the throughput of the ``interference" curve on the
 \(y1\) axis because the metadata server can handle the extra load but
 performance suffers.  
 

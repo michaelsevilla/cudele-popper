@@ -2,11 +2,11 @@
 \label{sec:implementation}
 
 We use a programmable storage approach~\cite{sevilla:eurosys17} to design
-Cudele; namely, we try to leverage components inside Ceph to inherit the
+Cudele; namely, we try to leverage components inside CephFS to inherit the
 robustness and correctness of the internal subsystems. Using this `dirty-slate'
 approach, we only had to implement 4 of the 6 mechanisms from
 Figure~\ref{fig:decouple} and just 1 required changes to the underlying storage
-system itself.  In this section, we first describe a Ceph internal subsystem or
+system itself.  In this section, we first describe a CephFS internal subsystem or
 component and then we show how we use it in Cudele.
 
 %- no change (rpcs, stream)s, library(create, nonvolatile apply, local/global
@@ -27,7 +27,7 @@ stored together in objects to improve the performance of scans.  The metadata
 store data structure is structured as a tree of directory fragments making it
 easier to read and traverse. \textbf{In Cudele} the RPCs mechanism uses the
 metadata store to service requests. Using code designed for recovery,
-Nonvolatile Apply and Volatile Apply replay updates onto the metadata store in
+Volatile Apply and Nonvolatile Apply replay updates onto the metadata store in
 memory and in the object store, respectively.  When the clients are ready to
 merge their updates back into the global namespace, they pass a binary file of
 metadata updates to the metadata server. 
@@ -145,9 +145,9 @@ the object store or for managing subtrees for load balancing. These policies
 adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has
 the ability to recursively apply policies to subtrees and to isolate subtrees
-from each other. \textbf{In Cudele} the large inodes store consistency and
-durability policies in the directory inode. This approach uses the File Type
-interface from the Malacology programmable store
+from each other. \textbf{In Cudele} the large inodes also store consistency and
+durability policies. This approach uses the File Type
+interface from the Malacology programmable storage
 system~\cite{sevilla:eurosys17} and it tells clients how to access the
 underlying metadata. The underlying implementation stores executable code in
 the inode that calls the different Cudele mechanisms. Of course, there are many
