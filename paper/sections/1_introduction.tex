@@ -12,15 +12,13 @@ is a storage client or application that interacts with the metadata server,
 ``administrator" is a system administrator that configures the storage, and
 ``end-users" interact with the file system via home directories or runtimes.  }
 is unreasonable. This problem is exacerbated by current hardware and software
-trends: parallel runtimes like Hadoop and Spark use storage systems to
-implement important scheduling and timing semantics and  \oldcomment{; for
-example, } HPC architectures are transitioning from complex storage stacks with
-burst buffer, file system, object store, and tape tiers to more simplified
-stacks with just a burst buffer and object
+trends; for example,  HPC architectures are transitioning from complex storage
+stacks with burst buffer, file system, object store, and tape tiers to more
+simplified stacks with just a burst buffer and object
 store~\cite{bent:login16-hpc-trends}. These types of trends put pressure on
 data access because more requests from different nodes end up hitting the same
-layers in parallel\oldcomment{and latencies cannot be hidden while data
-migrates across tiers}.
+software layers in parallel and latencies cannot be hidden while data migrates
+across tiers.
 
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
@@ -63,7 +61,7 @@ strong consistency/durability themselves.
 % What did we do
 %\footnote{HDFS itself is not directly evaluated in this paper, although the
 %semantics and their performance is explored in~\S\ref{sec:use-case-1}.} 
-To address this problem, we present an API and framework that lets developers
+To address this problem, we present an API and framework that lets administrators
 dynamically control the consistency and durability guarantees for subtrees in
 the file system namespace.  Figure~\ref{fig:subtree-policies} shows a potential
 setup in our proposed system where a single global namespace has subtrees for
