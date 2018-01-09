@@ -29,8 +29,8 @@ In this section we describe our API and framework that lets
 \oldcomment{users}\newcomment{administrators} assign consistency and durability
 semantics to subtrees in the global namespace. A \textbf{mechanism} is an
 abstraction and basic building block for constructing consistency and
-durability guarantees.\oldcomment{Cudele exposes these mechanisms and the
-users}\newcomment{ The administrator} composes these mechanisms together to
+durability guarantees. \oldcomment{Cudele exposes these mechanisms and the
+users}\newcomment{The administrator} composes these mechanisms together to
 construct \textbf{policies}.  These policies are assigned to subtrees and they
 dictate how the file system should handle operations within that subtree.
 Below, we describe the mechanisms (which are \underline{underlined}), the
@@ -92,15 +92,14 @@ back to the object store.
 %store from the client.  Next, we discuss how these mechanisms can be composed
 %to get different consistency and durability semantics. 
 
-\subsubsection{Mechanisms Used for Durability} \underline{Stream} is one of the
-mechanisms used by default in CephFS.  Using existing configuration settings we
-can turn Stream on and off.  If it is off, then the metadata servers will not
-save journals in the object store. For \underline{Local Persist}, clients write
-serialized log events to a file on local disk and for \underline{Global
-Persist}, clients push the journal into the object store. The overheads for
-both Local Persist and Global Persist is the write bandwidth of the local disk
-and object store, respectively.  These persist mechanisms are part of the
-library that links into the client.
+\subsubsection{Mechanisms Used for Durability} \underline{Stream}, the default
+setting in CephFS, saves a journal of metadata updates in the object store.
+Using existing configuration settings we can turn Stream on and off.  For
+\underline{Local Persist}, clients write serialized log events to a file on
+local disk and for \underline{Global Persist}, clients push the journal into
+the object store. The overheads for both Local Persist and Global Persist is
+the write bandwidth of the local disk and object store, respectively.  These
+persist mechanisms are part of the library that links into the client.
 
 \subsection{Defining Policies in Cudele}
 \label{sec:setting-policies-with-cudele}
@@ -144,7 +143,7 @@ updates are always recoverable.
 
 % which system they represent and which are impossible
 Existing, state-of-the-art systems in HPC can be represented by the cells in
-Table~\ref{table:spectrum} POSIX IO-compliant systems like CephFS and IndexFS
+Table~\ref{table:spectrum}. POSIX IO-compliant systems like CephFS and IndexFS
 have global consistency and durability\footnote{ IndexFS also has bulk merge
 which is a form of ``weak consistency"}; DeltaFS uses ``invisible" consistency
 and ``local" durability and BatchFS uses ``weak" consistency and ``local"
@@ -183,26 +182,27 @@ the system called a monitor, which manages cluster state changes.  Users
 present a directory path and a policies configuration that gets distributed and
 versioned by the monitor to all daemons in the system. For example,
 (msevilla/mydir, policies.yml) would decouple the path ``msevilla/mydir" and
-would apply the policies in ``policies.yml".  The policies file supports the
-following parameters (default values are in parenthesis): which consistency
-model to use (\texttt{RPCs}), which durability model to use (\texttt{stream}), 
-number of inodes to provision to the decoupled namespace (100), and which interfere
-policy to use, {\it i.e.} how to handle a request from another client
-targeted at this subtree (\texttt{allow}). The ``Consistency" and ``Durability"
-parameters are compositions of mechanisms; they can be serialized (\(+\)) or
-run in parallel (\(|\|\)).  ``Allocated Inodes" is a way for the application to
-specify how many files it intends to create. It is a contract so that the file
-system can provision enough resources for the incumbent merge and so it can
-give valid inodes to other clients. The inodes can be used anywhere within the
-decoupled namespace ({\it i.e.} at any depth in the subtree).  ``Interfere Policy"
-has two settings: \texttt{block} and \texttt{allow}.  For \texttt{block}, any
-requests to this part of the namespace returns with ``Device is busy", which
-will spare the metadata server from wasting resources for updates that may get
-overwritten. If the application does not mind losing updates, for example it
-wants approximations for results that take too long to compute, it can select
-\texttt{allow}. In this case, metadata from the interfering client will be
-written and the computation from the decoupled namespace will take priority at
-merge time because the results are more accurate.  Given these default values
-decoupling the namespace with an empty policies file would give the application
-100 inodes but the subtree would behave like the existing CephFS
-implementation.  
+would apply the policies in ``policies.yml". 
+
+The policies file supports the following parameters (default values are in
+parenthesis): which consistency model to use (\texttt{RPCs}), which durability
+model to use (\texttt{stream}), number of inodes to provision to the decoupled
+namespace (100), and which interfere policy to use, {\it i.e.} how to handle a
+request from another client targeted at this subtree (\texttt{allow}). The
+``Consistency" and ``Durability" parameters are compositions of mechanisms;
+they can be serialized (\(+\)) or run in parallel (\(||\)).  ``Allocated
+Inodes" is a way for the application to specify how many files it intends to
+create. It is a contract so that the file system can provision enough resources
+for the incumbent merge and so it can give valid inodes to other clients. The
+inodes can be used anywhere within the decoupled namespace ({\it i.e.} at any
+depth in the subtree).  ``Interfere Policy" has two settings: \texttt{block}
+and \texttt{allow}.  For \texttt{block}, any requests to this part of the
+namespace returns with ``Device is busy", which will spare the metadata server
+from wasting resources for updates that may get overwritten. If the application
+does not mind losing updates, for example it wants approximations for results
+that take too long to compute, it can select \texttt{allow}. In this case,
+metadata from the interfering client will be written and the computation from
+the decoupled namespace will take priority at merge time because the results
+are more accurate.  Given these default values decoupling the namespace with an
+empty policies file would give the application 100 inodes but the subtree would
+behave like the existing CephFS implementation.  

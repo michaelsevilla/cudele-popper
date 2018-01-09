@@ -35,9 +35,9 @@ cluster. Load balancing across a cluster of metadata servers with partitioning
 and replication can be explored with something like
 Mantle~\cite{sevilla:sc15-mantle}.  \newcomment{To make our results
 reproducible, this paper adheres to The Popper
-Convention~\cite{jimenez_popper_2016}, so experiments can be examined in more
+Convention~\cite{jimenez_popper_2016} so experiments can be examined in more
 detail, or even re-run, by visiting the \texttt{[source]} link next to each
-figure.  The source code is available on the Cudele branch~\cite{docs:cudele}
+figure.  The source code for Cudele is available on a branch~\cite{docs:cudele}
 of our Ceph fork.}
 
 %\newcomment{\indent We understand concerns about cluster size and network, especially
@@ -89,7 +89,7 @@ Cudele mechanisms for a single client creating files in the same directory, }
 100K files in a directory for various subtree configurations.
 Figure~\ref{fig:composable-mechanisms} shows the time that it takes each Cudele
 mechanism to process all metadata events.  Results are} normalized to the time
-it takes to write \oldcomment{100K file create} updates to the client's in-memory journal
+it takes to write \oldcomment{100K file create}updates to the client's in-memory journal
 ({\it i.e.} the Append Client Journal mechanism), which is about 11K creates/sec.  \newcomment{The first graph
 groups the consistency mechanisms, the second groups the durability mechanisms,
 and the third has compositions representing real-world systems.} \oldcomment{Stream is an
@@ -433,7 +433,7 @@ strong consistency with RPCs to mirror the setup from the problem presented in
 Figure~\ref{fig:overhead-b}. We configure one subtree with an interfere policy
 of ``allow" and another subtree with ``block" so \texttt{-EBUSY} is
 returned to interfering clients.  The former is the default behavior in file
-systems and the latter isolates performance from malicious clients.}
+systems and the latter isolates performance from interfering clients.}
 
 \oldcomment{We only scale to 15 clients because the performance variability of
 a nearly overloaded metadata server, in our case 18 clients, is too high.}
@@ -451,8 +451,8 @@ performance with and without an interfering client touching files in every
 directory, respectively. The goal is to explicitly isolate clients so that
 performance is similar to the ``no interference" curve, which has lower
 slowdowns (on average, \(1.42\times\) per client compared to \(1.67\times\) per
-client for ``interfere") and less variability (on average, a standard deviation
-of 0.06 compared to 0.44 for ``interfere").  ``Block interference" uses the
+client for ``interference") and less variability (on average, a standard deviation
+of 0.06 compared to 0.44 for ``interference").  ``Block interference" uses the
 Cudele API to block interfering clients and the slowdown (\(1.34\times\) per
 client) and variability (0.09) look very similar to ``no interference" for a
 larger number of clients. For smaller clusters the overhead to reject requests
@@ -483,7 +483,7 @@ of the progress. This practice is not too different from cloud systems that use 
 file system to manage the progress of jobs; Spark/Hadoop writes to temporary
 files, renames them when complete, and creates a ``DONE" file to indicate to
 the runtime that the task did not fail and should not be re-scheduled on
-another node. \newcomment{Also, the browser interface lets Hadoop/Spark users check
+another node. \newcomment{So the browser interface lets Hadoop/Spark users check
 progress by querying the file system and returning a \% of job complete
 metric.} 
 

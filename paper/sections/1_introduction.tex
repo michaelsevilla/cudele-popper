@@ -7,16 +7,20 @@ checkpointing~\cite{bent_plfs_2009} or scanning the file
 system~\cite{zheng:pdsw2014-batchfs}, contend for the same directories and
 inodes. Applications perform better with dedicated metadata
 servers~\cite{sevilla:sc15-mantle, ren:sc2014-indexfs} but provisioning a
-metadata server for every \newcomment{client} is unreasonable. This problem is
-exacerbated by current hardware and software trends: parallel runtimes like
-Hadoop and Spark use storage systems to implement important scheduling and
-timing semantics, and  \oldcomment{; for example, } HPC architectures are
-transitioning from complex storage stacks with burst buffer, file system,
-object store, and tape tiers to more simplified stacks with just a burst buffer
-and object store~\cite{bent:login16-hpc-trends}. These types of trends put
-pressure on data access because more requests from different nodes end up
-hitting the same layer in parallel and latencies cannot be hidden while data
-migrates across tiers.
+metadata server for every \newcomment{client}\footnote{In this paper, ``client"
+is a storage client or application that interacts with the metadata server,
+``administrator" is a system administrator that configures the storage, and
+``end-users" interact with the file system via home directories or runtimes.  }
+is unreasonable. This problem is exacerbated by current hardware and software
+trends: parallel runtimes like Hadoop and Spark use storage systems to
+implement important scheduling and timing semantics and  \oldcomment{; for
+example, } HPC architectures are transitioning from complex storage stacks with
+burst buffer, file system, object store, and tape tiers to more simplified
+stacks with just a burst buffer and object
+store~\cite{bent:login16-hpc-trends}. These types of trends put pressure on
+data access because more requests from different nodes end up hitting the same
+layers in parallel\oldcomment{and latencies cannot be hidden while data
+migrates across tiers}.
 
 % What is HPC doing?
 To address this, developers are relaxing the consistency and durability
@@ -46,15 +50,15 @@ a way to tell the file system that the subtree is important or may cause
 resource contention in the near-future~\cite{grider:pdsw2015-marfs,
 zheng:pdsw2015-deltafs, zheng:pdsw2014-batchfs, ren:sc2014-indexfs,
 bent:slides-twotiers}. Then the file system can change its internal structure
-to optimize performance. For example, the file system could enter a mode that
-prevents other clients from interfering with the decoupled directory.  This
-delayed merge ({\it i.e.} a form of eventual consistency) and relaxed
-durability improves performance and scalability by avoiding the costs of remote
-procedure calls (RPCs), synchronization, false sharing, and serialization.
-While the performance benefits of decoupling the namespace are obvious,
-applications that rely on the file system's guarantees must be deployed on an
-entirely different system or re-written to coordinate strong
-consistency/durability themselves. 
+to optimize performance. For example, the file system could enter a mode where
+clients with decoupled directories perform operations locally and bulk merge their
+updates at completion. This delayed merge ({\it i.e.} a form of eventual
+consistency) and relaxed durability improves performance and scalability by
+avoiding the costs of remote procedure calls (RPCs), synchronization, false
+sharing, and serialization.  While the performance benefits of decoupling the
+namespace are obvious, applications that rely on the file system's guarantees
+must be deployed on an entirely different system or re-written to coordinate
+strong consistency/durability themselves. 
 
 % What did we do
 %\footnote{HDFS itself is not directly evaluated in this paper, although the
@@ -91,7 +95,7 @@ contributions:
   \item
 
   \oldcomment{This framework lets subtrees with different semantics co-exist in
-a global namespace. We show how this} \newcomment{We show how that letting
+a global namespace. We show how this} \newcomment{We show that letting
 different semantics co-exist in a global namespace scales further and performs
 better than systems that use one strategy.}
 
@@ -114,19 +118,20 @@ semantics over {\it time and space}, where subtrees can change their semantics
 and migrate around the cluster without ever moving the data they reference.}
 
 % Results
-The results in this paper confirm the assertions of ``clean-state" research of
+The results in this paper confirm the assertions of ``clean-slate" research of
 decoupled namespaces; specifically that these techniques drastically improve
-performance.  We go a step further by quantifying the costs of merging updates
-(3.37\(\times\) slowdown) and maintaining durability (\(2.4\times\) slowdown).
-In our prototype, \newcomment{we also show how to assign subtree semantics for
-certain applications such as checkpoint-restart (\(91.7\times\) speedup if
-consistency is fully relaxed), user home directories (within a 0.03 standard
-deviation from optimal), and end-users checking for partial results (only a 2\%
-overhead).} \oldcomment{we get an 8\(\times\) speedup and can scale to twice as
-many clients when we assign a more relaxed form of consistency and durability
-to a subtree with a create-heavy workload.}  We use Ceph as a prototyping
-platform because it is used in cloud-based and data center systems and has a
-presence in HPC~\cite{wang:pdsw13-ceph-hpc}.
+performance.  We go a step further by quantifying the costs of traditional file
+system approaches to maintaining consistency (3.37\(\times\) slowdown) and
+durability (\(2.4\times\) slowdown).  In our prototype, \newcomment{we also
+show the benefits of assigning subtree semantics to certain applications such
+as checkpoint-restart (\(91.7\times\) speedup if consistency is fully relaxed),
+user home directories (within a 0.03 standard deviation from optimal), and
+end-users checking for partial results (only a 2\% overhead).} \oldcomment{we
+get an 8\(\times\) speedup and can scale to twice as many clients when we
+assign a more relaxed form of consistency and durability to a subtree with a
+create-heavy workload.}  We use Ceph as a prototyping platform because it is
+used in cloud-based and data center systems and has a presence in
+HPC~\cite{wang:pdsw13-ceph-hpc}.
 
 %In the remainder of the paper, Section~\ref{sec:posix-overheads} quantifies the
 %cost of POSIX IO consistency and system-defined durability and

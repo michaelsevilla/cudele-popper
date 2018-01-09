@@ -24,7 +24,7 @@ In addition to this cover letter, we have posted a
 online} explicitly showing additions in \textcolor{blue}{\textbf{blue}} and
 deletions in \textcolor{red}{\textbf{red}}. Three issues were common across
 reviewer feedback; Reviewer 1 and 3's comments are addressed in issues II and
-III, Reviewer 2's comments are addressed in issues I and III, and Reviewer 4's
+III, Reviewer 2's comments are addressed in all issues, and Reviewer 4's
 comments are addressed in issues I and II.  
 
 %Use Cases R2, R4
@@ -47,7 +47,7 @@ parallel and distributed computing.
 
 To align the paper to the themes of the conference, we changed Section~{\S}V-A
 and Figures 6a, 6b, and 6c to emphasize that decoupled namespaces facilitate
-client-driven parallelism, where clients detach subtrees form the global namespaces
+client-driven parallelism, where clients detach subtrees form the global namespace
 and do operations in-parallel to their local disk. We also hope that changes to
 the use cases above motivate the need for robust distributed storage systems
 that can handle today's applications.  So while the paper is storage-centric,
@@ -77,9 +77,9 @@ slowdown/speedup) and aligned Section~{\S}V with the graphs in Section~{\S}II.
 removing cross-references and adding baseline values so readers can calculate
 raw numbers from our speedup/slowdown graphs. 
 
-  \item explicitly state Cudele setups and subtree configurations in bold in
-Section~{\S}V-B to guide the reader through use cases and the effects of
-different Cudele API configurations.
+%  \item explicitly state Cudele setups and subtree configurations in bold in
+%Section~{\S}V-B to guide the reader through use cases and the effects of
+%different Cudele API configurations.
 
   \item removed ``major takeaways" from Section~{\S}V and focused on
 insights into results by analyzing raw numbers in comparison to hardware
@@ -90,7 +90,7 @@ explicit. We do not attempt to validate or prove any of the statements about
 the benefits of changing consistency and durability properties of a subtree
 dynamically, such as saving resource provisioning costs.  
 
-  \item clarified confusing terminology in Section~{\S}II: administrator refers
+  \item clarified confusing terminology in Section~{\S}I: administrator refers
 to a person that configures subtrees and client refers to a storage client or
 application that interacts with the metadata server. We avoid using the term
 ``user" except when referring to end-users that interact with home directories
@@ -104,16 +104,16 @@ in a file system or the Hadoop/Spark runtime itself.
 \section*{Issue III: No Experimental Setup (Reviewers 1, 2, and 3)}
 
 We apologize for the omission of experimental setup and source code details.
-We made artifacts available online for all experiments in the paper. For the
-experimental setup, we describe the cluster setup (hardware, software, etc.) in
-Section~{\S}V.  We have also made the infrastructure code available and added
-links after each figure to show exactly how experiments are run.  This
-infrastructure code contains scripts to deploy the system, run experiments, and
-gather results.  This process follows the \href{http://falsifiable.us/}{Popper
-Convention}, which aims to make research reproducible.  We also made the source
-code available online and a link is provided in Section~{\S}V. Finally, we add
-details about which tools and classes we modified in Section~{\S}IV to address
-Reviewer 1's questions about the framework implementation.
+For the experimental setup, we describe the cluster setup (hardware, software,
+etc.) in Section~{\S}V.  We have also made the infrastructure code available
+and added links after each figure to show exactly how experiments are run.
+This infrastructure code contains scripts to deploy the system, run
+experiments, and gather results.  This process follows the
+\href{http://falsifiable.us/}{Popper Convention}, which aims to make research
+reproducible.  We also made the source code available online and a link is
+provided in Section~{\S}V. Finally, we add details about which tools and
+code bases we modified in Section~{\S}IV to address Reviewer 1's questions about
+the framework implementation.
 
 \section*{Additional Cosmetic Fixes}
 %%Terminology
@@ -122,10 +122,10 @@ Reviewer 1's questions about the framework implementation.
 For Reviewer 1, we fixed user/client terminology in Section~{\S}III,
 clarified that the cost of dynamically changing semantics is future work in
 Sections~{\S}I and~{\S}III, and added source code pointers in Section~{\S}V.
-For Reviewer 2, we removed the major takeaways headings and cross-references in
+For Reviewer 2, we removed the major takeaway headings and cross-references in
 Section~{\S}V. For Reviewer 3, we quantified speedups with figure annotations
 in Section~{\S}V. For Reviewers 1 and 3, we added servers, network, and storage
-setups in Section~{\S}V. For Reviewer 4 we added descriptions to each use case
+setups in Section~{\S}V. For Reviewer 4, we added descriptions to each use case
 in Section~{\S}V describing how Cudele would work with Spark. 
 
 \end{document}

@@ -4,8 +4,8 @@ HPC and data center scale application developers are abandoning POSIX IO
 because file system metadata synchronization and serialization overheads of
 providing strong consistency and durability are too costly -- and often
 unnecessary -- for their applications.  Unfortunately, designing file systems
-with weaker consistency or durability semantics excludes applications that rely on
-stronger guarantees, forcing developers to re-write their applications or
+with weaker consistency or durability semantics excludes applications that rely
+on stronger guarantees, forcing developers to re-write their applications or
 deploy them on a different system.  We present a framework and API that lets
 \oldcomment{clients}\newcomment{administrators} specify their
 consistency/durability requirements and dynamically assign them to subtrees in
@@ -17,8 +17,8 @@ namespace to applications common in large data centers, }\newcomment{ we show
 performance improvements when we custom fit subtree semantics to applications
 such as checkpoint-restart (91.7\(\times\) speedup), user home directories
 (0.03 standard deviation from optimal), and users checking for partial results
-(2\% \oldcomment{clients}\newcomment{users} overhead).} \oldcomment{ and can
-scale to 2\(\times\) as many clients when compared to our baseline system.}
+(2\% overhead).} \oldcomment{ and can scale to 2\(\times\) as many clients when
+compared to our baseline system.}
 
 \end{abstract}
 

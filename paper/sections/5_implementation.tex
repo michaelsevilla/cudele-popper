@@ -3,7 +3,7 @@
 
 We use a programmable storage approach~\cite{sevilla:eurosys17} to design
 Cudele; namely, we try to leverage components inside CephFS to inherit the
-robustness and correctness of the internal subsystems. Using this `dirty-slate'
+robustness and correctness of the internal subsystems. Using this ``dirty-slate"
 approach, we only had to implement 4 of the 6 mechanisms from
 Figure~\ref{fig:decouple} and just 1 required changes to the underlying storage
 system itself.  In this section, we first describe a CephFS internal subsystem or
@@ -25,12 +25,14 @@ i.e.} in the collective memory of the metadata server cluster) and as objects
 in the object store. In the object store, directories and their inodes are
 stored together in objects to improve the performance of scans.  The metadata
 store data structure is structured as a tree of directory fragments making it
-easier to read and traverse. \textbf{In Cudele} the RPCs mechanism uses the
-metadata store to service requests. Using code designed for recovery,
+easier to read and traverse. \textbf{In Cudele,} the RPCs mechanism uses the
+in-memory metadata store to service requests. Using code designed for recovery,
 Volatile Apply and Nonvolatile Apply replay updates onto the metadata store in
-memory and in the object store, respectively.  When the clients are ready to
-merge their updates back into the global namespace, they pass a binary file of
-metadata updates to the metadata server. 
+memory and in the object store, respectively.  
+
+%When the clients are ready to
+%merge their updates back into the global namespace, they pass a binary file of
+%metadata updates to the metadata server. 
 
 %\noindent\textbf{Used to Implement}: RPCs, Stream, Volatile Apply
 
@@ -44,7 +46,7 @@ it is a log of metadata updates that can materialize the namespace when the
 updates are replayed onto the metadata store. The journal is a ``pile system";
 writes are fast but reads are slow because state must be reconstructed.
 Specifically, reads are slow because there is more state to read, it is
-unorganized, and many of the updates may be redundant.  \textbf{In Cudele} the
+unorganized, and many of the updates may be redundant.  \textbf{In Cudele,} the
 journal format is used by Stream, Append Client Journal, Local Persist, and
 Global Persist.  Stream is the default implementation for achieving global
 durability in CephFS but the rest of the mechanisms are implemented by writing
@@ -66,7 +68,7 @@ modify the journal. It can read the journal, export the journal as a file,
 erase events, and apply updates to the metadata store.  To apply journal
 updates to the metadata store, the journal tool reads the journal from object
 store objects and replays the updates on the metadata store in the object
-store.  \textbf{In Cudele} the external library the clients link into is based
+store.  \textbf{In Cudele,} the external library the clients link into is based
 on the journal tool. It already had functions for importing, exporting, and
 modifying the updates in the journal so we re-purposed that code to implement
 Append Client Journal, Volatile Apply, and Nonvolatile Apply.  
@@ -133,7 +135,7 @@ of the inode cache is configurable so as not to saturate the memory on the
 metadata server -- inodes in CephFS are about 1400
 bytes~\cite{docs:cephinternals}.  The inode cache has code for manipulating
 inode numbers, such as pre-allocating inodes to clients. \textbf{ In
-Cudele}, Nonvolatile Apply uses the internal inode cache code to allocate inodes
+Cudele,} Nonvolatile Apply uses the internal inode cache code to allocate inodes
 to clients that decouple parts of the namespace and to skip inodes used by the
 client at merge time.
 
@@ -145,7 +147,7 @@ the object store or for managing subtrees for load balancing. These policies
 adhere to logical partitionings of metadata or data, like Ceph pools and file
 system namespace subtrees. To implement this, the namespace data structure has
 the ability to recursively apply policies to subtrees and to isolate subtrees
-from each other. \textbf{In Cudele} the large inodes also store consistency and
+from each other. \textbf{In Cudele,} the large inodes also store consistency and
 durability policies. This approach uses the File Type
 interface from the Malacology programmable storage
 system~\cite{sevilla:eurosys17} and it tells clients how to access the
