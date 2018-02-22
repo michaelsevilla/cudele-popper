@@ -39,26 +39,24 @@ guarantees to subtrees in the global namespace, resulting in
 custom fit semantics for applications. We show how applications can co-exist and
 perform well in a global namespace and our prototype enables studies that
 adjust these semantics over {\it time and space}, where subtrees can change
-without ever moving the data they reference.
+without moving data they reference.`
 
 %This approach is superior to mounting different storage systems in a global
 %namespace because there is no need to provision dedicated storage clusters to
 %applications or move data between these systems.  
-Cudele prompts many avenues for future work.  First is to co-locate HPC
-workflows with real highly parallel runtimes from the cloud in the same
-namespace. This setup would show how Cudele reasonably incorporates both programming
-models (client-driven parallelism and user-defined workflows) at the same time
-and should show large performance gains.  Second is dynamically changing
-semantics of a subtree from stronger to weaker guarantees (or vice versa). This
-reduces data movement across storage cluster and file system boundaries so
-the results of a Hadoop job do not need to be migrated into CephFS for
-other processing; instead the \oldcomment{user}\newcomment{administrator} can
-change the semantics of the HDFS subtree into a CephFS subtree, which may cause
-metadata/data movement to ensure strong consistency. Third is embeddable
-policies, where child subtrees have specialized features but still maintain
-guarantees of their parent subtrees.  For example, a RAMDisk subtree is POSIX
-IO-compliant but relaxes durability constraints, so it can reside under a POSIX
-IO subtree alongside a globally durable subtree.
+\textbf{Future Work}: First is to co-locate HPC workflows with real highly
+parallel runtimes from the cloud in the same namespace. This setup would show
+how Cudele reasonably incorporates both programming models at the same time.
+Second is dynamically changing semantics of a subtree from stronger to weaker
+guarantees. This reduces data movement across storage cluster and file system
+boundaries so the results of a Hadoop job do not need to be migrated into
+CephFS for other processing; instead the
+\oldcomment{user}\newcomment{administrator} can change the semantics of the
+HDFS subtree into a CephFS subtree. Third is embeddable policies, where child
+subtrees have specialized features but still maintain guarantees of the
+parent subtree.  For example, a RAMDisk subtree is POSIX IO-compliant but
+relaxes durability, so it can reside under a POSIX IO subtree
+alongside a globally durable subtree.\vspace{-1ex}
 
 %Finally, our prototype enables
 %performance prediction because it helps administrators quantify the costs of

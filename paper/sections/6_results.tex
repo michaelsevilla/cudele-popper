@@ -36,7 +36,7 @@ cluster. Load balancing across a cluster of metadata servers with partitioning
 and replication can be explored with something like
 Mantle~\cite{sevilla:sc15-mantle}.  \newcomment{To make our results
 reproducible, this paper adheres to The Popper
-Convention~\cite{jimenez_popper_2016} so experiments can be examined in more
+Convention~\cite{jimenez:ipdpsw17-popper} so experiments can be examined in more
 detail, or even re-run, by visiting the \texttt{[source]} link next to each
 figure.  The source code for Cudele is available on a branch~\cite{docs:cudele}
 of our Ceph fork.}
@@ -61,20 +61,20 @@ of our Ceph fork.}
 
 \subsection{Microbenchmarks}
 \label{sec:microbenchmarks}
-\begin{figure}[tb]
-\centering
-\includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
-\caption{
-[\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-mechanisms/visualize/viz.ipynb}{source}]
-\newcomment{Overhead of processing 100K create events for each mechanism in
-\oldcomment{Table~\ref{table:mechanisms}}\newcomment{Figure~\ref{fig:decouple}},
-normalized to the runtime of writing events to client memory. The far right
-graph shows the overhead of building semantics of real world systems.}
-\oldcomment{Performance of each mechanism (left) and building the
-consistency/durability semantics of real-world systems (right) for 100K files
-creates from a single client. Results are normalized to the runtime of writing
-events to the client's in-memory journal.}\label{fig:composable-mechanisms}}
-\end{figure}
+%\begin{figure}[tb]
+%\centering
+%\includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
+%\caption{
+%[\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-mechanisms/visualize/viz.ipynb}{source}]
+%\newcomment{Overhead of processing 100K create events for each mechanism in
+%\oldcomment{Table~\ref{table:mechanisms}}\newcomment{Figure~\ref{fig:decouple}},
+%normalized to the runtime of writing events to client memory. The far right
+%graph shows the overhead of building semantics of real world systems.}
+%\oldcomment{Performance of each mechanism (left) and building the
+%consistency/durability semantics of real-world systems (right) for 100K files
+%creates from a single client. Results are normalized to the runtime of writing
+%events to the client's in-memory journal.}\vspace{-3ex}\label{fig:composable-mechanisms}}
+%\end{figure}
 
 %\begin{figure}[tb]
 %\centering
@@ -203,7 +203,7 @@ are less messages and consistency/durability code paths are bypassed. (b) shows
 how the allow/block API isolates directories from interfering clients. (c) is
 the slowdown of a single client syncing updates to the global namespace. The
 inflection point is the trade-off of frequent updates vs. larger journal
-files.}
+files.\vspace{-3ex}}
 \label{fig:use-cases}
 \end{figure*}
 
@@ -246,8 +246,7 @@ xzf}), where the file system services a flash crowd of creates across all
 directories as shown in Figure~\ref{fig:overhead-creates}.  But the workload
 also appears in cloud workloads: Hadoop/Spark use the file \newcomment{system
 to assign work units to workers and the performance is proportional to the
-open/create throughput of the underlying file system~\cite{xiao:socc15-shardfs,
-shi:vldb15-spark, shvachko:login2012-hdfs-scalability}; Big Data Benchmark jobs
+open/create throughput of the underlying file system~\cite{shi:vldb15-spark}; Big Data Benchmark jobs
 examined in~\cite{chaimov:hpdc16-spark} have on the order of 15,000 file opens
 or creates just to start a single Spark query and the Lustre system they tested
 on did not handle creates well, showing up to a \(24\times\) slowdown compared
@@ -504,16 +503,16 @@ the standard deviations of 3 runs.} We scale the namespace sync interval to
 show the trade-off of frequently pausing or writing large logs of updates.  We
 use an idle core to log the updates and to do the network transfer. The client
 only pauses to fork off a background process, which is expensive as the address
-space needs to be copied. The alternative is to pause the client completely and
-write the update to disk but since this implementation is limited by the speed
-of the disk, we choose the memory-to-memory copy of the fork approach.
+space needs to be copied.  As expected, syncing namespace updates too
+frequently has the highest overhead (up to 9\% overhead if done every second).
+The optimal sync interval for performance is 10 seconds, which only incurs 2\%
+overhead, because larger intervals must write more updates to disk and network.
+For the 25 second interval, the client only pauses 3-4 times but each sync
+writes about 278 thousand updates at once, which is a journal of size 678MB.
 
-As expected, syncing namespace updates too frequently has the highest overhead
-(up to 9\% overhead if done every second). The optimal sync interval for
-performance is 10 seconds, which only incurs 2\% overhead, because larger
-intervals must write more updates to disk and network. For the 25 second
-interval, the client only pauses 3-4 times but each sync writes about 278
-thousand updates at once, which is a journal of size 678MB.
+%The alternative is to pause the client completely and
+%write the update to disk but since this implementation is limited by the speed
+%of the disk, we choose the memory-to-memory copy of the fork approach.
 
 \oldcomment{\textbf{Takeaway}: Syncing namespace updates has up to a 9\%
 overhead and can be tuned depending on the users preference but, more

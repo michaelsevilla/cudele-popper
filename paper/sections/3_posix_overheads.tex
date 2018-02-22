@@ -6,7 +6,7 @@
 \caption{[\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/baseline-compile/visualize/viz.ipynb}{source}]
 For the CephFS metadata server, create-heavy workloads ({\it e.g.},
 \texttt{untar}) incur the highest disk, network, and CPU utilization because of
-consistency/durability demands.}\label{fig:overhead-creates}
+consistency/durability demands.\vspace{-3ex}}\label{fig:overhead-creates}
 \end{figure}
 
 In our examination of the overheads of POSIX IO we benchmark and analyze
@@ -68,7 +68,7 @@ and (c) highlights the cause: }\oldcomment{The overhead of durability and
 strong consistency in CephFS. (a) shows the effect of different journal segment
 sizes, which are streamed into the object store for fault tolerance. (b) and
 (c) show that} when another client interferes, capabilities are revoked and
-metadata servers do more work.} \label{fig:overhead}
+metadata servers do more work.\vspace{-3ex}} \label{fig:overhead}
 \end{figure*}
 
 % what is durability
@@ -85,8 +85,8 @@ of failure, metadata will be lost when components die in a None configuration.
 
 % - sequential IO, trim redundant operations
 \textbf{CephFS Design}: A journal of metadata updates that streams into the
-resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} and
-WAFL~\cite{hitz:wtec1994-WAFL} the metadata journal is designed to be large (on
+resilient object store. Similar to LFS~\cite{rosenblum:acm1992-LFS} 
+the metadata journal is designed to be large (on
 the order of MBs) which ensures (1) sequential writes into the object store and
 (2) the ability for daemons to trim redundant or irrelevant journal entries.
 The journal is striped over objects where multiple journal updates can reside

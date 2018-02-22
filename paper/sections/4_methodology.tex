@@ -1,15 +1,56 @@
 \section{Methodology: Global Namespace, Subtree Consistency/Durability}
 \label{sec:methodology-decoupled-namespaces}
 
-\begin{figure}[tb]
-\centering
-%\includegraphics[width=50mm]{figures/fig-decouple.png}
-\includegraphics[width=1.0\linewidth]{figures/fig-decouple.png}
-\caption{Illustration of the \textbf{mechanisms} used by applications to build
-consistency/durability semantics. Descriptions are provided by the
-underlined words in Section~\S\ref{sec:the-cudelesfs-mechanisms}.
-}\label{fig:decouple}
-\end{figure}
+\begin{figure*}[tb]
+  \centering
+  \begin{subfigure}[b]{.32\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/fig-decouple0.png}
+    \caption{Cudele \textbf{mechanisms}
+    }\label{fig:decouple}
+  \end{subfigure}
+  \begin{subfigure}[b]{.32\linewidth}
+    \centering
+    \scalebox{0.7}{
+    \begin{tabular}{ l | l | l | l }
+      C \(\rightarrow\) &&& \\
+      D \(\downarrow\)  & invisible             & weak                  & strong  \\\hline
+      none              & append client journal & append client journal & RPCs    \\
+                        &                       & +volatile apply       &         \\
+                        &                       &                       &         \\\hdashline
+      local             & append client journal & append client journal & RPCs    \\
+                        & +local persist        & +local persist        & +local  \\
+                        &                       & +volatile apply       & persist \\
+                        &                       &                       &         \\\hdashline
+      global            & append client journal & append client journal & RPCs    \\
+                        & +global persist       & +global persist       & +stream \\
+                        &                       & +volatile apply       &         \\
+    \end{tabular}}
+    \caption{building guarantees from mechanisms
+    }\label{table:spectrum}
+  \end{subfigure}
+  \begin{subfigure}[b]{.32\linewidth}
+    \includegraphics[width=1.0\linewidth]{graphs/composable-mechanisms.png}
+    \caption{
+    [\href{https://github.com/michaelsevilla/cudele-popper/blob/master/experiments/cudele-mechanisms/visualize/viz.ipynb}{source}]
+    \textbf{mechanism} performance
+    }\label{fig:composable-mechanisms}
+  \end{subfigure}
+  \caption{Cudele mechanism performance.
+    (a) is an illustration of the \textbf{mechanisms} used by applications to build
+    semantics. Descriptions are provided by the
+    underlined words in Section~\S\ref{sec:the-cudelesfs-mechanisms}.
+    (b) shows how users can explore the consistency (C) and
+    durability (D) spectrum by composing Cudele mechanisms.
+    \newcomment{(c) shows the overhead of processing 100K create events for each mechanism in
+    \oldcomment{Table~\ref{table:mechanisms}}\newcomment{Figure~\ref{fig:decouple}},
+    normalized to the runtime of writing events to client memory. The far right
+    graph shows the cost of building real world systems.}
+    \oldcomment{Performance of each mechanism (left) and building the
+    consistency/durability semantics of real-world systems (right) for 100K files
+    creates from a single client. Results are normalized to the runtime of writing
+    events to the client's in-memory journal.}\vspace{-3ex}}
+\end{figure*}
 
 %\begin{table}
 %\begin{tabular}{ r | l }
@@ -103,27 +144,6 @@ persist mechanisms are part of the library that links into the client.
 
 \subsection{Defining Policies in Cudele}
 \label{sec:setting-policies-with-cudele}
-
-\begin{table}[t]
-\begin{center}
-\begin{tabular}{ l | l | l | l }
-  C \(\rightarrow\) &&& \\  
-  D \(\downarrow\)  	     & invisible         & weak        & strong  \\\hline
-  none                       & append client journal            & append client journal          & RPCs    \\
-                             &                   & +volatile apply &         \\\hdashline
-  local                      & append client journal            & append client journal          & RPCs    \\
-                             & +local persist    & +local persist  & +local  \\
-                             &                   & +volatile apply &  persist\\\hdashline
-  global                     & append client journal            & append client journal          & RPCs    \\
-                             & +global persist   & +global persist & +stream \\
-                             &                   & +volatile apply &         \\
-\end{tabular}
-
-\caption{Users can explore the consistency (C) and
-durability (D) spectrum by composing Cudele mechanisms. 
-\label{table:spectrum}}
-\end{center}
-\end{table}
 
 % describe table
 The spectrum of consistency and durability guarantees that
