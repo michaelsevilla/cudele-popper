@@ -165,8 +165,7 @@ merges, applications needing some degree of ground truth can either manage
 consistency themselves on a read or add a bolt-on service to manage the
 consistency. For (2), if the client fails and stays down, all metadata
 operations on the decoupled namespace are lost. If the client recovers, the
-on-disk structures (for BatchFS and DeltaFS this is the SSTables used in
-TableFS) can be recovered. In other words, the clients have state that cannot
+on-disk structures can be recovered. In other words, the clients have state that cannot
 be recovered if the node stays failed and any progress will be lost. This
 scenario is a disaster for checkpoint-restart where missed cycles may cause the
 checkpoint to bleed over into computation time. For (3), decoupled namespace

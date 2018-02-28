@@ -133,15 +133,16 @@ to flush ({\it i.e.} apply journal updates) to the metadata store.  The journal
 overhead is sufficient enough to slow down metadata throughput but not so much
 as to overwhelm the bandwidth of the object store.}
 
-\textbf{Comparison to decoupled namespaces}: For BatchFS, if a client fails
-when it is writing to the local log-structured merge tree (implemented as an
-SSTable~\cite{ren:atc2013-tablefs}) then unwritten metadata operations are
-lost. For DeltaFS, if the client fails then, on restart, the computation does
-the work again -- since the snapshots of the namespace are never globally
-consistent and there is no ground truth.  On the server side, BatchFS and
-DeltaFS use IndexFS~\cite{ren:sc2014-indexfs}. IndexFS writes metadata to
-SSTables, which initially reside in memory but are later flushed to the
-underlying distributed file system.
+\textbf{Comparison to decoupled namespaces}: For BatchFS and DeltaFS, if the
+client fails and stays down then computation must be done again because the
+metadata updates were never globally consistent.  Both systems write metadata
+to log-structured merge trees (implemented as
+SSTables~\cite{ren:atc2013-tablefs}) so updates initially reside in memory but
+are later flushed to the underlying file system. As a result, after a client
+crash, updates that have not been written safely to disk may be lost.  On the
+server side, BatchFS and DeltaFS use IndexFS~\cite{ren:sc2014-indexfs}.
+IndexFS writes metadata to SSTables as well but writes to lower tiers are
+globally persisted in a distributed file system.
 
 \subsection{Strong Consistency}
 \label{sec:strong-consistency}

@@ -20,7 +20,7 @@ application}.
 \newcomment{\indent We graph standard deviations for three runs (sometimes
 error bars are too small to see) and normalize results to make our results more
 generally applicable to different hardware. We use a CloudLab cluster of 34
-nodes connected with 10Gbit ethernet, each with 16 2.4 GHz CPUs, 128GB RAM, and
+nodes connected with 10Gbit ethernet, each with 2 2.4 GHz CPUs (16 total cores), 128GB RAM, and
 400GB SSDs.  Each node uses Ubuntu 14.04 and we develop on Ceph's Jewel
 release, version 10.2.1, which was released in May 2016. We use 1 monitor
 daemon, 3 object storage daemons, 1 metadata server daemon, and up to 20
@@ -253,7 +253,7 @@ creates just to start a single Spark query and the Lustre system they tested on
 did not handle creates well, showing up to a \(24\times\) slowdown compared to
 other metadata operations. Common approaches to solve these types of
 bottlenecks is to change the application behavior or to design a new file
-system, like BatchFS or DeltaFS, that uses one set of metadata optimizations
+system that uses one set of metadata optimizations
 for the entire namespace.} \oldcomment{ abstraction to exchange work units to
 workers or to indicate when jobs complete  The workload is clients creating
 100K files in private directories in the same global namespace.}
@@ -316,7 +316,7 @@ the same for all schemes.}
 
 \newcomment{ ``Decoupled: merge + create" outperforms ``RPCs" by \(3.37\times\)
 because ``decoupled: merge + create" uses a relaxed form of consistency and
-leverages bulk updates just like DeltaFS~\cite{zheng:pdsw2015-deltafs}.
+leverages bulk updates just like DeltaFS.
 Decoupled namespaces (1)} place no restrictions on the validity of metadata
 inserted into the journal ({\it e.g.}, never checking for the existence of
 files before creating files), \newcomment{(2)} avoid touching poorly scaling
