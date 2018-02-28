@@ -128,19 +128,20 @@ RPCs is to use leases or capabilities.
 %are much shorter, on the order of microseconds.
 
 % Non POSIX IO
-High performance computing has unique requirements for file systems ({\it
-e.g.}, fast creates) and well-defined workloads ({\it e.g.}, workflows) that
-make relaxing POSIX IO sensible.  BatchFS assumes the application coordinates
-accesses to the namespace, so the clients can batch local operations and merge
-with a global namespace image lazily. Similarly, DeltaFS eliminates RPC
-traffic using subtree snapshots for non-conflicting workloads and middleware
-for conflicting workloads. MarFS gives users the ability to lock
-``project directories" and allocate GPFS clusters for demanding metadata
-workloads. TwoTiers eliminates high-latencies by storing metadata in a flash
-tier; applications lock the namespace so that metadata can be accessed more quickly.
-Unfortunately, decoupling the namespace has costs: (1) merging metadata state
-back into the global namespace is slow; (2) failures are local to the failing
-node; and (3) the systems are not backwards compatible. 
+High performance computing has unique requirements for file systems and
+well-defined workloads that make relaxing POSIX IO sensible.  BatchFS assumes
+the application coordinates accesses to the namespace, so the clients can batch
+local operations and merge with a global namespace image lazily. Similarly,
+DeltaFS eliminates RPC traffic using subtree snapshots for non-conflicting
+workloads and middleware for conflicting workloads.
+MarFS~\cite{grider:pdsw2015-marfs} gives users the ability to lock ``project
+directories" and allocate clusters for demanding metadata workloads.
+TwoTiers~\cite{bent:slides-twotiers} eliminates high-latencies by storing
+metadata in a flash tier; applications lock the namespace so that metadata can
+be accessed more quickly.  Unfortunately, decoupling the namespace has costs:
+(1) merging metadata state back into the global namespace is slow; (2) failures
+are local to the failing node; and (3) the systems are not backwards
+compatible.
 
 % NON POSIX IO
 %Decoupling the namespaces has many advantages, including improved scalability,

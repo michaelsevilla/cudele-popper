@@ -64,7 +64,7 @@
 % draft mode.
 %
 %\documentclass[10pt, conference, compsocconf]{IEEEtran}
-\documentclass[conference]{IEEEtran}
+\documentclass[10pt, conference]{IEEEtran}
 % Add the compsocconf option for Computer Society conferences.
 %
 % If IEEEtran.cls has not been installed into the LaTeX system files,
@@ -86,13 +86,13 @@
 %    urlcolor=cyan,
 %}
 %\usepackage[noadjust]{cite}
-\let\OLDthebibliography\thebibliography
-\renewcommand\thebibliography[1]{
-  \OLDthebibliography{#1}
-  \setlength{\parskip}{0pt}
-  \setlength{\itemsep}{0pt plus 0.3ex}
-}
-\setlength{\belowcaptionskip}{-5pt}
+%\let\OLDthebibliography\thebibliography
+%\renewcommand\thebibliography[1]{
+%  \OLDthebibliography{#1}
+%  \setlength{\parskip}{0pt}
+%  \setlength{\itemsep}{0pt plus 0.3ex}
+%}
+\setlength{\belowcaptionskip}{-6pt}
 \usepackage{caption}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -614,11 +614,13 @@ file systems; high performance computing; data storage systems; system software
 
 
 % use section* for acknowledgement
-\section*{Acknowledgment}
+\section*{Acknowledgments}
 
-We thank the IPDPS reviewers for their helpful suggestions. This work was
-supported by the DOE grant number DE-SC0016074, the NSF grant number 1450488,
-and the Center for Research in Open Source Software. 
+We thank the IPDPS reviewers for their helpful suggestions.  This work is
+supported by the Center for Research in Open Source Software
+(\href{https://cross.soe.ucsc.edu}{cross.soe.ucsc.edu}), the U.S.  Department
+of Energy's Office of Science, under the grant number DE-SC0016074, and the
+NSF, under the award number 1450488.
 
 
 %The authors would like to thank...

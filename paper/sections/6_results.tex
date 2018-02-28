@@ -36,7 +36,7 @@ cluster. Load balancing across a cluster of metadata servers with partitioning
 and replication can be explored with something like
 Mantle~\cite{sevilla:sc15-mantle}.  \newcomment{To make our results
 reproducible, this paper adheres to The Popper
-Convention~\cite{jimenez_popper_2016} so experiments can be examined in more
+Convention~\cite{jimenez:ipdpsw17-popper} so experiments can be examined in more
 detail, or even re-run, by visiting the \texttt{[source]} link next to each
 figure.  The source code for Cudele is available on a branch~\cite{docs:cudele}
 of our Ceph fork.}
@@ -247,11 +247,11 @@ directories as shown in Figure~\ref{fig:overhead-creates}.  But the workload
 also appears in cloud workloads: Hadoop/Spark use the file \newcomment{system
 to assign work units to workers and the performance is proportional to the
 open/create throughput of the underlying file system~\cite{xiao:socc15-shardfs,
-shi:vldb15-spark, shvachko:login2012-hdfs-scalability}; Big Data Benchmark jobs
-examined in~\cite{chaimov:hpdc16-spark} have on the order of 15,000 file opens
-or creates just to start a single Spark query and the Lustre system they tested
-on did not handle creates well, showing up to a \(24\times\) slowdown compared
-to other metadata operations. Common approaches to solve these types of
+shi:vldb15-spark}; Big Data Benchmark jobs examined
+in~\cite{chaimov:hpdc16-spark} have on the order of 15,000 file opens or
+creates just to start a single Spark query and the Lustre system they tested on
+did not handle creates well, showing up to a \(24\times\) slowdown compared to
+other metadata operations. Common approaches to solve these types of
 bottlenecks is to change the application behavior or to design a new file
 system, like BatchFS or DeltaFS, that uses one set of metadata optimizations
 for the entire namespace.} \oldcomment{ abstraction to exchange work units to
